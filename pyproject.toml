@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "petri-net"
+version = "0.1.0"
+description = ""
+authors = [
+    "Michał Mastej <m.mastej1812@gmail.com>",
+    "Juliusz Tarnowski <juliusz.stanislaw.tarnowski@gmail.com>"
+]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pyqt5 = "^5.15.11"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
