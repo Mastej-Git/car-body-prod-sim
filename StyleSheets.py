@@ -1,0 +1,118 @@
+style_sheet_QPushButton = """
+QPushButton {
+    background-color: #404040;
+    color: #00ffff;
+    border: 1px solid #404040;
+    height: 50px;
+}
+
+QPushButton:hover {
+    background-color: #2e2e2e;
+    border: 1px solid #00ffff;
+}
+"""
+
+style_sheet_QComboBox = """
+QComboBox {
+    background-color: #404040;
+    color: #00ffff;
+    height: 40px;
+    border: 1px solid #404040;
+    padding: 5px;
+    border-radius: 3px;
+    combobox-popup: 0;
+}
+
+QComboBox:hover {
+    background-color: #2e2e2e;
+    border: 1px solid #00ffff;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 15px;
+    border-left-width: 1px;
+    border-left-color: #00ffff;
+    border-left-style: solid;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
+    background-color: #404040;
+}
+
+QComboBox::down-arrow {
+    image: url(down-arrow.png);
+    width: 10px;
+    height: 10px;
+}
+
+QComboBox QAbstractItemView {
+    background-color: #404040;
+    color: #00ffff;
+    selection-background-color: #2e2e2e;
+    selection-color: #00ffff;
+    border: 1px solid #00ffff;
+}
+"""
+
+style_sheet_label = """
+QLabel {
+    color: #00ffff;
+    padding: 5px;
+    border-radius: 3px;
+    height: 30px;
+}
+"""
+
+style_sheet_tab = """
+QTabWidget::pane { 
+    border: none; 
+}
+
+QTabBar::tab {
+    background: #2e2e2e; 
+    color: #b1b1b1; 
+    width: 260px; 
+    height: 40px;
+}
+
+QTabBar::tab:selected { 
+    background: #404040; 
+    color: #00ffff; 
+    font-weight: bold;
+}
+"""
+
+style_sheet_sub_tab = """
+QTabBar::tab {
+    background: #2e2e2e;
+    color: #b1b1b1;
+    width: 50px;
+    height: 120px;
+}
+
+QTabBar::tab:selected {
+    background: #404040;
+    color: #00ffff;
+    font-weight: bold;
+}
+"""
+
+style_sheet_app = """
+QWidget {
+    background-color: #2e2e2e;
+    color: #b1b1b1;
+}
+
+QLabel {
+    color: #b1b1b1;
+}
+"""
+
+style_sheet_central_widget = """
+QFrame {
+    border: 1px solid #2e2e2e;
+    border-radius: 10px;
+    background-color: #2e2e2e;
+}
+"""

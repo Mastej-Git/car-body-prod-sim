@@ -4,91 +4,9 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt
 
-
-style_sheet_QPushButton = """
-            QPushButton {
-                background-color: #404040;
-                color: #00ffff;
-                border: 1px solid #404040;
-                height: 50px;
-            }
-            QPushButton:hover {
-                background-color: #2e2e2e;
-                border: 1px solid #00ffff;
-            }
-        """
-
-style_sheet_QComboBox = """
-QComboBox {
-    background-color: #404040;
-    color: #00ffff;
-    height: 40px;
-    border: 1px solid #404040;
-    padding: 5px;
-    border-radius: 3px;
-    combobox-popup: 0;
-}
-
-QComboBox:hover {
-    background-color: #2e2e2e;
-    border: 1px solid #00ffff;
-}
-
-QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 15px;
-    border-left-width: 1px;
-    border-left-color: #00ffff;
-    border-left-style: solid;
-    border-top-right-radius: 3px;
-    border-bottom-right-radius: 3px;
-    background-color: #404040;
-}
-
-QComboBox::down-arrow {
-    image: url(down-arrow.png);
-    width: 10px;
-    height: 10px;
-}
-
-QComboBox QAbstractItemView {
-    background-color: #404040;
-    color: #00ffff;
-    selection-background-color: #2e2e2e;
-    selection-color: #00ffff;
-    border: 1px solid #00ffff;
-}
-"""
-
-style_sheet_label = """
-QLabel {
-    color: #00ffff;
-    padding: 5px;
-    border-radius: 3px;
-    height: 30px;
-}
-"""
-
-
-class Cup():
-
-    def __init__(self, material, size) -> None:
-        self.material = material
-        self.size = size
-
-class AirConditioning():
-
-    def __init__(self, refrigerant_type, compressor_type, heat_exchanger_efficiency):
-        self.refrigerant_type = refrigerant_type
-        self.compressor_type = compressor_type
-        self.heat_exchanger_efficiency = heat_exchanger_efficiency
-
-class Corps():
-
-    def __init__(self, cup: Cup, air_conditioning: AirConditioning) -> None:
-        self.cup = cup
-        self.air_conditioning = AirConditioning            
+from Cup import Cup
+from AirConditioning import AirConditioning
+from StyleSheets import *
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -100,40 +18,19 @@ class GUI(QMainWindow):
         self.setGeometry(100, 100, 800, 1000)
 
         central_widget = QFrame()
-        central_widget.setStyleSheet("""
-            QFrame {
-                border: 1px solid #2e2e2e;
-                border-radius: 10px;
-                background-color: #2e2e2e;
-            }
-        """)
+        central_widget.setStyleSheet(style_sheet_central_widget)
         layout = QVBoxLayout(central_widget)
 
         self.tabs = QTabWidget()
         self.tabs.tabBar().setExpanding(True)
-        self.tabs.setStyleSheet("""
-            QTabWidget::pane { 
-                border: none; 
-            }
-            QTabBar::tab {
-                background: #2e2e2e; 
-                color: #b1b1b1; 
-                width: 260px; 
-                height: 40px;
-            }
-            QTabBar::tab:selected { 
-                background: #404040; 
-                color: #00ffff; 
-                font-weight: bold;
-            }
-        """)
+        self.tabs.setStyleSheet(style_sheet_tab)
 
         
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
-        self.tabs.addTab(self.tab1, "Add Corps")
-        self.tabs.addTab(self.tab2, "Current corps state")
+        self.tabs.addTab(self.tab1, "Add Body")
+        self.tabs.addTab(self.tab2, "Current Body state")
         self.tabs.addTab(self.tab3, "Gantt chart")
 
         self.create_tab_content()
@@ -144,19 +41,7 @@ class GUI(QMainWindow):
         layout1 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
         sub_tab_widget.setTabPosition(QTabWidget.West)
-        sub_tab_widget.setStyleSheet("""
-            QTabBar::tab {
-                background: #2e2e2e;
-                color: #b1b1b1;
-                width: 50px;
-                height: 120px;
-            }
-            QTabBar::tab:selected {
-                background: #404040;
-                color: #00ffff;
-                font-weight: bold;
-            }
-        """)
+        sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
 
         sub_tab1 = QWidget()
         sub_tab2 = QWidget()
@@ -292,7 +177,6 @@ class GUI(QMainWindow):
         button3.setFixedSize(200, 40)
 
         buttons_layout = QVBoxLayout()
-        # buttons_layout.setContentsMargins(0, 0, 0, 0)
         buttons_layout.addWidget(button1)
         buttons_layout.addWidget(button2)
         buttons_layout.addWidget(button3)
@@ -329,15 +213,7 @@ class GUI(QMainWindow):
 
 def main():
     app = QApplication([])
-    app.setStyleSheet("""
-        QWidget {
-            background-color: #2e2e2e;
-            color: #b1b1b1;
-        }
-        QLabel {
-            color: #b1b1b1;
-        }
-    """)
+    app.setStyleSheet(style_sheet_app)
     window = GUI()
     window.show()
     app.exec_()
