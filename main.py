@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QStackedWidget, 
-    QFrame, QSizePolicy, QGroupBox, QComboBox
+    QFrame, QSizePolicy, QGroupBox, QComboBox, QScrollArea
 )
 from PyQt5.QtCore import Qt
 
@@ -11,6 +11,8 @@ from StyleSheets import *
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.body_counter = 0
 
         self.cup = Cup("", "")
 
@@ -33,11 +35,11 @@ class GUI(QMainWindow):
         self.tabs.addTab(self.tab2, "Current Body state")
         self.tabs.addTab(self.tab3, "Gantt chart")
 
-        self.create_tab_content()
+        self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
 
-    def create_tab_content(self):
+    def create_tabs_content(self):
         layout1 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
         sub_tab_widget.setTabPosition(QTabWidget.West)
@@ -46,6 +48,8 @@ class GUI(QMainWindow):
         sub_tab1 = QWidget()
         sub_tab2 = QWidget()
         sub_tab3 = QWidget()
+
+        self.gowno = 1
 
         sub_tab1 = self.create_sub_tab_cup_content()
 
@@ -80,26 +84,23 @@ class GUI(QMainWindow):
         layout1.addWidget(overlay_widget)
         self.tab1.setLayout(layout1)
 
-        layout2 = QVBoxLayout()
-        layout2.addWidget(QLabel("This is the content of Tab 2"))
+        self.layout = QVBoxLayout()
 
-        group_box1 = QGroupBox()
-        group_box1 = self.create_group_box_corpse()
-        group_box1.setFixedSize(800, 200)
-        group_box2 = QGroupBox()
-        group_box2 = self.create_group_box_corpse()
-        group_box2.setFixedSize(800, 200)
+        self.starting_label = QLabel("There are no bodys in the making")
+        self.starting_label.setStyleSheet(style_sheet_label)
+        self.starting_label.setAlignment(Qt.AlignCenter)
 
-        outer_layout = QVBoxLayout()
-        outer_layout.addWidget(group_box1)
-        outer_layout.addWidget(group_box2)
-        self.tab2.setLayout(outer_layout)
+        self.scroll_area = QScrollArea()
+        self.scroll_widget = QWidget()
+        self.outer_layout = QVBoxLayout(self.scroll_widget)
 
-        # Set the initial size and resize policy
-        # layout2.setMinimumHeight(200)
-        # layout2.setMinimumWidth(400)
-        # layout2.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        # self.tab2.setLayout(layout2)
+        self.scroll_widget.setLayout(self.outer_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
+        self.scroll_area.setWidgetResizable(True)
+
+        self.outer_layout.addWidget(self.starting_label)
+        self.layout.addWidget(self.scroll_area)
+        self.tab2.setLayout(self.layout)
 
         layout3 = QVBoxLayout()
         layout3.addWidget(QLabel("This is the content of Tab 3"))
@@ -158,7 +159,7 @@ class GUI(QMainWindow):
 
         return sub_tab_cup
     
-    def create_group_box_corpse(self):
+    def create_group_box_body(self):
         group_box = QGroupBox()
 
         label = QLabel("This is a label. The label text will determine the height of the label.")
@@ -210,6 +211,16 @@ class GUI(QMainWindow):
 
     def on_change_pb(self):
         print(f"Cup added with parameters: {self.cup.material}, {self.cup.size}")
+
+        group_box1 = QGroupBox()
+        self.body_counter += 1
+        group_box1 = self.create_group_box_body()
+        group_box1.setFixedSize(738, 200)
+        if (self.body_counter == 1):
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        self.outer_layout.addWidget(group_box1)
 
 def main():
     app = QApplication([])
