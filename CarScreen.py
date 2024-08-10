@@ -8,3 +8,8 @@ class CarScreen():
     def check_activation(self):
         if self.type != "" and self.size != "":
             self.is_activated = True
+
+    def remove_parameters(self):
+        self.type = ""
+        self.size = ""
+        self.is_activated = False

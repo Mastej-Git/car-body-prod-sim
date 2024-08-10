@@ -12,10 +12,10 @@ from StyleSheets import *
 
 class CarBodyGroupBox():
 
-    def __init__(self, body: Body, index: int) -> None:
+    def __init__(self, body: Body) -> None:
+        
         self.group_box = QGroupBox()
         self.body = body
-        self.index = index
 
         label_text = self.create_label()
 
@@ -24,15 +24,14 @@ class CarBodyGroupBox():
         label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         label.setStyleSheet(style_sheet_label)
 
-        button_schedule = self.create_push_button("Schedule", 200, 40)
-        button_schedule.clicked.connect(self.clicked_pb_gb)
-        button_remove = self.create_push_button("Remove", 200, 40)
-        button_edit = self.create_push_button("Edit", 200, 40)
+        self.button_schedule = self.create_push_button("Schedule", 200, 40)
+        self.button_remove = self.create_push_button("Remove", 200, 40)
+        self.button_edit = self.create_push_button("Edit", 200, 40)
 
         buttons_layout = QVBoxLayout()
-        buttons_layout.addWidget(button_schedule)
-        buttons_layout.addWidget(button_remove)
-        buttons_layout.addWidget(button_edit)
+        buttons_layout.addWidget(self.button_schedule)
+        buttons_layout.addWidget(self.button_remove)
+        buttons_layout.addWidget(self.button_edit)
 
         main_layout = QHBoxLayout()
 
@@ -61,10 +60,6 @@ class CarBodyGroupBox():
         button.setFixedSize(size_x, size_y)
 
         return button
-    
-    def clicked_pb_gb(self):
-        self.index += 1
-
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -73,8 +68,6 @@ class GUI(QMainWindow):
         self.body_counter = 0
 
         self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""))
-        # self.cup = Cup("", "")
-        # self.car_screen = CarScreen("", "")
 
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 800, 1000)
@@ -112,10 +105,6 @@ class GUI(QMainWindow):
         self.gowno = 1
 
         sub_tab1 = self.create_sub_tab_cup_content()
-
-        # sub_layout2 = QVBoxLayout()
-        # sub_layout2.addWidget(QLabel("This is the content of Sub-Tab 2"))
-        # sub_tab2.setLayout(sub_layout2)
 
         sub_tab2 = self.create_sub_tab_screen_content()
 
@@ -279,9 +268,8 @@ class GUI(QMainWindow):
         return sub_tab_cup
     
     def create_group_box_body(self):
-        car_body_group_box = CarBodyGroupBox(self.body, self.body_counter)
-
-        return car_body_group_box
+        self.car_body_group_box = CarBodyGroupBox(self.body)
+        self.car_body_group_box.button_schedule.pressed.connect(self.on_schedule_clicked)
 
     def on_change_cbox_cup_material(self, index):
         print(f"Selected material index: {index}")
@@ -326,16 +314,16 @@ class GUI(QMainWindow):
     def on_change_pb_cup(self):
         print(f"Cup added with parameters: {self.body.cup.material}, {self.body.cup.size}")
 
-        group_box1 = self.create_group_box_body()
-        group_box1.group_box.setFixedSize(738, 200)
+        self.create_group_box_body()
+        self.car_body_group_box.group_box.setFixedSize(738, 200)
         if (self.body_counter == 0):
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
 
-        if self.outer_layout.count() > 0:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(0).widget())
-        self.outer_layout.addWidget(group_box1.group_box)
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
 
     def on_change_cbox_screen_type(self, index):
         print(f"Selected material index: {index}")
@@ -380,16 +368,16 @@ class GUI(QMainWindow):
     def on_change_pb_screen(self):
         print(f"Screen added with parameters: {self.body.car_screen.type}, {self.body.car_screen.size}")
 
-        group_box = self.create_group_box_body()
-        group_box.group_box.setFixedSize(738, 200)
+        self.create_group_box_body()
+        self.car_body_group_box.group_box.setFixedSize(738, 200)
         if (self.body_counter == 0):
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
 
-        if self.outer_layout.count() > 0:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(0).widget())
-        self.outer_layout.addWidget(group_box.group_box)
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
 
     def create_push_button(self, name, size_x, size_y):
         button = QPushButton(name)
@@ -397,6 +385,13 @@ class GUI(QMainWindow):
         button.setFixedSize(size_x, size_y)
 
         return button
+    
+    def on_schedule_clicked(self):
+        print(f"Scheduled body nr: {self.body_counter}")
+        self.body_counter += 1
+        self.body.cup.remove_parameters()
+        self.body.car_screen.remove_parameters()
+        self.car_body_group_box.button_schedule.setEnabled(False)
 
 def main():
     app = QApplication([])

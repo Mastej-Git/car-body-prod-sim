@@ -8,3 +8,8 @@ class Cup():
     def check_activation(self):
         if self.material != "" and self.size != "":
             self.is_activated = True
+
+    def remove_parameters(self):
+        self.material = ""
+        self.size = ""
+        self.is_activated = False
