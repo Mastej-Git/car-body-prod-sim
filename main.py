@@ -4,6 +4,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 import time
+import copy
 
 from PetrisNet import PetriNet
 from Body import Body
@@ -14,22 +15,24 @@ from StyleSheets import *
 
 class PetriNetThread(QThread):
 
-    stop_signal = pyqtSignal()
+    # stop_signal = pyqtSignal()
 
-    def __init__(self, petri_net: PetriNet):
+    def __init__(self, thread_id, petri_net: PetriNet):
         super().__init__()
         self._running = True
-        self.stop_signal.connect(self.stop)
+        # self.stop_signal.connect(self.stop)
         self.petri_net = petri_net
+        self.thread_id = thread_id
+        print(self.thread_id)
 
     def run(self):
         while self._running:
             for name, transition in self.petri_net.transitions.items():
                 if transition.is_enabled():
-                    print(f"\nFiring Transition {name}")
+                    print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
                     self.petri_net.fire_transition(name)
-                    print(self.petri_net)
-                    time.sleep(2)
+                    # print(self.petri_net)
+                    time.sleep(3)
 
     def stop(self):
         self._running = False
@@ -90,6 +93,7 @@ class GUI(QMainWindow):
         super().__init__()
 
         self.body_counter = 0
+        self.list_of_threads = []
 
         self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""))
 
@@ -127,7 +131,7 @@ class GUI(QMainWindow):
         self.petri_net.add_transition("T3", {"P3": 1}, {"P4": 1})
         self.petri_net.add_transition("T4", {"P4": 1}, {"P1": 1})
 
-        self.petri_net_thread = PetriNetThread(self.petri_net)
+        # self.petri_net_thread = PetriNetThread(self.petri_net)
         # self.petri_net_thread.start()
 
     def create_tabs_content(self):
@@ -424,14 +428,21 @@ class GUI(QMainWindow):
 
         return button
     
-    @pyqtSlot()
+    # @pyqtSlot()
     def on_schedule_clicked(self):
         print(f"Scheduled body nr: {self.body_counter}")
-        self.body_counter += 1
-        self.petri_net_thread.start()
+
+        petri_net_copy = copy.deepcopy(self.petri_net)
+        new_petri_net_thread = PetriNetThread(self.body_counter, petri_net_copy)
+        self.list_of_threads.append(new_petri_net_thread)
+        # self.petri_net_thread.start()
+        self.list_of_threads[self.body_counter - 1].start()
+
         self.body.cup.remove_parameters()
         self.body.car_screen.remove_parameters()
         self.car_body_group_box.button_schedule.setEnabled(False)
+
+        self.body_counter += 1
 
 def main():
     app = QApplication([])
