@@ -2,13 +2,37 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QStackedWidget, 
     QFrame, QSizePolicy, QGroupBox, QComboBox, QScrollArea
 )
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
+import time
 
+from PetrisNet import PetriNet
 from Body import Body
 from Cup import Cup
 from AirConditioning import AirConditioning
 from CarScreen import CarScreen
 from StyleSheets import *
+
+class PetriNetThread(QThread):
+
+    stop_signal = pyqtSignal()
+
+    def __init__(self, petri_net: PetriNet):
+        super().__init__()
+        self._running = True
+        self.stop_signal.connect(self.stop)
+        self.petri_net = petri_net
+
+    def run(self):
+        while self._running:
+            for name, transition in self.petri_net.transitions.items():
+                if transition.is_enabled():
+                    print(f"\nFiring Transition {name}")
+                    self.petri_net.fire_transition(name)
+                    print(self.petri_net)
+                    time.sleep(2)
+
+    def stop(self):
+        self._running = False
 
 class CarBodyGroupBox():
 
@@ -91,6 +115,20 @@ class GUI(QMainWindow):
         self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
+
+        self.petri_net = PetriNet()
+        self.petri_net.add_place("P1", tokens=1, max_tokens=5)
+        self.petri_net.add_place("P2", tokens=0, max_tokens=5)
+        self.petri_net.add_place("P3", tokens=0, max_tokens=5)
+        self.petri_net.add_place("P4", tokens=0, max_tokens=5)
+
+        self.petri_net.add_transition("T1", {"P1": 1}, {"P2": 1})
+        self.petri_net.add_transition("T2", {"P2": 1}, {"P3": 1})
+        self.petri_net.add_transition("T3", {"P3": 1}, {"P4": 1})
+        self.petri_net.add_transition("T4", {"P4": 1}, {"P1": 1})
+
+        self.petri_net_thread = PetriNetThread(self.petri_net)
+        # self.petri_net_thread.start()
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
@@ -386,9 +424,11 @@ class GUI(QMainWindow):
 
         return button
     
+    @pyqtSlot()
     def on_schedule_clicked(self):
         print(f"Scheduled body nr: {self.body_counter}")
         self.body_counter += 1
+        self.petri_net_thread.start()
         self.body.cup.remove_parameters()
         self.body.car_screen.remove_parameters()
         self.car_body_group_box.button_schedule.setEnabled(False)
