@@ -13,6 +13,8 @@ from AirConditioning import AirConditioning
 from CarScreen import CarScreen
 from StyleSheets import *
 
+from CupPetriNet import cup_petris_net
+
 class PetriNetThread(QThread):
 
     # stop_signal = pyqtSignal()
@@ -32,7 +34,7 @@ class PetriNetThread(QThread):
                     print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
                     self.petri_net.fire_transition(name)
                     # print(self.petri_net)
-                    time.sleep(3)
+                    time.sleep(4)
 
     def stop(self):
         self._running = False
@@ -121,15 +123,16 @@ class GUI(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.petri_net = PetriNet()
-        self.petri_net.add_place("P1", tokens=1, max_tokens=5)
-        self.petri_net.add_place("P2", tokens=0, max_tokens=5)
-        self.petri_net.add_place("P3", tokens=0, max_tokens=5)
-        self.petri_net.add_place("P4", tokens=0, max_tokens=5)
+        self.petri_net = cup_petris_net
+        # self.petri_net.add_place("P1", tokens=1, max_tokens=5)
+        # self.petri_net.add_place("P2", tokens=0, max_tokens=5)
+        # self.petri_net.add_place("P3", tokens=0, max_tokens=5)
+        # self.petri_net.add_place("P4", tokens=0, max_tokens=5)
 
-        self.petri_net.add_transition("T1", {"P1": 1}, {"P2": 1})
-        self.petri_net.add_transition("T2", {"P2": 1}, {"P3": 1})
-        self.petri_net.add_transition("T3", {"P3": 1}, {"P4": 1})
-        self.petri_net.add_transition("T4", {"P4": 1}, {"P1": 1})
+        # self.petri_net.add_transition("T1", {"P1": 1}, {"P2": 1})
+        # self.petri_net.add_transition("T2", {"P2": 1}, {"P3": 1})
+        # self.petri_net.add_transition("T3", {"P3": 1}, {"P4": 1})
+        # self.petri_net.add_transition("T4", {"P4": 1}, {"P1": 1})
 
         # self.petri_net_thread = PetriNetThread(self.petri_net)
         # self.petri_net_thread.start()
