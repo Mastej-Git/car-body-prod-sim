@@ -13,7 +13,7 @@ from AirConditioning import AirConditioning
 from CarScreen import CarScreen
 from StyleSheets import *
 
-from CupPetriNet import cup_petris_net_start, cup_petris_net_aluminium, cup_petris_net_end, merge_nets
+from CupPetriNet import cup_petris_net_start, cup_petris_net_aluminium, cup_petris_net_sstell, cup_petris_net_end, merge_nets
 
 class PetriNetThread(QThread):
 
@@ -124,7 +124,7 @@ class GUI(QMainWindow):
 
         self.petri_net = PetriNet()
 
-        self.petri_net = merge_nets([copy.deepcopy(cup_petris_net_start), copy.deepcopy(cup_petris_net_aluminium), copy.deepcopy(cup_petris_net_end)])
+        self.petri_net = merge_nets([copy.deepcopy(cup_petris_net_start), copy.deepcopy(cup_petris_net_sstell), copy.deepcopy(cup_petris_net_end)])
         print(self.petri_net)
 
     def create_tabs_content(self):
@@ -423,9 +423,10 @@ class GUI(QMainWindow):
     
     # @pyqtSlot()
     def on_schedule_clicked(self):
-        print(f"Scheduled body nr: {self.body_counter}")
+        print(f"\nScheduled body nr: {self.body_counter}")
 
-        petri_net_copy = copy.deepcopy(self.petri_net)
+
+        petri_net_copy = copy.deepcopy(create_petri_net(self.body))
         new_petri_net_thread = PetriNetThread(self.body_counter, petri_net_copy)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
@@ -436,6 +437,23 @@ class GUI(QMainWindow):
         self.car_body_group_box.button_schedule.setEnabled(False)
 
         self.body_counter += 1
+
+def create_petri_net(body: Body):
+
+    pn = PetriNet()
+
+    start = cup_petris_net_start
+
+    if body.cup.material == "aluminum":
+        middle = cup_petris_net_aluminium
+    elif body.cup.material == "stainless steel":
+        middle = cup_petris_net_sstell
+    
+    end = cup_petris_net_end
+
+    pn = merge_nets([copy.deepcopy(start), copy.deepcopy(middle), copy.deepcopy(end)])
+
+    return pn
 
 def main():
     app = QApplication([])
