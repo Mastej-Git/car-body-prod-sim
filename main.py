@@ -11,18 +11,20 @@ from Body import Body
 from Cup import Cup
 from AirConditioning import AirConditioning
 from CarScreen import CarScreen
+
 from StyleSheets import *
+from Enums import CupMaterial, ScreenTypes
 
 from CupPetriNet import cup_petris_net_start, cup_petris_net_aluminium, cup_petris_net_sstell, cup_petris_net_end, merge_nets
 
 class PetriNetThread(QThread):
 
-    # stop_signal = pyqtSignal()
+    finished_signal = pyqtSignal(int)
 
     def __init__(self, thread_id, petri_net: PetriNet):
         super().__init__()
         self._running = True
-        # self.stop_signal.connect(self.stop)
+        # self.finished_signal.connect(self.stop)
         self.petri_net = petri_net
         self.thread_id = thread_id
         print(self.thread_id)
@@ -34,7 +36,14 @@ class PetriNetThread(QThread):
                     print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
                     self.petri_net.fire_transition(name)
                     # print(self.petri_net)
-                    time.sleep(4)
+                    time.sleep(3)
+
+                if self.petri_net.places["P38"].tokens == 1:
+                    break
+            if self.petri_net.places["P38"].tokens == 1:
+                    break
+            
+        self.finished_signal.emit(self.thread_id)
 
     def stop(self):
         self._running = False
@@ -205,7 +214,8 @@ class GUI(QMainWindow):
         label_size.setStyleSheet(style_sheet_label)
 
         combo_box_material = QComboBox()
-        combo_box_material.addItems(["Alminum", "Stainless steel", "policarbonate"])
+        # combo_box_material.addItems([CupMaterial.ALUMINUM, CupMaterial.STAINLESS_STEEL, CupMaterial.POLICARBONATE])
+        combo_box_material.addItems(["Aluminum", "Stainless steel", "Policarbonate"])
         combo_box_material.setStyleSheet(style_sheet_QComboBox)
         combo_box_material.currentIndexChanged.connect(self.on_change_cbox_cup_material)
         combo_box_material.activated.connect(self.on_activate_cbox_cup_material)
@@ -260,7 +270,8 @@ class GUI(QMainWindow):
         label_size.setStyleSheet(style_sheet_label)
 
         combo_box_material = QComboBox()
-        combo_box_material.addItems(["Resistive", "Capacitive", "Projected capacitive"])
+        # combo_box_material.addItems([ScreenTypes.RESISTIVE, ScreenTypes.CAPACITIVE, ScreenTypes.PROJECTED_CAPACITIVE])
+        combo_box_material.addItems(["Resistive", "Capacitive", "Projected Capacitive"])
         combo_box_material.setStyleSheet(style_sheet_QComboBox)
         combo_box_material.currentIndexChanged.connect(self.on_change_cbox_screen_type)
         combo_box_material.activated.connect(self.on_activate_cbox_screen_type)
@@ -309,11 +320,11 @@ class GUI(QMainWindow):
     def on_change_cbox_cup_material(self, index):
         print(f"Selected material index: {index}")
         if index == 0:
-            self.body.cup.material = "aluminum"
+            self.body.cup.material = CupMaterial.ALUMINUM
         elif index == 1:
-            self.body.cup.material = "stainless steel"
+            self.body.cup.material = CupMaterial.STAINLESS_STEEL
         elif index == 2:
-            self.body.cup.material = "policarbonate"
+            self.body.cup.material = CupMaterial.POLICARBONATE
         self.body.cup.check_activation()
 
     def on_change_cbox_cup_size(self, index):
@@ -329,11 +340,11 @@ class GUI(QMainWindow):
     def on_activate_cbox_cup_material(self, index):
         print(f"Selected material index: {index}")
         if index == 0:
-            self.body.cup.material = "aluminum"
+            self.body.cup.material = CupMaterial.ALUMINUM
         elif index == 1:
-            self.body.cup.material = "stainless steel"
+            self.body.cup.material = CupMaterial.STAINLESS_STEEL
         elif index == 2:
-            self.body.cup.material = "policarbonate"
+            self.body.cup.material = CupMaterial.POLICARBONATE
         self.body.cup.check_activation()
 
     def on_activate_cbox_cup_size(self, index):
@@ -363,11 +374,11 @@ class GUI(QMainWindow):
     def on_change_cbox_screen_type(self, index):
         print(f"Selected material index: {index}")
         if index == 0:
-            self.body.car_screen.type = "Resistive"
+            self.body.car_screen.type = ScreenTypes.RESISTIVE
         elif index == 1:
-            self.body.car_screen.type = "Capacitive"
+            self.body.car_screen.type = ScreenTypes.CAPACITIVE
         elif index == 2:
-            self.body.car_screen.type = "Projected capacitive"
+            self.body.car_screen.type = ScreenTypes.PROJECTED_CAPACITIVE
         self.body.car_screen.check_activation()
 
     def on_change_cbox_screen_size(self, index):
@@ -383,11 +394,11 @@ class GUI(QMainWindow):
     def on_activate_cbox_screen_type(self, index):
         print(f"Selected material index: {index}")
         if index == 0:
-            self.body.car_screen.type = "Resistive"
+            self.body.car_screen.type = ScreenTypes.RESISTIVE
         elif index == 1:
-            self.body.car_screen.type = "Capacitive"
+            self.body.car_screen.type = ScreenTypes.CAPACITIVE
         elif index == 2:
-            self.body.car_screen.type = "Projected capacitive"
+            self.body.car_screen.type = ScreenTypes.PROJECTED_CAPACITIVE
         self.body.car_screen.check_activation()
 
     def on_activate_cbox_screen_size(self, index):
@@ -421,13 +432,15 @@ class GUI(QMainWindow):
 
         return button
     
-    # @pyqtSlot()
+    @pyqtSlot()
     def on_schedule_clicked(self):
         print(f"\nScheduled body nr: {self.body_counter}")
 
 
         petri_net_copy = copy.deepcopy(create_petri_net(self.body))
+        # petri_net_copy = create_petri_net(self.body)
         new_petri_net_thread = PetriNetThread(self.body_counter, petri_net_copy)
+        new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
         self.list_of_threads[self.body_counter - 1].start()
@@ -438,15 +451,19 @@ class GUI(QMainWindow):
 
         self.body_counter += 1
 
+    @pyqtSlot(int)
+    def on_thread_finished(self, thread_id):
+        print(f"Thread {thread_id} has finished.")
+
 def create_petri_net(body: Body):
 
     pn = PetriNet()
 
     start = cup_petris_net_start
 
-    if body.cup.material == "aluminum":
+    if body.cup.material == CupMaterial.ALUMINUM:
         middle = cup_petris_net_aluminium
-    elif body.cup.material == "stainless steel":
+    elif body.cup.material == CupMaterial.STAINLESS_STEEL:
         middle = cup_petris_net_sstell
     
     end = cup_petris_net_end
