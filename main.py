@@ -2,7 +2,7 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QStackedWidget, 
     QFrame, QSizePolicy, QGroupBox, QComboBox, QScrollArea
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QTimer
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QTimer, QMutex
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
@@ -24,6 +24,7 @@ from Enums import CupMaterial, ScreenTypes
 from CupPetriNet import cup_main_petri_net
 
 lock = threading.Lock()
+mutex = QMutex()
 
 class MatplotlibWidget(QWidget):
     def __init__(self, petri_net: PetriNet, parent=None):
@@ -131,23 +132,49 @@ class PetriNetThread(QThread):
             
     #     self.finished_signal.emit(self.thread_id)
 
+    # def run(self):
+    #     i = 0
+
+    #     while self._running:
+    #         if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
+    #             mutex.lock()
+    #             print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
+    #             # with lock:
+    #             self.petri_net.fire_transition(self.available_transitions[i])
+    #             self.executed_transitions.append(self.available_transitions[i])
+    #             mutex.unlock()
+    #             self.mpl_widget.plot()
+    #             i += 1
+    #             # print(self.petri_net)
+    #             time.sleep(3)
+
+    #         if self.executed_transitions == self.available_transitions:
+    #             break
+            
+    #     self.finished_signal.emit(self.thread_id)
+
     def run(self):
         i = 0
 
         while self._running:
-            if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
-                with lock:
+            mutex.lock()
+            try:
+                # Only one thread can check and fire transitions at a time
+                if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
+                    print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
-                self.executed_transitions.append(self.available_transitions[i])
-                self.mpl_widget.plot()
-                i += 1
-                # print(self.petri_net)
-                time.sleep(3)
+                    self.executed_transitions.append(self.available_transitions[i])
+                    self.mpl_widget.plot()
+                    i += 1
 
-            if self.executed_transitions == self.available_transitions:
-                break
-            
+                # Check if all available transitions have been executed
+                if self.executed_transitions == self.available_transitions:
+                    break
+            finally:
+                mutex.unlock()
+
+            time.sleep(3)
+
         self.finished_signal.emit(self.thread_id)
 
     def stop(self):
@@ -236,6 +263,13 @@ class GUI(QMainWindow):
         self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
+
+        # self.list_of_threads.append(PetriNetThread(1, Body(Cup(CupMaterial.STAINLESS_STEEL, "750 ml"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
+        # self.list_of_threads[0].start()
+        # self.list_of_threads.append(PetriNetThread(2, Body(Cup(CupMaterial.ALUMINUM, "500 ml"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
+        # self.list_of_threads[1].start()
+        # self.list_of_threads.append(PetriNetThread(3, Body(Cup(CupMaterial.STAINLESS_STEEL, "1 L"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
+        # self.list_of_threads[2].start()
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
