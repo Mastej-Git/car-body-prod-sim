@@ -14,12 +14,12 @@ import random
 
 from PetrisNet import PetriNet
 from Body import Body
-from Cup import Cup
-from AirConditioning import AirConditioning
-from CarScreen import CarScreen
+from body_parts.Cup import Cup
+from body_parts.AirConditioning import AirConditioning
+from body_parts.CarScreen import CarScreen
 
-from StyleSheets import *
-from Enums import CupMaterial, ScreenTypes
+from other.StyleSheets import *
+from other.Enums import CupMaterial, ScreenTypes
 
 from CupPetriNet import cup_main_petri_net
 

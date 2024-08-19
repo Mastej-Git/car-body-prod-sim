@@ -1,6 +1,6 @@
-from Cup import Cup
-from AirConditioning import AirConditioning
-from CarScreen import CarScreen
+from body_parts.Cup import Cup
+from body_parts.AirConditioning import AirConditioning
+from body_parts.CarScreen import CarScreen
 
 class Body():
 

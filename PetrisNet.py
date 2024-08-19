@@ -5,7 +5,7 @@ class Place:
         self.max_tokens = max_tokens
 
     def __str__(self) -> str:
-        return f"Place({self.name}, tokens={self.tokens})"
+        return f"Place({self.name}, tokens={self.tokens}, max_tokens={self.max_tokens})"
     
 
 class Transition:
