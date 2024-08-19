@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
 import time
 import copy
+import threading
 
 from PetrisNet import PetriNet
 from Body import Body
@@ -15,33 +16,66 @@ from CarScreen import CarScreen
 from StyleSheets import *
 from Enums import CupMaterial, ScreenTypes
 
-from CupPetriNet import cup_petris_net_start, cup_petris_net_aluminium, cup_petris_net_sstell, cup_petris_net_end, merge_nets
+from CupPetriNet import cup_main_petri_net
+
+lock = threading.Lock()
 
 class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, thread_id, petri_net: PetriNet):
+    def __init__(self, thread_id, body: Body):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
-        self.petri_net = petri_net
+        self.petri_net = cup_main_petri_net
+        self.body = body
         self.thread_id = thread_id
+        self.available_transitions = []
+        self.executed_transitions = []
+
+        if self.body.cup.material == CupMaterial.ALUMINUM:
+            self.available_transitions = ["T2", "T3", "T6", "T9", "T12", "T15", "T18", "T21", "T24", "T27", "T28"]
+        elif self.body.cup.material == CupMaterial.STAINLESS_STEEL:
+            self.available_transitions = ["T2", "T4", "T7", "T10", "T13", "T16", "T19", "T22", "T25", "T27", "T28"]  
+
+        self.petri_net.fire_transition("T1")
+
         print(self.thread_id)
 
-    def run(self):
-        while self._running:
-            for name, transition in self.petri_net.transitions.items():
-                if transition.is_enabled():
-                    print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
-                    self.petri_net.fire_transition(name)
-                    # print(self.petri_net)
-                    time.sleep(3)
+    # def run(self):
+    #     while self._running:
+    #         for name, transition in self.petri_net.transitions.items():
+    #             if transition.is_enabled() and name in self.available_transitions:
+    #                 with lock:
+    #                     print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
+    #                     self.petri_net.fire_transition(name)
+    #                     self.executed_transitions.append(name)
+    #                     # print(self.petri_net)
+    #                     time.sleep(3)
 
-                if self.petri_net.places["P38"].tokens == 1:
-                    break
-            if self.petri_net.places["P38"].tokens == 1:
-                    break
+    #             if self.executed_transitions == self.available_transitions:
+    #                 break
+    #         if self.executed_transitions == self.available_transitions:
+    #             break
+            
+    #     self.finished_signal.emit(self.thread_id)
+
+    def run(self):
+        i = 0
+
+        while self._running:
+            if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
+                print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
+                with lock:
+                    self.petri_net.fire_transition(self.available_transitions[i])
+                self.executed_transitions.append(self.available_transitions[i])
+                i += 1
+                print(self.petri_net)
+                time.sleep(3)
+
+            if self.executed_transitions == self.available_transitions:
+                break
             
         self.finished_signal.emit(self.thread_id)
 
@@ -132,9 +166,6 @@ class GUI(QMainWindow):
         self.setCentralWidget(central_widget)
 
         self.petri_net = PetriNet()
-
-        self.petri_net = merge_nets([copy.deepcopy(cup_petris_net_start), copy.deepcopy(cup_petris_net_sstell), copy.deepcopy(cup_petris_net_end)])
-        print(self.petri_net)
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
@@ -436,10 +467,7 @@ class GUI(QMainWindow):
     def on_schedule_clicked(self):
         print(f"\nScheduled body nr: {self.body_counter}")
 
-
-        petri_net_copy = copy.deepcopy(create_petri_net(self.body))
-        # petri_net_copy = create_petri_net(self.body)
-        new_petri_net_thread = PetriNetThread(self.body_counter, petri_net_copy)
+        new_petri_net_thread = PetriNetThread(self.body_counter, self.body)
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
@@ -454,23 +482,6 @@ class GUI(QMainWindow):
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
         print(f"Thread {thread_id} has finished.")
-
-def create_petri_net(body: Body):
-
-    pn = PetriNet()
-
-    start = cup_petris_net_start
-
-    if body.cup.material == CupMaterial.ALUMINUM:
-        middle = cup_petris_net_aluminium
-    elif body.cup.material == CupMaterial.STAINLESS_STEEL:
-        middle = cup_petris_net_sstell
-    
-    end = cup_petris_net_end
-
-    pn = merge_nets([copy.deepcopy(start), copy.deepcopy(middle), copy.deepcopy(end)])
-
-    return pn
 
 def main():
     app = QApplication([])
