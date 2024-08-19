@@ -2,10 +2,15 @@ from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QStackedWidget, 
     QFrame, QSizePolicy, QGroupBox, QComboBox, QScrollArea
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QTimer
+
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+
 import time
 import copy
 import threading
+import random
 
 from PetrisNet import PetriNet
 from Body import Body
@@ -20,11 +25,75 @@ from CupPetriNet import cup_main_petri_net
 
 lock = threading.Lock()
 
+class MatplotlibWidget(QWidget):
+    def __init__(self, petri_net: PetriNet, parent=None):
+        super().__init__(parent)
+
+        self.petri_net = petri_net
+        
+        self.figure = Figure(facecolor='#404040')
+        
+        self.canvas = FigureCanvas(self.figure)
+        
+        layout = QVBoxLayout()
+        layout.addWidget(self.canvas)
+        
+        self.setLayout(layout)
+        
+        self.tasks = []
+        self.start_times = []
+        self.durations = []
+        self.current_time = 0
+        
+    def plot(self):
+
+        self.tasks = self.petri_net.places.keys()
+        self.start_times = [0 for place in self.petri_net.places.keys()]
+        self.durations = [place.tokens for place in self.petri_net.places.values()]
+
+        self.figure.clear()
+        
+        ax = self.figure.add_subplot(111)
+        
+        ax.set_facecolor('#404040')
+        ax.tick_params(axis='x', colors='#00ffff')
+        ax.tick_params(axis='y', colors='#00ffff')
+        ax.spines['top'].set_color('#00ffff')
+        ax.spines['bottom'].set_color('#00ffff')
+        ax.spines['left'].set_color('#00ffff')
+        ax.spines['right'].set_color('#00ffff')
+        ax.xaxis.label.set_color('#00ffff')
+        ax.yaxis.label.set_color('#00ffff')
+        ax.title.set_color('#00ffff')
+        
+        ax.barh(self.tasks, self.durations, left=self.start_times, color='#00ffff')
+
+        ax.grid(True, color='#2e2e2e', linestyle='--', linewidth=0.5)
+        
+        ax.invert_yaxis()
+        
+        ax.set_xlabel('Time')
+        ax.set_ylabel('Tokens')
+        ax.set_title('Tokens distribution')
+        
+        self.canvas.draw()
+        
+    # def add_task(self):
+    #     self.current_time += 1
+        
+    #     task_name = f'Task {len(self.tasks) + 1}'
+        
+    #     self.tasks.append(task_name)
+    #     self.start_times.append(self.current_time)
+    #     self.durations.append(duration)
+        
+    #     self.plot()
+
 class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, thread_id, body: Body):
+    def __init__(self, thread_id, body: Body, mpl_widget: MatplotlibWidget):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
@@ -33,6 +102,7 @@ class PetriNetThread(QThread):
         self.thread_id = thread_id
         self.available_transitions = []
         self.executed_transitions = []
+        self.mpl_widget = mpl_widget
 
         if self.body.cup.material == CupMaterial.ALUMINUM:
             self.available_transitions = ["T2", "T3", "T6", "T9", "T12", "T15", "T18", "T21", "T24", "T27", "T28"]
@@ -70,8 +140,9 @@ class PetriNetThread(QThread):
                 with lock:
                     self.petri_net.fire_transition(self.available_transitions[i])
                 self.executed_transitions.append(self.available_transitions[i])
+                self.mpl_widget.plot()
                 i += 1
-                print(self.petri_net)
+                # print(self.petri_net)
                 time.sleep(3)
 
             if self.executed_transitions == self.available_transitions:
@@ -141,6 +212,7 @@ class GUI(QMainWindow):
         self.list_of_threads = []
 
         self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""))
+        self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 800, 1000)
@@ -164,8 +236,6 @@ class GUI(QMainWindow):
         self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
-
-        self.petri_net = PetriNet()
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
@@ -228,9 +298,16 @@ class GUI(QMainWindow):
         self.layout.addWidget(self.scroll_area)
         self.tab2.setLayout(self.layout)
 
+        self.mpl_widget = MatplotlibWidget(self.petri_net, self)
+
         layout3 = QVBoxLayout()
-        layout3.addWidget(QLabel("This is the content of Tab 3"))
+        layout3.addWidget(self.mpl_widget)
+        self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
+
+        # self.timer = QTimer(self)
+        # self.timer.timeout.connect(self.mpl_widget.add_task)
+        # self.timer.start(3000) 
 
     def create_sub_tab_cup_content(self):
 
@@ -467,7 +544,7 @@ class GUI(QMainWindow):
     def on_schedule_clicked(self):
         print(f"\nScheduled body nr: {self.body_counter}")
 
-        new_petri_net_thread = PetriNetThread(self.body_counter, self.body)
+        new_petri_net_thread = PetriNetThread(self.body_counter, self.body, self.mpl_widget)
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
