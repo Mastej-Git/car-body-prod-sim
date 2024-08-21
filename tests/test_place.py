@@ -1,6 +1,6 @@
 import unittest
 
-from PetrisNet import Place, Transition
+from PetrisNet import Place
 
 class TestPlace(unittest.TestCase):
 

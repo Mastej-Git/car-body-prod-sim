@@ -1,16 +1,25 @@
+import time
+import threading
+
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QTabWidget, QWidget, QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QStackedWidget, 
-    QFrame, QSizePolicy, QGroupBox, QComboBox, QScrollArea
+    QApplication,
+    QMainWindow,
+    QTabWidget,
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QPushButton,
+    QHBoxLayout,
+    QStackedWidget,
+    QFrame,
+    QGroupBox,
+    QComboBox,
+    QScrollArea
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QTimer, QMutex
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QMutex
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-
-import time
-import copy
-import threading
-import random
 
 from PetrisNet import PetriNet
 from Body import Body
@@ -18,7 +27,15 @@ from body_parts.Cup import Cup
 from body_parts.AirConditioning import AirConditioning
 from body_parts.CarScreen import CarScreen
 
-from other.StyleSheets import *
+from other.StyleSheets import (
+    style_sheet_central_widget,
+    style_sheet_app,
+    style_sheet_label,
+    style_sheet_QComboBox,
+    style_sheet_QPushButton,
+    style_sheet_sub_tab,
+    style_sheet_tab
+)
 from other.Enums import CupMaterial, ScreenTypes
 
 from CupPetriNet import cup_main_petri_net
@@ -106,9 +123,13 @@ class PetriNetThread(QThread):
         self.mpl_widget = mpl_widget
 
         if self.body.cup.material == CupMaterial.ALUMINUM:
-            self.available_transitions = ["T2", "T3", "T6", "T9", "T12", "T15", "T18", "T21", "T24", "T27", "T28"]
+            self.available_transitions = ["T2", "T3", "T6", "T9", "T12",
+                                          "T15", "T18", "T21", "T24", "T27",
+                                          "T28"]
         elif self.body.cup.material == CupMaterial.STAINLESS_STEEL:
-            self.available_transitions = ["T2", "T4", "T7", "T10", "T13", "T16", "T19", "T22", "T25", "T27", "T28"]  
+            self.available_transitions = ["T2", "T4", "T7", "T10", "T13", 
+                                          "T16", "T19", "T22", "T25", "T27", 
+                                          "T28"]  
 
         self.petri_net.fire_transition("T1")
 
@@ -138,7 +159,8 @@ class PetriNetThread(QThread):
     #     while self._running:
     #         if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
     #             mutex.lock()
-    #             print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
+    #             print(
+    # f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
     #             # with lock:
     #             self.petri_net.fire_transition(self.available_transitions[i])
     #             self.executed_transitions.append(self.available_transitions[i])
@@ -217,9 +239,9 @@ class CarBodyGroupBox():
 
         label = "Body consists of following elements:\n"
 
-        if self.body.cup.is_activated == True:
+        if self.body.cup.is_activated is True:
             label += f"▸  Cup:\n\t ▪ Material: {self.body.cup.material}\n\t ▪ Size: {self.body.cup.size}\n"
-        if self.body.car_screen.is_activated == True:
+        if self.body.car_screen.is_activated is True:
             label += f"▸  Screen:\n\t ▪ Type: {self.body.car_screen.type}\n\t ▪ Size: {self.body.car_screen.size}\n"
 
         return label
@@ -349,7 +371,7 @@ class GUI(QMainWindow):
 
         sub_layout1 = QVBoxLayout()
 
-        groupBox = QGroupBox("Cup parameters")
+        group_box1 = QGroupBox("Cup parameters")
         label_material = QLabel("Material")
         label_material.setStyleSheet(style_sheet_label)
         label_size = QLabel("Size")
@@ -392,9 +414,9 @@ class GUI(QMainWindow):
         vbox_main.addLayout(hbox_cboxs)
         vbox_main.addWidget(button_add_to_corpse)
 
-        groupBox.setLayout(vbox_main)
+        group_box1.setLayout(vbox_main)
 
-        sub_layout1.addWidget(groupBox)
+        sub_layout1.addWidget(group_box1)
         sub_tab_cup.setLayout(sub_layout1)
 
         return sub_tab_cup
@@ -405,7 +427,7 @@ class GUI(QMainWindow):
 
         sub_layout1 = QVBoxLayout()
 
-        groupBox = QGroupBox("Screen parameters")
+        group_box1 = QGroupBox("Screen parameters")
         label_material = QLabel("Type")
         label_material.setStyleSheet(style_sheet_label)
         label_size = QLabel("Size")
@@ -448,9 +470,9 @@ class GUI(QMainWindow):
         vbox_main.addLayout(hbox_cboxs)
         vbox_main.addWidget(button_add_to_corpse)
 
-        groupBox.setLayout(vbox_main)
+        group_box1.setLayout(vbox_main)
 
-        sub_layout1.addWidget(groupBox)
+        sub_layout1.addWidget(group_box1)
         sub_tab_cup.setLayout(sub_layout1)
 
         return sub_tab_cup
@@ -504,7 +526,7 @@ class GUI(QMainWindow):
 
         self.create_group_box_body()
         self.car_body_group_box.group_box.setFixedSize(738, 200)
-        if (self.body_counter == 0):
+        if self.body_counter == 0:
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
@@ -558,7 +580,7 @@ class GUI(QMainWindow):
 
         self.create_group_box_body()
         self.car_body_group_box.group_box.setFixedSize(738, 200)
-        if (self.body_counter == 0):
+        if self.body_counter == 0:
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()

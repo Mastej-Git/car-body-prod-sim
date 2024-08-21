@@ -50,16 +50,20 @@ class TestTransition(unittest.TestCase):
         self.assertEqual(list(self.transition1.outputs.keys())[0].tokens, 2)
 
     def test_fire_exception_not_enabled(self):
+        output = "Transition T3 is not enabled"
+
         with self.assertRaises(Exception) as context:
             self.transition3.fire()
         
-        self.assertEqual(str(context.exception), "Transition T3 is not enabled")
+        self.assertEqual(str(context.exception), output)
 
     def test_fire_exception_cannot_fire(self):
+        output = "Transition T4 cannot fire due to max token constraints"
+
         with self.assertRaises(Exception) as context:
             self.transition4.fire()
         
-        self.assertEqual(str(context.exception), "Transition T4 cannot fire due to max token constraints")
+        self.assertEqual(str(context.exception), output)
 
     def test_reverse_fire(self):
         self.transition1.fire()
@@ -76,3 +80,4 @@ class TestTransition(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+    
