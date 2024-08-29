@@ -14,7 +14,8 @@ from PyQt5.QtWidgets import (
     QFrame,
     QGroupBox,
     QComboBox,
-    QScrollArea
+    QScrollArea,
+    QRadioButton
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QMutex
 
@@ -26,6 +27,7 @@ from Body import Body
 from body_parts.Cup import Cup
 from body_parts.AirConditioning import AirConditioning
 from body_parts.CarScreen import CarScreen
+from body_parts.UpperPanel import UpperPanel
 
 from other.StyleSheets import (
     style_sheet_central_widget,
@@ -95,17 +97,6 @@ class MatplotlibWidget(QWidget):
         ax.set_title('Tokens distribution')
         
         self.canvas.draw()
-        
-    # def add_task(self):
-    #     self.current_time += 1
-        
-    #     task_name = f'Task {len(self.tasks) + 1}'
-        
-    #     self.tasks.append(task_name)
-    #     self.start_times.append(self.current_time)
-    #     self.durations.append(duration)
-        
-    #     self.plot()
 
 class PetriNetThread(QThread):
 
@@ -243,6 +234,8 @@ class CarBodyGroupBox():
             label += f"▸  Cup:\n\t ▪ Material: {self.body.cup.material}\n\t ▪ Size: {self.body.cup.size}\n"
         if self.body.car_screen.is_activated is True:
             label += f"▸  Screen:\n\t ▪ Type: {self.body.car_screen.type}\n\t ▪ Size: {self.body.car_screen.size}\n"
+        if self.body.upper_panel.is_activated is True:
+            label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.car_screen.size}\n"
 
         return label
 
@@ -260,7 +253,7 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
 
-        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""))
+        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""))
         self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
@@ -286,13 +279,6 @@ class GUI(QMainWindow):
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
 
-        # self.list_of_threads.append(PetriNetThread(1, Body(Cup(CupMaterial.STAINLESS_STEEL, "750 ml"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
-        # self.list_of_threads[0].start()
-        # self.list_of_threads.append(PetriNetThread(2, Body(Cup(CupMaterial.ALUMINUM, "500 ml"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
-        # self.list_of_threads[1].start()
-        # self.list_of_threads.append(PetriNetThread(3, Body(Cup(CupMaterial.STAINLESS_STEEL, "1 L"), AirConditioning("", "", ""), CarScreen("", "")), self.mpl_widget))
-        # self.list_of_threads[2].start()
-
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
@@ -302,6 +288,7 @@ class GUI(QMainWindow):
         sub_tab1 = QWidget()
         sub_tab2 = QWidget()
         sub_tab3 = QWidget()
+        sub_tab4 = QWidget()
 
         self.gowno = 1
 
@@ -309,13 +296,11 @@ class GUI(QMainWindow):
 
         sub_tab2 = self.create_sub_tab_screen_content()
 
-        sub_layout3 = QVBoxLayout()
-        sub_layout3.addWidget(QLabel("This is the content of Sub-Tab 3"))
-        sub_tab3.setLayout(sub_layout3)
+        sub_tab4 = self.create_sub_tab_u_p_content()
 
         sub_tab_widget.addTab(sub_tab1, "Cup")
         sub_tab_widget.addTab(sub_tab2, "Screen")
-        sub_tab_widget.addTab(sub_tab3, "Air ventilation")
+        sub_tab_widget.addTab(sub_tab4, "Panel górny")
 
         stacked_widget = QStackedWidget()
         stacked_widget.addWidget(sub_tab_widget)
@@ -360,10 +345,6 @@ class GUI(QMainWindow):
         layout3.addWidget(self.mpl_widget)
         self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
-
-        # self.timer = QTimer(self)
-        # self.timer.timeout.connect(self.mpl_widget.add_task)
-        # self.timer.start(3000) 
 
     def create_sub_tab_cup_content(self):
 
@@ -461,6 +442,75 @@ class GUI(QMainWindow):
 
         vbox_sub2.addWidget(label_size)
         vbox_sub2.addWidget(combo_box_size)
+        vbox_sub2.setSpacing(5)
+
+        hbox_cboxs.addLayout(vbox_sub1)
+        hbox_cboxs.addLayout(vbox_sub2)
+        hbox_cboxs.setSpacing(20)
+
+        vbox_main.addLayout(hbox_cboxs)
+        vbox_main.addWidget(button_add_to_corpse)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_cup.setLayout(sub_layout1)
+
+        return sub_tab_cup
+    
+    def create_sub_tab_u_p_content(self):
+
+        sub_tab_cup = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu górnego")
+        label_material = QLabel("Sterowanie klimatyzacją")
+        label_material.setStyleSheet(style_sheet_label)
+        label_size = QLabel("Klimatyzacja")
+        label_size.setStyleSheet(style_sheet_label)
+
+        radio1 = QRadioButton("Tak")
+        radio2 = QRadioButton("Nie")
+        radio1.toggled.connect(self.on_radio_button_clicked)
+        radio2.toggled.connect(self.on_radio_button_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio1)
+        radio_vboxlayout1.addWidget(radio2)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        radio3 = QRadioButton("4-strefowa")
+        radio4 = QRadioButton("2-strefowa")
+        radio3.toggled.connect(self.on_radio_button_clicked)
+        radio4.toggled.connect(self.on_radio_button_clicked)
+
+        radio_groupbox2 = QGroupBox()
+        radio_vboxlayout2 = QVBoxLayout()
+
+        radio_vboxlayout2.addWidget(radio3)
+        radio_vboxlayout2.addWidget(radio4)
+
+        radio_groupbox2.setLayout(radio_vboxlayout2)
+
+        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse.clicked.connect(self.pb_u_p_clicked)
+
+        vbox_main = QVBoxLayout()
+        hbox_cboxs = QHBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_size)
+        vbox_sub2.addWidget(radio_groupbox2)
         vbox_sub2.setSpacing(5)
 
         hbox_cboxs.addLayout(vbox_sub1)
@@ -577,6 +627,33 @@ class GUI(QMainWindow):
 
     def on_change_pb_screen(self):
         print(f"Screen added with parameters: {self.body.car_screen.type}, {self.body.car_screen.size}")
+
+        self.create_group_box_body()
+        self.car_body_group_box.group_box.setFixedSize(738, 200)
+        if self.body_counter == 0:
+            self.body_counter += 1
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+
+    def on_radio_button_clicked(self):
+        sender = self.sender()
+
+        if sender.isChecked():
+            if (sender.text() == "Tak" or sender.text() == "Nie"):
+                self.body.upper_panel.is_controlable = sender.text()
+                pass
+            else:
+                self.body.upper_panel.type = sender.text()
+            print(f'Selected option: {sender.text()}')
+
+        self.body.upper_panel.check_activation()
+
+    def pb_u_p_clicked(self):
+        print(f"Gorny panel dodany z parametrami: {self.body.upper_panel.is_controlable}, {self.body.upper_panel.type}")
 
         self.create_group_box_body()
         self.car_body_group_box.group_box.setFixedSize(738, 200)
