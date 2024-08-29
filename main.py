@@ -195,7 +195,7 @@ class PetriNetThread(QThread):
             finally:
                 mutex.unlock()
 
-            time.sleep(3)
+            time.sleep(2)
 
         self.finished_signal.emit(self.thread_id)
 
@@ -482,7 +482,7 @@ class GUI(QMainWindow):
         self.car_body_group_box.button_schedule.pressed.connect(self.on_schedule_clicked)
 
     def on_change_cbox_cup_material(self, index):
-        print(f"Selected material index: {index}")
+        # print(f"Selected material index: {index}")
         if index == 0:
             self.body.cup.material = CupMaterial.ALUMINUM
         elif index == 1:
@@ -492,7 +492,7 @@ class GUI(QMainWindow):
         self.body.cup.check_activation()
 
     def on_change_cbox_cup_size(self, index):
-        print(f"Selected size index: {index}")
+        # print(f"Selected size index: {index}")
         if index == 0:
             self.body.cup.size = "500 ml"
         elif index == 1:
@@ -502,7 +502,7 @@ class GUI(QMainWindow):
         self.body.cup.check_activation()
 
     def on_activate_cbox_cup_material(self, index):
-        print(f"Selected material index: {index}")
+        # print(f"Selected material index: {index}")
         if index == 0:
             self.body.cup.material = CupMaterial.ALUMINUM
         elif index == 1:
@@ -512,7 +512,7 @@ class GUI(QMainWindow):
         self.body.cup.check_activation()
 
     def on_activate_cbox_cup_size(self, index):
-        print(f"Selected size index: {index}")
+        # print(f"Selected size index: {index}")
         if index == 0:
             self.body.cup.size = "500 ml"
         elif index == 1:
@@ -536,7 +536,7 @@ class GUI(QMainWindow):
         self.outer_layout.addWidget(self.car_body_group_box.group_box)
 
     def on_change_cbox_screen_type(self, index):
-        print(f"Selected material index: {index}")
+        # print(f"Selected material index: {index}")
         if index == 0:
             self.body.car_screen.type = ScreenTypes.RESISTIVE
         elif index == 1:
@@ -546,7 +546,7 @@ class GUI(QMainWindow):
         self.body.car_screen.check_activation()
 
     def on_change_cbox_screen_size(self, index):
-        print(f"Selected size index: {index}")
+        # print(f"Selected size index: {index}")
         if index == 0:
             self.body.car_screen.size = "7 inches"
         elif index == 1:
@@ -556,7 +556,7 @@ class GUI(QMainWindow):
         self.body.car_screen.check_activation()
 
     def on_activate_cbox_screen_type(self, index):
-        print(f"Selected material index: {index}")
+        # print(f"Selected material index: {index}")
         if index == 0:
             self.body.car_screen.type = ScreenTypes.RESISTIVE
         elif index == 1:
@@ -566,7 +566,7 @@ class GUI(QMainWindow):
         self.body.car_screen.check_activation()
 
     def on_activate_cbox_screen_size(self, index):
-        print(f"Selected size index: {index}")
+        # print(f"Selected size index: {index}")
         if index == 0:
             self.body.car_screen.size = "7 inches"
         elif index == 1:
