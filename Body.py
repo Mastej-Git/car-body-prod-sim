@@ -2,14 +2,16 @@ from body_parts.Cup import Cup
 from body_parts.AirConditioning import AirConditioning
 from body_parts.CarScreen import CarScreen
 from body_parts.UpperPanel import UpperPanel
+from body_parts.LowerPanel import LowerPanel
 
 class Body():
 
-    def __init__(self, cup: Cup, air_conditioning: AirConditioning, car_screen: CarScreen, upper_panel: UpperPanel) -> None:
+    def __init__(self, cup: Cup, air_conditioning: AirConditioning, car_screen: CarScreen, upper_panel: UpperPanel, lower_panel: LowerPanel) -> None:
         self.cup = cup
         self.car_screen = car_screen
         self.air_conditioning = air_conditioning
         self.upper_panel = upper_panel
+        self.lower_panel = lower_panel
 
     def set_cup(self, cup: Cup):
         self.cup = cup

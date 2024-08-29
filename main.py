@@ -19,15 +19,16 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QMutex
 
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.figure import Figure
-
 from PetrisNet import PetriNet
+
 from Body import Body
 from body_parts.Cup import Cup
 from body_parts.AirConditioning import AirConditioning
 from body_parts.CarScreen import CarScreen
 from body_parts.UpperPanel import UpperPanel
+from body_parts.LowerPanel import LowerPanel
+
+from utils.MatPlotlibWidget import MatplotlibWidget
 
 from other.StyleSheets import (
     style_sheet_central_widget,
@@ -44,59 +45,6 @@ from CupPetriNet import cup_main_petri_net
 
 lock = threading.Lock()
 mutex = QMutex()
-
-class MatplotlibWidget(QWidget):
-    def __init__(self, petri_net: PetriNet, parent=None):
-        super().__init__(parent)
-
-        self.petri_net = petri_net
-        
-        self.figure = Figure(facecolor='#404040')
-        
-        self.canvas = FigureCanvas(self.figure)
-        
-        layout = QVBoxLayout()
-        layout.addWidget(self.canvas)
-        
-        self.setLayout(layout)
-        
-        self.tasks = []
-        self.start_times = []
-        self.durations = []
-        self.current_time = 0
-        
-    def plot(self):
-
-        self.tasks = self.petri_net.places.keys()
-        self.start_times = [0 for place in self.petri_net.places.keys()]
-        self.durations = [place.tokens for place in self.petri_net.places.values()]
-
-        self.figure.clear()
-        
-        ax = self.figure.add_subplot(111)
-        
-        ax.set_facecolor('#404040')
-        ax.tick_params(axis='x', colors='#00ffff')
-        ax.tick_params(axis='y', colors='#00ffff')
-        ax.spines['top'].set_color('#00ffff')
-        ax.spines['bottom'].set_color('#00ffff')
-        ax.spines['left'].set_color('#00ffff')
-        ax.spines['right'].set_color('#00ffff')
-        ax.xaxis.label.set_color('#00ffff')
-        ax.yaxis.label.set_color('#00ffff')
-        ax.title.set_color('#00ffff')
-        
-        ax.barh(self.tasks, self.durations, left=self.start_times, color='#00ffff')
-
-        ax.grid(True, color='#2e2e2e', linestyle='--', linewidth=0.5)
-        
-        ax.invert_yaxis()
-        
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Tokens')
-        ax.set_title('Tokens distribution')
-        
-        self.canvas.draw()
 
 class PetriNetThread(QThread):
 
@@ -126,53 +74,12 @@ class PetriNetThread(QThread):
 
         print(self.thread_id)
 
-    # def run(self):
-    #     while self._running:
-    #         for name, transition in self.petri_net.transitions.items():
-    #             if transition.is_enabled() and name in self.available_transitions:
-    #                 with lock:
-    #                     print(f"\nThread id: {self.thread_id} - Firing Transition {name}")
-    #                     self.petri_net.fire_transition(name)
-    #                     self.executed_transitions.append(name)
-    #                     # print(self.petri_net)
-    #                     time.sleep(3)
-
-    #             if self.executed_transitions == self.available_transitions:
-    #                 break
-    #         if self.executed_transitions == self.available_transitions:
-    #             break
-            
-    #     self.finished_signal.emit(self.thread_id)
-
-    # def run(self):
-    #     i = 0
-
-    #     while self._running:
-    #         if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-    #             mutex.lock()
-    #             print(
-    # f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
-    #             # with lock:
-    #             self.petri_net.fire_transition(self.available_transitions[i])
-    #             self.executed_transitions.append(self.available_transitions[i])
-    #             mutex.unlock()
-    #             self.mpl_widget.plot()
-    #             i += 1
-    #             # print(self.petri_net)
-    #             time.sleep(3)
-
-    #         if self.executed_transitions == self.available_transitions:
-    #             break
-            
-    #     self.finished_signal.emit(self.thread_id)
-
     def run(self):
         i = 0
 
         while self._running:
             mutex.lock()
             try:
-                # Only one thread can check and fire transitions at a time
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
                     print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
@@ -180,7 +87,6 @@ class PetriNetThread(QThread):
                     self.mpl_widget.plot()
                     i += 1
 
-                # Check if all available transitions have been executed
                 if self.executed_transitions == self.available_transitions:
                     break
             finally:
@@ -235,7 +141,9 @@ class CarBodyGroupBox():
         if self.body.car_screen.is_activated is True:
             label += f"▸  Screen:\n\t ▪ Type: {self.body.car_screen.type}\n\t ▪ Size: {self.body.car_screen.size}\n"
         if self.body.upper_panel.is_activated is True:
-            label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.car_screen.size}\n"
+            label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.upper_panel.type}\n"
+        if self.body.lower_panel.is_activated is True:
+            label += f"▸  Panel dolny:\n\t ▪ Funkcjonalność: {self.body.lower_panel.functionality}\n\t ▪ Chwytaki na kubki: {self.body.lower_panel.is_cup}\n\t ▪ Kolor: {self.body.lower_panel.color}\n"
 
         return label
 
@@ -253,7 +161,7 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
 
-        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""))
+        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""), LowerPanel("", "", ""))
         self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
@@ -287,20 +195,20 @@ class GUI(QMainWindow):
 
         sub_tab1 = QWidget()
         sub_tab2 = QWidget()
-        sub_tab3 = QWidget()
         sub_tab4 = QWidget()
+        sub_tab5 = QWidget()
 
         self.gowno = 1
 
         sub_tab1 = self.create_sub_tab_cup_content()
-
         sub_tab2 = self.create_sub_tab_screen_content()
-
-        sub_tab4 = self.create_sub_tab_u_p_content()
+        sub_tab4 = self.create_sub_tab_upper_panel_content()
+        sub_tab5 = self.create_sub_tab_lower_panel_content()
 
         sub_tab_widget.addTab(sub_tab1, "Cup")
         sub_tab_widget.addTab(sub_tab2, "Screen")
         sub_tab_widget.addTab(sub_tab4, "Panel górny")
+        sub_tab_widget.addTab(sub_tab5, "Panel dolny")
 
         stacked_widget = QStackedWidget()
         stacked_widget.addWidget(sub_tab_widget)
@@ -458,7 +366,7 @@ class GUI(QMainWindow):
 
         return sub_tab_cup
     
-    def create_sub_tab_u_p_content(self):
+    def create_sub_tab_upper_panel_content(self):
 
         sub_tab_cup = QWidget()
 
@@ -472,8 +380,8 @@ class GUI(QMainWindow):
 
         radio1 = QRadioButton("Tak")
         radio2 = QRadioButton("Nie")
-        radio1.toggled.connect(self.on_radio_button_clicked)
-        radio2.toggled.connect(self.on_radio_button_clicked)
+        radio1.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio2.toggled.connect(self.on_radio_button_upper_panel_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
@@ -485,8 +393,8 @@ class GUI(QMainWindow):
 
         radio3 = QRadioButton("4-strefowa")
         radio4 = QRadioButton("2-strefowa")
-        radio3.toggled.connect(self.on_radio_button_clicked)
-        radio4.toggled.connect(self.on_radio_button_clicked)
+        radio3.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio4.toggled.connect(self.on_radio_button_upper_panel_clicked)
 
         radio_groupbox2 = QGroupBox()
         radio_vboxlayout2 = QVBoxLayout()
@@ -498,7 +406,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Add")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_u_p_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_upper_panel_clicked)
 
         vbox_main = QVBoxLayout()
         hbox_cboxs = QHBoxLayout()
@@ -518,6 +426,78 @@ class GUI(QMainWindow):
         hbox_cboxs.setSpacing(20)
 
         vbox_main.addLayout(hbox_cboxs)
+        vbox_main.addWidget(button_add_to_corpse)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_cup.setLayout(sub_layout1)
+
+        return sub_tab_cup
+    
+    def create_sub_tab_lower_panel_content(self):
+
+        sub_tab_cup = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu dolnego")
+        label_material = QLabel("Funkcjonalność")
+        label_material.setStyleSheet(style_sheet_label)
+        label_size = QLabel("Miejsce na kubek")
+        label_size.setStyleSheet(style_sheet_label)
+
+        radio1 = QRadioButton("Ładowarka bezprzewodowa")
+        radio2 = QRadioButton("Półka")
+        radio1.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio2.toggled.connect(self.on_radio_button_lower_panel_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio1)
+        radio_vboxlayout1.addWidget(radio2)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        radio3 = QRadioButton("Tak")
+        radio4 = QRadioButton("Nie")
+        radio3.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio4.toggled.connect(self.on_radio_button_lower_panel_clicked)
+
+        radio_groupbox2 = QGroupBox()
+        radio_vboxlayout2 = QVBoxLayout()
+
+        radio_vboxlayout2.addWidget(radio3)
+        radio_vboxlayout2.addWidget(radio4)
+
+        radio_groupbox2.setLayout(radio_vboxlayout2)
+
+        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse.clicked.connect(self.pb_upper_panel_clicked)
+
+        combo_box_color = QComboBox()
+        combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
+        combo_box_color.setStyleSheet(style_sheet_QComboBox)
+        combo_box_color.currentIndexChanged.connect(self.on_change_cbox_lower_panel_color)
+        combo_box_color.activated.connect(self.on_activate_cbox_lower_panel_color)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_size)
+        vbox_sub2.addWidget(radio_groupbox2)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(combo_box_color)
         vbox_main.addWidget(button_add_to_corpse)
 
         group_box1.setLayout(vbox_main)
@@ -575,7 +555,8 @@ class GUI(QMainWindow):
         print(f"Cup added with parameters: {self.body.cup.material}, {self.body.cup.size}")
 
         self.create_group_box_body()
-        self.car_body_group_box.group_box.setFixedSize(738, 200)
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
         if self.body_counter == 0:
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
@@ -625,11 +606,32 @@ class GUI(QMainWindow):
             self.body.car_screen.size = "10 inches"
         self.body.car_screen.check_activation()
 
+    def on_change_cbox_lower_panel_color(self, index):
+        # print(f"Selected size index: {index}")
+        if index == 0:
+            self.body.lower_panel.color = "Czerwony"
+        elif index == 1:
+            self.body.lower_panel.color = "Zielony"
+        elif index == 2:
+            self.body.lower_panel.color = "Niebieski"
+        self.body.lower_panel.check_activation()
+
+    def on_activate_cbox_lower_panel_color(self, index):
+        # print(f"Selected material index: {index}")
+        if index == 0:
+            self.body.lower_panel.color = "Czerwony"
+        elif index == 1:
+            self.body.lower_panel.color = "Zielony"
+        elif index == 2:
+            self.body.lower_panel.color = "Niebieski"
+        self.body.lower_panel.check_activation()
+
     def on_change_pb_screen(self):
         print(f"Screen added with parameters: {self.body.car_screen.type}, {self.body.car_screen.size}")
 
         self.create_group_box_body()
-        self.car_body_group_box.group_box.setFixedSize(738, 200)
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
         if self.body_counter == 0:
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
@@ -639,7 +641,7 @@ class GUI(QMainWindow):
             self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
         self.outer_layout.addWidget(self.car_body_group_box.group_box)
 
-    def on_radio_button_clicked(self):
+    def on_radio_button_upper_panel_clicked(self):
         sender = self.sender()
 
         if sender.isChecked():
@@ -652,11 +654,25 @@ class GUI(QMainWindow):
 
         self.body.upper_panel.check_activation()
 
-    def pb_u_p_clicked(self):
+    def on_radio_button_lower_panel_clicked(self):
+        sender = self.sender()
+
+        if sender.isChecked():
+            if (sender.text() == "Tak" or sender.text() == "Nie"):
+                self.body.lower_panel.is_cup = sender.text()
+                pass
+            else:
+                self.body.lower_panel.functionality = sender.text()
+            print(f'Selected option: {sender.text()}')
+
+        self.body.lower_panel.check_activation()
+
+    def pb_upper_panel_clicked(self):
         print(f"Gorny panel dodany z parametrami: {self.body.upper_panel.is_controlable}, {self.body.upper_panel.type}")
 
         self.create_group_box_body()
-        self.car_body_group_box.group_box.setFixedSize(738, 200)
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
         if self.body_counter == 0:
             self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
