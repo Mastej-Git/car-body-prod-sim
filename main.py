@@ -25,7 +25,9 @@ from Body import Body
 from body_parts.Cup import Cup
 from body_parts.AirConditioning import AirConditioning
 from body_parts.CarScreen import CarScreen
+
 from body_parts.UpperPanel import UpperPanel
+from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
 
 from utils.MatPlotlibWidget import MatplotlibWidget
@@ -134,7 +136,7 @@ class CarBodyGroupBox():
     
     def create_label(self):
 
-        label = "Body consists of following elements:\n"
+        label = "Korpus zawiera następujące elementy:\n"
 
         if self.body.cup.is_activated is True:
             label += f"▸  Cup:\n\t ▪ Material: {self.body.cup.material}\n\t ▪ Size: {self.body.cup.size}\n"
@@ -142,8 +144,12 @@ class CarBodyGroupBox():
             label += f"▸  Screen:\n\t ▪ Type: {self.body.car_screen.type}\n\t ▪ Size: {self.body.car_screen.size}\n"
         if self.body.upper_panel.is_activated is True:
             label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.upper_panel.type}\n"
+        if self.body.middle_panel.is_activated is True:
+            label += f"▸  Panel środkowy:\n\t ▪ Funkcjonalność: {self.body.middle_panel.functionality}\n"
         if self.body.lower_panel.is_activated is True:
-            label += f"▸  Panel dolny:\n\t ▪ Funkcjonalność: {self.body.lower_panel.functionality}\n\t ▪ Chwytaki na kubki: {self.body.lower_panel.is_cup}\n\t ▪ Kolor: {self.body.lower_panel.color}\n"
+            label += (f"▸  Panel dolny:\n\t ▪ Funkcjonalność: {self.body.lower_panel.functionality}\n\t "
+                      f"▪ Chwytaki na kubki: {self.body.lower_panel.is_cup}\n\t" 
+                      f" ▪ Kolor: {self.body.lower_panel.color}\n")
 
         return label
 
@@ -161,7 +167,7 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
 
-        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""), LowerPanel("", "", ""))
+        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""), MiddlePanel(""), LowerPanel("", "", ""))
         self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
@@ -179,9 +185,9 @@ class GUI(QMainWindow):
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
-        self.tabs.addTab(self.tab1, "Add Body")
-        self.tabs.addTab(self.tab2, "Current Body state")
-        self.tabs.addTab(self.tab3, "Gantt chart")
+        self.tabs.addTab(self.tab1, "Dodaj korpus")
+        self.tabs.addTab(self.tab2, "Stan korpusów")
+        self.tabs.addTab(self.tab3, "Wykres Gantta")
 
         self.create_tabs_content()
         layout.addWidget(self.tabs)
@@ -195,6 +201,7 @@ class GUI(QMainWindow):
 
         sub_tab1 = QWidget()
         sub_tab2 = QWidget()
+        sub_tab3 = QWidget()
         sub_tab4 = QWidget()
         sub_tab5 = QWidget()
 
@@ -202,12 +209,14 @@ class GUI(QMainWindow):
 
         sub_tab1 = self.create_sub_tab_cup_content()
         sub_tab2 = self.create_sub_tab_screen_content()
-        sub_tab4 = self.create_sub_tab_upper_panel_content()
+        sub_tab3 = self.create_sub_tab_upper_panel_content()
+        sub_tab4 = self.create_sub_tab_middle_panel_content()
         sub_tab5 = self.create_sub_tab_lower_panel_content()
 
         sub_tab_widget.addTab(sub_tab1, "Cup")
         sub_tab_widget.addTab(sub_tab2, "Screen")
-        sub_tab_widget.addTab(sub_tab4, "Panel górny")
+        sub_tab_widget.addTab(sub_tab3, "Panel górny")
+        sub_tab_widget.addTab(sub_tab4, "Panel środkowy")
         sub_tab_widget.addTab(sub_tab5, "Panel dolny")
 
         stacked_widget = QStackedWidget()
@@ -231,7 +240,7 @@ class GUI(QMainWindow):
 
         self.layout = QVBoxLayout()
 
-        self.starting_label = QLabel("There are no bodys in the making")
+        self.starting_label = QLabel("Brak korpusów w produkcji")
         self.starting_label.setStyleSheet(style_sheet_label)
         self.starting_label.setAlignment(Qt.AlignCenter)
 
@@ -279,7 +288,7 @@ class GUI(QMainWindow):
         combo_box_size.currentIndexChanged.connect(self.on_change_cbox_cup_size)
         combo_box_size.activated.connect(self.on_activate_cbox_cup_size)
 
-        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
         button_add_to_corpse.clicked.connect(self.on_change_pb_cup)
 
@@ -335,7 +344,7 @@ class GUI(QMainWindow):
         combo_box_size.currentIndexChanged.connect(self.on_change_cbox_screen_size)
         combo_box_size.activated.connect(self.on_activate_cbox_screen_size)
 
-        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
         button_add_to_corpse.clicked.connect(self.on_change_pb_screen)
 
@@ -404,7 +413,7 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
         button_add_to_corpse.clicked.connect(self.pb_upper_panel_clicked)
 
@@ -434,6 +443,52 @@ class GUI(QMainWindow):
         sub_tab_cup.setLayout(sub_layout1)
 
         return sub_tab_cup
+    
+    def create_sub_tab_middle_panel_content(self):
+
+        sub_tab_cup = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu środkowego")
+        label_material = QLabel("Funkcjonalność")
+        label_material.setStyleSheet(style_sheet_label)
+
+        radio1 = QRadioButton("Interfejs multimedialny")
+        radio2 = QRadioButton("Schowek")
+        radio1.toggled.connect(self.on_radio_button_middle_panel_clicked)
+        radio2.toggled.connect(self.on_radio_button_middle_panel_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio1)
+        radio_vboxlayout1.addWidget(radio2)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        button_add_to_corpse = QPushButton("Dodaj")
+        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse.clicked.connect(self.pb_middle_panel_clicked)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(button_add_to_corpse)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_cup.setLayout(sub_layout1)
+
+        return sub_tab_cup    
     
     def create_sub_tab_lower_panel_content(self):
 
@@ -473,9 +528,9 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = QPushButton("Add")
+        button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_upper_panel_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_lower_panel_clicked)
 
         combo_box_color = QComboBox()
         combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
@@ -654,6 +709,15 @@ class GUI(QMainWindow):
 
         self.body.upper_panel.check_activation()
 
+    def on_radio_button_middle_panel_clicked(self):
+        sender = self.sender()
+
+        if sender.isChecked():
+            self.body.middle_panel.functionality = sender.text()
+            print(f'Selected option: {sender.text()}')
+
+        self.body.middle_panel.check_activation()
+
     def on_radio_button_lower_panel_clicked(self):
         sender = self.sender()
 
@@ -669,6 +733,36 @@ class GUI(QMainWindow):
 
     def pb_upper_panel_clicked(self):
         print(f"Gorny panel dodany z parametrami: {self.body.upper_panel.is_controlable}, {self.body.upper_panel.type}")
+
+        self.create_group_box_body()
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
+        if self.body_counter == 0:
+            self.body_counter += 1
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+
+    def pb_middle_panel_clicked(self):
+        print(f"Środkowy panel dodany z parametrami: {self.body.middle_panel.functionality}")
+
+        self.create_group_box_body()
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
+        if self.body_counter == 0:
+            self.body_counter += 1
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+
+    def pb_lower_panel_clicked(self):
+        print(f"Dolny panel dodany z parametrami: {self.body.lower_panel.functionality}, {self.body.lower_panel.is_cup}, {self.body.lower_panel.color}")
 
         self.create_group_box_body()
         # self.car_body_group_box.group_box.setFixedSize(738, 200)
