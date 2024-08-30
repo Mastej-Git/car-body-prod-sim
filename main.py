@@ -29,6 +29,7 @@ from body_parts.CarScreen import CarScreen
 from body_parts.UpperPanel import UpperPanel
 from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
+from body_parts.Armrest import Armrest
 
 from utils.MatPlotlibWidget import MatplotlibWidget
 
@@ -150,6 +151,10 @@ class CarBodyGroupBox():
             label += (f"▸  Panel dolny:\n\t ▪ Funkcjonalność: {self.body.lower_panel.functionality}\n\t "
                       f"▪ Chwytaki na kubki: {self.body.lower_panel.is_cup}\n\t" 
                       f" ▪ Kolor: {self.body.lower_panel.color}\n")
+        if self.body.armrest.is_activated is True:
+            label += (f"▸  Podłokietnik:\n\t ▪ Podgrzewanie: {self.body.armrest.heating}\n\t "
+                      f"▪ Materiał: {self.body.armrest.material}\n\t" 
+                      f" ▪ Kolor: {self.body.armrest.color}\n")
 
         return label
 
@@ -167,7 +172,12 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
 
-        self.body = Body(Cup("", ""), AirConditioning("", "", ""), CarScreen("", ""), UpperPanel("", ""), MiddlePanel(""), LowerPanel("", "", ""))
+        self.body = Body(Cup("", ""),
+                         AirConditioning("", "", ""),
+                         CarScreen("", ""), UpperPanel("", ""),
+                         MiddlePanel(""),
+                         LowerPanel("", "", ""),
+                         Armrest("", "", ""))
         self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
@@ -212,12 +222,14 @@ class GUI(QMainWindow):
         sub_tab3 = self.create_sub_tab_upper_panel_content()
         sub_tab4 = self.create_sub_tab_middle_panel_content()
         sub_tab5 = self.create_sub_tab_lower_panel_content()
+        sub_tab6 = self.create_sub_tab_armrest_content()
 
         sub_tab_widget.addTab(sub_tab1, "Cup")
         sub_tab_widget.addTab(sub_tab2, "Screen")
         sub_tab_widget.addTab(sub_tab3, "Panel górny")
         sub_tab_widget.addTab(sub_tab4, "Panel środkowy")
         sub_tab_widget.addTab(sub_tab5, "Panel dolny")
+        sub_tab_widget.addTab(sub_tab6, "Podłokietnik")
 
         stacked_widget = QStackedWidget()
         stacked_widget.addWidget(sub_tab_widget)
@@ -536,7 +548,7 @@ class GUI(QMainWindow):
         combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
         combo_box_color.setStyleSheet(style_sheet_QComboBox)
         combo_box_color.currentIndexChanged.connect(self.on_change_cbox_lower_panel_color)
-        combo_box_color.activated.connect(self.on_activate_cbox_lower_panel_color)
+        combo_box_color.activated.connect(self.on_change_cbox_lower_panel_color)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -559,6 +571,75 @@ class GUI(QMainWindow):
 
         sub_layout1.addWidget(group_box1)
         sub_tab_cup.setLayout(sub_layout1)
+
+        return sub_tab_cup
+    
+    def create_sub_tab_armrest_content(self):
+
+        sub_tab_cup = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry podłokietnika")
+        label_heating = QLabel("Grzanie")
+        label_heating.setStyleSheet(style_sheet_label)
+        label_material = QLabel("Materiał")
+        label_material.setStyleSheet(style_sheet_label)
+        label_color = QLabel("Kolor")
+        label_color.setStyleSheet(style_sheet_label)
+
+        radio1 = QRadioButton("Tak")
+        radio2 = QRadioButton("Nie")
+        radio1.toggled.connect(self.on_radio_button_armrest_clicked)
+        radio2.toggled.connect(self.on_radio_button_armrest_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio1)
+        radio_vboxlayout1.addWidget(radio2)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        combo_box_material = QComboBox()
+        combo_box_material.addItems(["Skóra", "Eko skóra", "Sztuczna skóra"])
+        combo_box_material.setStyleSheet(style_sheet_QComboBox)
+        combo_box_material.currentIndexChanged.connect(self.on_change_cbox_armrest_material)
+        combo_box_material.activated.connect(self.on_change_cbox_armrest_material)
+
+        combo_box_color = QComboBox()
+        combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
+        combo_box_color.setStyleSheet(style_sheet_QComboBox)
+        combo_box_color.currentIndexChanged.connect(self.on_change_cbox_armrest_color)
+        combo_box_color.activated.connect(self.on_change_cbox_armrest_color)
+
+        button_add_to_corpse = QPushButton("Dodaj")
+        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse.clicked.connect(self.pb_armrest_clicked)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_heating)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_material)
+        vbox_sub2.addWidget(combo_box_material)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(label_color)
+        vbox_main.addWidget(combo_box_color)
+        vbox_main.addWidget(button_add_to_corpse)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_cup.setLayout(sub_layout1)
+
 
         return sub_tab_cup
     
@@ -670,16 +751,26 @@ class GUI(QMainWindow):
         elif index == 2:
             self.body.lower_panel.color = "Niebieski"
         self.body.lower_panel.check_activation()
-
-    def on_activate_cbox_lower_panel_color(self, index):
-        # print(f"Selected material index: {index}")
+    
+    def on_change_cbox_armrest_material(self, index):
+        # print(f"Selected size index: {index}")
         if index == 0:
-            self.body.lower_panel.color = "Czerwony"
+            self.body.armrest.material = "Skóra"
         elif index == 1:
-            self.body.lower_panel.color = "Zielony"
+            self.body.armrest.material = "Eko skóra"
         elif index == 2:
-            self.body.lower_panel.color = "Niebieski"
-        self.body.lower_panel.check_activation()
+            self.body.armrest.material = "Sztuczna skóra"
+        self.body.armrest.check_activation()
+
+    def on_change_cbox_armrest_color(self, index):
+        # print(f"Selected size index: {index}")
+        if index == 0:
+            self.body.armrest.color = "Czerwony"
+        elif index == 1:
+            self.body.armrest.color = "Zielony"
+        elif index == 2:
+            self.body.armrest.color = "Niebieski"
+        self.body.armrest.check_activation()
 
     def on_change_pb_screen(self):
         print(f"Screen added with parameters: {self.body.car_screen.type}, {self.body.car_screen.size}")
@@ -731,6 +822,15 @@ class GUI(QMainWindow):
 
         self.body.lower_panel.check_activation()
 
+    def on_radio_button_armrest_clicked(self):
+        sender = self.sender()
+
+        if sender.isChecked():
+            self.body.armrest.heating = sender.text()
+        print(f'Selected option: {sender.text()}')
+
+        self.body.lower_panel.check_activation()
+
     def pb_upper_panel_clicked(self):
         print(f"Gorny panel dodany z parametrami: {self.body.upper_panel.is_controlable}, {self.body.upper_panel.type}")
 
@@ -763,6 +863,21 @@ class GUI(QMainWindow):
 
     def pb_lower_panel_clicked(self):
         print(f"Dolny panel dodany z parametrami: {self.body.lower_panel.functionality}, {self.body.lower_panel.is_cup}, {self.body.lower_panel.color}")
+
+        self.create_group_box_body()
+        # self.car_body_group_box.group_box.setFixedSize(738, 200)
+        self.car_body_group_box.group_box.setMinimumWidth(738)
+        if self.body_counter == 0:
+            self.body_counter += 1
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        if self.outer_layout.count() == self.body_counter:
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+
+    def pb_armrest_clicked(self):
+        print(f"Podłokietnik dodany z parametrami: {self.body.armrest.heating}, {self.body.armrest.material}, {self.body.armrest.color}")
 
         self.create_group_box_body()
         # self.car_body_group_box.group_box.setFixedSize(738, 200)
