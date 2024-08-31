@@ -88,7 +88,7 @@ QTabBar::tab {
     background: #2e2e2e;
     color: #b1b1b1;
     width: 50px;
-    height: 130px;
+    height: 140px;
 }
 
 QTabBar::tab:selected {
