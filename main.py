@@ -1,6 +1,3 @@
-import time
-import threading
-
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -17,22 +14,18 @@ from PyQt5.QtWidgets import (
     QScrollArea,
     QRadioButton
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, pyqtSlot, QMutex
-
-from PetrisNet import PetriNet
+from PyQt5.QtCore import Qt, pyqtSlot, QMutex
 
 from Body import Body
-from body_parts.Cup import Cup
-from body_parts.AirConditioning import AirConditioning
-from body_parts.CarScreen import CarScreen
-
 from body_parts.UpperPanel import UpperPanel
 from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
 from body_parts.Armrest import Armrest
 from body_parts.CupHolder import CupHolder
 
-from utils.MatPlotlibWidget import MatplotlibWidget
+from petri_nets.PetriNetThread import PetriNetThread
+
+from other.MatPlotlibWidget import MatplotlibWidget
 
 from other.StyleSheets import (
     style_sheet_central_widget,
@@ -47,61 +40,12 @@ from other.Enums import CupMaterial, ScreenTypes
 
 from CupPetriNet import cup_main_petri_net
 
-lock = threading.Lock()
-mutex = QMutex()
+def create_push_button(name, size_x, size_y):
+        button = QPushButton(name)
+        button.setStyleSheet(style_sheet_QPushButton)
+        button.setFixedSize(size_x, size_y)
 
-class PetriNetThread(QThread):
-
-    finished_signal = pyqtSignal(int)
-
-    def __init__(self, thread_id, body: Body, mpl_widget: MatplotlibWidget):
-        super().__init__()
-        self._running = True
-        # self.finished_signal.connect(self.stop)
-        self.petri_net = cup_main_petri_net
-        self.body = body
-        self.thread_id = thread_id
-        self.available_transitions = []
-        self.executed_transitions = []
-        self.mpl_widget = mpl_widget
-
-        if self.body.cup.material == CupMaterial.ALUMINUM:
-            self.available_transitions = ["T2", "T3", "T6", "T9", "T12",
-                                          "T15", "T18", "T21", "T24", "T27",
-                                          "T28"]
-        elif self.body.cup.material == CupMaterial.STAINLESS_STEEL:
-            self.available_transitions = ["T2", "T4", "T7", "T10", "T13", 
-                                          "T16", "T19", "T22", "T25", "T27", 
-                                          "T28"]  
-
-        self.petri_net.fire_transition("T1")
-
-        print(self.thread_id)
-
-    def run(self):
-        i = 0
-
-        while self._running:
-            mutex.lock()
-            try:
-                if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                    print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
-                    self.petri_net.fire_transition(self.available_transitions[i])
-                    self.executed_transitions.append(self.available_transitions[i])
-                    self.mpl_widget.plot()
-                    i += 1
-
-                if self.executed_transitions == self.available_transitions:
-                    break
-            finally:
-                mutex.unlock()
-
-            time.sleep(2)
-
-        self.finished_signal.emit(self.thread_id)
-
-    def stop(self):
-        self._running = False
+        return button
 
 class CarBodyGroupBox():
 
@@ -117,9 +61,9 @@ class CarBodyGroupBox():
         label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         label.setStyleSheet(style_sheet_label)
 
-        self.button_schedule = self.create_push_button("Schedule", 200, 40)
-        self.button_remove = self.create_push_button("Remove", 200, 40)
-        self.button_edit = self.create_push_button("Edit", 200, 40)
+        self.button_schedule = create_push_button("Schedule", 200, 40)
+        self.button_remove = create_push_button("Remove", 200, 40)
+        self.button_edit = create_push_button("Edit", 200, 40)
 
         buttons_layout = QVBoxLayout()
         buttons_layout.addWidget(self.button_schedule)
@@ -140,10 +84,6 @@ class CarBodyGroupBox():
 
         label = "Korpus zawiera następujące elementy:\n"
 
-        if self.body.cup.is_activated is True:
-            label += f"▸  Cup:\n\t ▪ Material: {self.body.cup.material}\n\t ▪ Size: {self.body.cup.size}\n"
-        if self.body.car_screen.is_activated is True:
-            label += f"▸  Screen:\n\t ▪ Type: {self.body.car_screen.type}\n\t ▪ Size: {self.body.car_screen.size}\n"
         if self.body.upper_panel.is_activated is True:
             label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.upper_panel.type}\n"
         if self.body.middle_panel.is_activated is True:
@@ -161,13 +101,6 @@ class CarBodyGroupBox():
 
         return label
 
-    def create_push_button(self, name, size_x, size_y):
-        button = QPushButton(name)
-        button.setStyleSheet(style_sheet_QPushButton)
-        button.setFixedSize(size_x, size_y)
-
-        return button
-
 class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -175,9 +108,7 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
 
-        self.body = Body(Cup("", ""),
-                         AirConditioning("", "", ""),
-                         CarScreen("", ""), UpperPanel("", ""),
+        self.body = Body(UpperPanel("", ""),
                          MiddlePanel(""),
                          LowerPanel("", "", ""),
                          Armrest("", "", ""),
@@ -194,7 +125,6 @@ class GUI(QMainWindow):
         self.tabs = QTabWidget()
         self.tabs.tabBar().setExpanding(True)
         self.tabs.setStyleSheet(style_sheet_tab)
-
         
         self.tab1 = QWidget()
         self.tab2 = QWidget()
@@ -213,29 +143,19 @@ class GUI(QMainWindow):
         sub_tab_widget.setTabPosition(QTabWidget.West)
         sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
 
-        sub_tab1 = QWidget()
-        sub_tab2 = QWidget()
-        sub_tab3 = QWidget()
-        sub_tab4 = QWidget()
-        sub_tab5 = QWidget()
-
         self.gowno = 1
 
-        sub_tab1 = self.create_sub_tab_cup_content()
-        sub_tab2 = self.create_sub_tab_screen_content()
-        sub_tab3 = self.create_sub_tab_upper_panel_content()
-        sub_tab4 = self.create_sub_tab_middle_panel_content()
-        sub_tab5 = self.create_sub_tab_lower_panel_content()
-        sub_tab6 = self.create_sub_tab_armrest_content()
-        sub_tab7 = self.create_sub_tab_cup_holder_content()
+        sub_tab1 = self.create_sub_tab_upper_panel_content()
+        sub_tab2 = self.create_sub_tab_middle_panel_content()
+        sub_tab3 = self.create_sub_tab_lower_panel_content()
+        sub_tab4 = self.create_sub_tab_armrest_content()
+        sub_tab5 = self.create_sub_tab_cup_holder_content()
 
-        sub_tab_widget.addTab(sub_tab1, "Cup")
-        sub_tab_widget.addTab(sub_tab2, "Screen")
-        sub_tab_widget.addTab(sub_tab3, "Panel górny")
-        sub_tab_widget.addTab(sub_tab4, "Panel środkowy")
-        sub_tab_widget.addTab(sub_tab5, "Panel dolny")
-        sub_tab_widget.addTab(sub_tab6, "Podłokietnik")
-        sub_tab_widget.addTab(sub_tab7, "Miejsce na kubki")
+        sub_tab_widget.addTab(sub_tab1, "Panel górny")
+        sub_tab_widget.addTab(sub_tab2, "Panel środkowy")
+        sub_tab_widget.addTab(sub_tab3, "Panel dolny")
+        sub_tab_widget.addTab(sub_tab4, "Podłokietnik")
+        sub_tab_widget.addTab(sub_tab5, "Miejsce na kubki")
 
         stacked_widget = QStackedWidget()
         stacked_widget.addWidget(sub_tab_widget)
@@ -280,122 +200,10 @@ class GUI(QMainWindow):
         layout3.addWidget(self.mpl_widget)
         self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
-
-    def create_sub_tab_cup_content(self):
-
-        sub_tab_cup = QWidget()
-
-        sub_layout1 = QVBoxLayout()
-
-        group_box1 = QGroupBox("Cup parameters")
-        label_material = QLabel("Material")
-        label_material.setStyleSheet(style_sheet_label)
-        label_size = QLabel("Size")
-        label_size.setStyleSheet(style_sheet_label)
-
-        combo_box_material = QComboBox()
-        # combo_box_material.addItems([CupMaterial.ALUMINUM, CupMaterial.STAINLESS_STEEL, CupMaterial.POLICARBONATE])
-        combo_box_material.addItems(["Aluminum", "Stainless steel", "Policarbonate"])
-        combo_box_material.setStyleSheet(style_sheet_QComboBox)
-        combo_box_material.currentIndexChanged.connect(self.on_change_cbox_cup_material)
-        combo_box_material.activated.connect(self.on_activate_cbox_cup_material)
-
-        combo_box_size = QComboBox()
-        combo_box_size.addItems(["500 ml", "750 ml", "1 L"])
-        combo_box_size.setStyleSheet(style_sheet_QComboBox)
-        combo_box_size.currentIndexChanged.connect(self.on_change_cbox_cup_size)
-        combo_box_size.activated.connect(self.on_activate_cbox_cup_size)
-
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.on_change_pb_cup)
-
-        vbox_main = QVBoxLayout()
-        hbox_cboxs = QHBoxLayout()
-        vbox_sub1 = QVBoxLayout()
-        vbox_sub2 = QVBoxLayout()
-
-        vbox_sub1.addWidget(label_material)
-        vbox_sub1.addWidget(combo_box_material)
-        vbox_sub1.setSpacing(5)
-
-        vbox_sub2.addWidget(label_size)
-        vbox_sub2.addWidget(combo_box_size)
-        vbox_sub2.setSpacing(5)
-
-        hbox_cboxs.addLayout(vbox_sub1)
-        hbox_cboxs.addLayout(vbox_sub2)
-        hbox_cboxs.setSpacing(20)
-
-        vbox_main.addLayout(hbox_cboxs)
-        vbox_main.addWidget(button_add_to_corpse)
-
-        group_box1.setLayout(vbox_main)
-
-        sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
-
-        return sub_tab_cup
-    
-    def create_sub_tab_screen_content(self):
-
-        sub_tab_cup = QWidget()
-
-        sub_layout1 = QVBoxLayout()
-
-        group_box1 = QGroupBox("Screen parameters")
-        label_material = QLabel("Type")
-        label_material.setStyleSheet(style_sheet_label)
-        label_size = QLabel("Size")
-        label_size.setStyleSheet(style_sheet_label)
-
-        combo_box_material = QComboBox()
-        # combo_box_material.addItems([ScreenTypes.RESISTIVE, ScreenTypes.CAPACITIVE, ScreenTypes.PROJECTED_CAPACITIVE])
-        combo_box_material.addItems(["Resistive", "Capacitive", "Projected Capacitive"])
-        combo_box_material.setStyleSheet(style_sheet_QComboBox)
-        combo_box_material.currentIndexChanged.connect(self.on_change_cbox_screen_type)
-        combo_box_material.activated.connect(self.on_activate_cbox_screen_type)
-
-        combo_box_size = QComboBox()
-        combo_box_size.addItems(["7 inches", "8 inches", "10 inches"])
-        combo_box_size.setStyleSheet(style_sheet_QComboBox)
-        combo_box_size.currentIndexChanged.connect(self.on_change_cbox_screen_size)
-        combo_box_size.activated.connect(self.on_activate_cbox_screen_size)
-
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.on_change_pb_screen)
-
-        vbox_main = QVBoxLayout()
-        hbox_cboxs = QHBoxLayout()
-        vbox_sub1 = QVBoxLayout()
-        vbox_sub2 = QVBoxLayout()
-
-        vbox_sub1.addWidget(label_material)
-        vbox_sub1.addWidget(combo_box_material)
-        vbox_sub1.setSpacing(5)
-
-        vbox_sub2.addWidget(label_size)
-        vbox_sub2.addWidget(combo_box_size)
-        vbox_sub2.setSpacing(5)
-
-        hbox_cboxs.addLayout(vbox_sub1)
-        hbox_cboxs.addLayout(vbox_sub2)
-        hbox_cboxs.setSpacing(20)
-
-        vbox_main.addLayout(hbox_cboxs)
-        vbox_main.addWidget(button_add_to_corpse)
-
-        group_box1.setLayout(vbox_main)
-
-        sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
-
-        return sub_tab_cup
     
     def create_sub_tab_upper_panel_content(self):
 
-        sub_tab_cup = QWidget()
+        sub_tab_upper_panel = QWidget()
 
         sub_layout1 = QVBoxLayout()
 
@@ -433,7 +241,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_upper_panel_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
         hbox_cboxs = QHBoxLayout()
@@ -458,13 +266,13 @@ class GUI(QMainWindow):
         group_box1.setLayout(vbox_main)
 
         sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
+        sub_tab_upper_panel.setLayout(sub_layout1)
 
-        return sub_tab_cup
+        return sub_tab_upper_panel
     
     def create_sub_tab_middle_panel_content(self):
 
-        sub_tab_cup = QWidget()
+        sub_tab_middle_panel = QWidget()
 
         sub_layout1 = QVBoxLayout()
 
@@ -487,7 +295,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_middle_panel_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -504,13 +312,13 @@ class GUI(QMainWindow):
         group_box1.setLayout(vbox_main)
 
         sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
+        sub_tab_middle_panel.setLayout(sub_layout1)
 
-        return sub_tab_cup    
+        return sub_tab_middle_panel    
     
     def create_sub_tab_lower_panel_content(self):
 
-        sub_tab_cup = QWidget()
+        sub_tab_lower_panel = QWidget()
 
         sub_layout1 = QVBoxLayout()
 
@@ -548,7 +356,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_lower_panel_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         combo_box_color = QComboBox()
         combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
@@ -576,13 +384,13 @@ class GUI(QMainWindow):
         group_box1.setLayout(vbox_main)
 
         sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
+        sub_tab_lower_panel.setLayout(sub_layout1)
 
-        return sub_tab_cup
+        return sub_tab_lower_panel
     
     def create_sub_tab_armrest_content(self):
 
-        sub_tab_cup = QWidget()
+        sub_tab_armrest = QWidget()
 
         sub_layout1 = QVBoxLayout()
 
@@ -621,7 +429,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_armrest_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -644,14 +452,13 @@ class GUI(QMainWindow):
         group_box1.setLayout(vbox_main)
 
         sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
+        sub_tab_armrest.setLayout(sub_layout1)
 
-
-        return sub_tab_cup
+        return sub_tab_armrest
     
     def create_sub_tab_cup_holder_content(self):
 
-        sub_tab_cup = QWidget()
+        sub_tab_cup_holder = QWidget()
 
         sub_layout1 = QVBoxLayout()
 
@@ -682,7 +489,7 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = QPushButton("Dodaj")
         button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
-        button_add_to_corpse.clicked.connect(self.pb_cup_holder_clicked)
+        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -701,109 +508,14 @@ class GUI(QMainWindow):
         group_box1.setLayout(vbox_main)
 
         sub_layout1.addWidget(group_box1)
-        sub_tab_cup.setLayout(sub_layout1)
+        sub_tab_cup_holder.setLayout(sub_layout1)
 
 
-        return sub_tab_cup
+        return sub_tab_cup_holder
     
     def create_group_box_body(self):
         self.car_body_group_box = CarBodyGroupBox(self.body)
         self.car_body_group_box.button_schedule.pressed.connect(self.on_schedule_clicked)
-
-    def on_change_cbox_cup_material(self, index):
-        # print(f"Selected material index: {index}")
-        if index == 0:
-            self.body.cup.material = CupMaterial.ALUMINUM
-        elif index == 1:
-            self.body.cup.material = CupMaterial.STAINLESS_STEEL
-        elif index == 2:
-            self.body.cup.material = CupMaterial.POLICARBONATE
-        self.body.cup.check_activation()
-
-    def on_change_cbox_cup_size(self, index):
-        # print(f"Selected size index: {index}")
-        if index == 0:
-            self.body.cup.size = "500 ml"
-        elif index == 1:
-            self.body.cup.size = "750 ml"
-        elif index == 2:
-            self.body.cup.size = "1 L"
-        self.body.cup.check_activation()
-
-    def on_activate_cbox_cup_material(self, index):
-        # print(f"Selected material index: {index}")
-        if index == 0:
-            self.body.cup.material = CupMaterial.ALUMINUM
-        elif index == 1:
-            self.body.cup.material = CupMaterial.STAINLESS_STEEL
-        elif index == 2:
-            self.body.cup.material = CupMaterial.POLICARBONATE
-        self.body.cup.check_activation()
-
-    def on_activate_cbox_cup_size(self, index):
-        # print(f"Selected size index: {index}")
-        if index == 0:
-            self.body.cup.size = "500 ml"
-        elif index == 1:
-            self.body.cup.size = "750 ml"
-        elif index == 2:
-            self.body.cup.size = "1 L"
-        self.body.cup.check_activation()
-
-    def on_change_pb_cup(self):
-        print(f"Cup added with parameters: {self.body.cup.material}, {self.body.cup.size}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def on_change_cbox_screen_type(self, index):
-        # print(f"Selected material index: {index}")
-        if index == 0:
-            self.body.car_screen.type = ScreenTypes.RESISTIVE
-        elif index == 1:
-            self.body.car_screen.type = ScreenTypes.CAPACITIVE
-        elif index == 2:
-            self.body.car_screen.type = ScreenTypes.PROJECTED_CAPACITIVE
-        self.body.car_screen.check_activation()
-
-    def on_change_cbox_screen_size(self, index):
-        # print(f"Selected size index: {index}")
-        if index == 0:
-            self.body.car_screen.size = "7 inches"
-        elif index == 1:
-            self.body.car_screen.size = "8 inches"
-        elif index == 2:
-            self.body.car_screen.size = "10 inches"
-        self.body.car_screen.check_activation()
-
-    def on_activate_cbox_screen_type(self, index):
-        # print(f"Selected material index: {index}")
-        if index == 0:
-            self.body.car_screen.type = ScreenTypes.RESISTIVE
-        elif index == 1:
-            self.body.car_screen.type = ScreenTypes.CAPACITIVE
-        elif index == 2:
-            self.body.car_screen.type = ScreenTypes.PROJECTED_CAPACITIVE
-        self.body.car_screen.check_activation()
-
-    def on_activate_cbox_screen_size(self, index):
-        # print(f"Selected size index: {index}")
-        if index == 0:
-            self.body.car_screen.size = "7 inches"
-        elif index == 1:
-            self.body.car_screen.size = "8 inches"
-        elif index == 2:
-            self.body.car_screen.size = "10 inches"
-        self.body.car_screen.check_activation()
 
     def on_change_cbox_lower_panel_color(self, index):
         # print(f"Selected size index: {index}")
@@ -913,8 +625,7 @@ class GUI(QMainWindow):
 
         self.body.cup_holder.check_activation()
 
-    def pb_upper_panel_clicked(self):
-        print(f"Gorny panel dodany z parametrami: {self.body.upper_panel.is_controlable}, {self.body.upper_panel.type}")
+    def pb_add_clicked(self):
 
         self.create_group_box_body()
         # self.car_body_group_box.group_box.setFixedSize(738, 200)
@@ -927,73 +638,6 @@ class GUI(QMainWindow):
         if self.outer_layout.count() == self.body_counter:
             self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
         self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def pb_middle_panel_clicked(self):
-        print(f"Środkowy panel dodany z parametrami: {self.body.middle_panel.functionality}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def pb_lower_panel_clicked(self):
-        print(f"Dolny panel dodany z parametrami: {self.body.lower_panel.functionality}, {self.body.lower_panel.is_cup}, {self.body.lower_panel.color}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def pb_armrest_clicked(self):
-        print(f"Podłokietnik dodany z parametrami: {self.body.armrest.heating}, {self.body.armrest.material}, {self.body.armrest.color}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def pb_cup_holder_clicked(self):
-        print(f"Miejsce na kubki dodane z parametrami: {self.body.cup_holder.usb_socket}, {self.body.cup_holder.color}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
-
-    def create_push_button(self, name, size_x, size_y):
-        button = QPushButton(name)
-        button.setStyleSheet(style_sheet_QPushButton)
-        button.setFixedSize(size_x, size_y)
-
-        return button
     
     @pyqtSlot()
     def on_schedule_clicked(self):
@@ -1005,8 +649,7 @@ class GUI(QMainWindow):
         # self.petri_net_thread.start()
         self.list_of_threads[self.body_counter - 1].start()
 
-        self.body.cup.remove_parameters()
-        self.body.car_screen.remove_parameters()
+        self.body.remove_parameters()
         self.car_body_group_box.button_schedule.setEnabled(False)
 
         self.body_counter += 1
