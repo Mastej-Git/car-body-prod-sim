@@ -1,0 +1,52 @@
+[
+    {
+        "body": {
+            "upper_panel": {
+                    "is_controllable": "Tak",
+                    "type": "4-strefowa"
+            },
+            "middle_panel": {
+                    "functionality": "Interfejs multimedialny"
+            },
+            "lower_panel": {
+                    "functionality": "Ładowarka bezprzewodowa",
+                    "is_cup": "Tak",
+                    "color": "Czerwony"
+            },
+            "armrest": {
+                    "heating": "Tak",
+                    "material": "Skóra",
+                    "color": "Czerwony"
+            },
+            "cup_holder": {
+                    "usb_socket": "Tak",
+                    "color": "Czerwony"
+            }
+        }
+    },
+    {
+        "body": {
+            "upper_panel": {
+                    "is_controllable": "Tak",
+                    "type": "2-strefowa"
+            },
+            "middle_panel": {
+                    "functionality": "Schowek"
+            },
+            "lower_panel": {
+                    "functionality": "Półka",
+                    "is_cup": "Nie",
+                    "color": "Niebieski"
+            },
+            "armrest": {
+                    "heating": "Tak",
+                    "material": "Eko skóra",
+                    "color": "Niebieski"
+            },
+            "cup_holder": {
+                    "usb_socket": "Nie",
+                    "color": "Niebieski"
+            }
+        }
+    } 
+]

@@ -1,3 +1,5 @@
+import json, copy
+
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -36,7 +38,6 @@ from other.StyleSheets import (
     style_sheet_sub_tab,
     style_sheet_tab
 )
-from other.Enums import CupMaterial, ScreenTypes
 
 from CupPetriNet import cup_main_petri_net
 
@@ -47,28 +48,77 @@ def create_push_button(name, size_x, size_y):
 
         return button
 
+class ReadJSON():
+
+    def __init__(self, file_name: str):
+
+        self.file_name = file_name
+
+    def parse_json(self, gui):
+
+        with open(self.file_name, "r") as file:
+            body_configs = json.load(file)
+
+        for index, body_config in enumerate(body_configs):
+
+            body_tmp = Body(gui.body_counter, upper_panel=UpperPanel("", ""), 
+                middle_panel=MiddlePanel(""), 
+                lower_panel=LowerPanel("", "", ""),
+                armrest=Armrest("", "", ""),
+                cup_holder=CupHolder("", ""))
+
+            body_tmp.upper_panel.is_controlable = body_config['body']['upper_panel']['is_controllable']
+            body_tmp.upper_panel.type = body_config['body']['upper_panel']['type']
+
+            body_tmp.middle_panel.functionality = body_config['body']['middle_panel']['functionality']
+
+            body_tmp.lower_panel.functionality = body_config['body']['lower_panel']['functionality']
+            body_tmp.lower_panel.is_cup = body_config['body']['lower_panel']['is_cup']
+            body_tmp.lower_panel.color = body_config['body']['lower_panel']['color']
+
+            body_tmp.armrest.heating = body_config['body']['armrest']['heating']
+            body_tmp.armrest.material = body_config['body']['armrest']['material']
+            body_tmp.armrest.color = body_config['body']['armrest']['color']
+
+            body_tmp.cup_holder.usb_socket = body_config['body']['cup_holder']['usb_socket']
+            body_tmp.cup_holder.color = body_config['body']['cup_holder']['color']
+
+            gui.list_of_bodys.append(body_tmp)
+
+            car_body_group_box = CarBodyGroupBox(gui.body_counter, body_tmp)
+            # car_body_group_box.button_schedule.pressed.connect(gui.pb_schedule_clicked)
+            car_body_group_box.button_ready.pressed.connect(gui.pb_ready_clicked)
+            if gui.body_counter == 0:
+                gui.outer_layout.removeWidget(gui.starting_label)
+                gui.starting_label.deleteLater()
+            gui.outer_layout.addWidget(car_body_group_box.group_box)
+            gui.body_counter += 1
+
 class CarBodyGroupBox():
 
-    def __init__(self, body: Body) -> None:
+    def __init__(self, id: int, body: Body) -> None:
         
         self.group_box = QGroupBox()
         self.body = body
+        self.id = id
 
-        label_text = self.create_label()
+        label_text = self.body.__str__()
 
         label = QLabel(label_text)
         label.setWordWrap(True)
         label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         label.setStyleSheet(style_sheet_label)
 
-        self.button_schedule = create_push_button("Schedule", 200, 40)
-        self.button_remove = create_push_button("Remove", 200, 40)
-        self.button_edit = create_push_button("Edit", 200, 40)
+        self.button_schedule = create_push_button("Planuj", 200, 40)
+        self.button_ready = create_push_button("Gotowe", 200, 40)
+        self.button_edit = create_push_button("Edytuj", 200, 40)
+        self.button_remove = create_push_button("Usuń", 200, 40)
 
         buttons_layout = QVBoxLayout()
         buttons_layout.addWidget(self.button_schedule)
-        buttons_layout.addWidget(self.button_remove)
+        buttons_layout.addWidget(self.button_ready)
         buttons_layout.addWidget(self.button_edit)
+        buttons_layout.addWidget(self.button_remove)
 
         main_layout = QHBoxLayout()
 
@@ -79,27 +129,6 @@ class CarBodyGroupBox():
 
     def get_car_body_group_box(self):
         return self.group_box
-    
-    def create_label(self):
-
-        label = "Korpus zawiera następujące elementy:\n"
-
-        if self.body.upper_panel.is_activated is True:
-            label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.body.upper_panel.is_controlable}\n\t ▪ Typ: {self.body.upper_panel.type}\n"
-        if self.body.middle_panel.is_activated is True:
-            label += f"▸  Panel środkowy:\n\t ▪ Funkcjonalność: {self.body.middle_panel.functionality}\n"
-        if self.body.lower_panel.is_activated is True:
-            label += (f"▸  Panel dolny:\n\t ▪ Funkcjonalność: {self.body.lower_panel.functionality}\n\t "
-                      f"▪ Chwytaki na kubki: {self.body.lower_panel.is_cup}\n\t" 
-                      f" ▪ Kolor: {self.body.lower_panel.color}\n")
-        if self.body.armrest.is_activated is True:
-            label += (f"▸  Podłokietnik:\n\t ▪ Podgrzewanie: {self.body.armrest.heating}\n\t "
-                      f"▪ Materiał: {self.body.armrest.material}\n\t" 
-                      f" ▪ Kolor: {self.body.armrest.color}\n")
-        if self.body.cup_holder.is_activated is True:
-            label += f"▸  Miejsce na kubki:\n\t ▪ Wejście USB: {self.body.cup_holder.usb_socket}\n\t ▪ Kolor: {self.body.cup_holder.color}\n"
-
-        return label
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -107,16 +136,13 @@ class GUI(QMainWindow):
 
         self.body_counter = 0
         self.list_of_threads = []
+        self.list_of_radio_buttons = []
 
-        self.body = Body(UpperPanel("", ""),
-                         MiddlePanel(""),
-                         LowerPanel("", "", ""),
-                         Armrest("", "", ""),
-                         CupHolder("", ""))
+        self.list_of_bodys = []
         self.petri_net = cup_main_petri_net
 
         self.setWindowTitle("Tab Example")
-        self.setGeometry(100, 100, 800, 1000)
+        self.setGeometry(100, 100, 1300, 1000)
 
         central_widget = QFrame()
         central_widget.setStyleSheet(style_sheet_central_widget)
@@ -129,21 +155,23 @@ class GUI(QMainWindow):
         self.tab1 = QWidget()
         self.tab2 = QWidget()
         self.tab3 = QWidget()
+        self.tab4 = QWidget()
         self.tabs.addTab(self.tab1, "Dodaj korpus")
         self.tabs.addTab(self.tab2, "Stan korpusów")
         self.tabs.addTab(self.tab3, "Wykres Gantta")
+        self.tabs.addTab(self.tab4, "Dodaj korpusy z pliku")
 
         self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
+
+        self.json_file_name = "bodys.json"
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
         sub_tab_widget.setTabPosition(QTabWidget.West)
         sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
-
-        self.gowno = 1
 
         sub_tab1 = self.create_sub_tab_upper_panel_content()
         sub_tab2 = self.create_sub_tab_middle_panel_content()
@@ -165,6 +193,7 @@ class GUI(QMainWindow):
         overlay_layout.addWidget(stacked_widget)
 
         plus_button = QPushButton("+")
+        plus_button.clicked.connect(self.pb_debug)
         plus_button.setFixedSize(40, 40)
         plus_button.setStyleSheet(style_sheet_QPushButton)
 
@@ -200,6 +229,12 @@ class GUI(QMainWindow):
         layout3.addWidget(self.mpl_widget)
         self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
+
+        layout4 = QVBoxLayout()
+        read_from_file_button = create_push_button("Wczytaj", 400, 80)
+        read_from_file_button.clicked.connect(self.pb_read_json)
+        layout4.addWidget(read_from_file_button)
+        self.tab4.setLayout(layout4)
     
     def create_sub_tab_upper_panel_content(self):
 
@@ -226,16 +261,18 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        radio3 = QRadioButton("4-strefowa")
-        radio4 = QRadioButton("2-strefowa")
-        radio3.toggled.connect(self.on_radio_button_upper_panel_clicked)
-        radio4.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio_upac_4 = QRadioButton("4-strefowa")
+        radio_upac_2 = QRadioButton("2-strefowa")
+        radio_upac_4.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio_upac_2.toggled.connect(self.on_radio_button_upper_panel_clicked)
+
+        self.list_of_radio_buttons.extend([radio1, radio2, radio_upac_4, radio_upac_2])
 
         radio_groupbox2 = QGroupBox()
         radio_vboxlayout2 = QVBoxLayout()
 
-        radio_vboxlayout2.addWidget(radio3)
-        radio_vboxlayout2.addWidget(radio4)
+        radio_vboxlayout2.addWidget(radio_upac_4)
+        radio_vboxlayout2.addWidget(radio_upac_2)
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
@@ -244,7 +281,6 @@ class GUI(QMainWindow):
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
-        hbox_cboxs = QHBoxLayout()
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
 
@@ -256,11 +292,9 @@ class GUI(QMainWindow):
         vbox_sub2.addWidget(radio_groupbox2)
         vbox_sub2.setSpacing(5)
 
-        hbox_cboxs.addLayout(vbox_sub1)
-        hbox_cboxs.addLayout(vbox_sub2)
-        hbox_cboxs.setSpacing(20)
 
-        vbox_main.addLayout(hbox_cboxs)
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(button_add_to_corpse)
 
         group_box1.setLayout(vbox_main)
@@ -280,16 +314,17 @@ class GUI(QMainWindow):
         label_material = QLabel("Funkcjonalność")
         label_material.setStyleSheet(style_sheet_label)
 
-        radio1 = QRadioButton("Interfejs multimedialny")
-        radio2 = QRadioButton("Schowek")
-        radio1.toggled.connect(self.on_radio_button_middle_panel_clicked)
-        radio2.toggled.connect(self.on_radio_button_middle_panel_clicked)
+        radio3 = QRadioButton("Interfejs multimedialny")
+        radio4 = QRadioButton("Schowek")
+        radio3.toggled.connect(self.on_radio_button_middle_panel_clicked)
+        radio4.toggled.connect(self.on_radio_button_middle_panel_clicked)
+        self.list_of_radio_buttons.extend([radio3, radio4])
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
 
-        radio_vboxlayout1.addWidget(radio1)
-        radio_vboxlayout1.addWidget(radio2)
+        radio_vboxlayout1.addWidget(radio3)
+        radio_vboxlayout1.addWidget(radio4)
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
@@ -328,29 +363,31 @@ class GUI(QMainWindow):
         label_size = QLabel("Miejsce na kubek")
         label_size.setStyleSheet(style_sheet_label)
 
-        radio1 = QRadioButton("Ładowarka bezprzewodowa")
-        radio2 = QRadioButton("Półka")
-        radio1.toggled.connect(self.on_radio_button_lower_panel_clicked)
-        radio2.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio5 = QRadioButton("Ładowarka bezprzewodowa")
+        radio6 = QRadioButton("Półka")
+        radio5.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio6.toggled.connect(self.on_radio_button_lower_panel_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
 
-        radio_vboxlayout1.addWidget(radio1)
-        radio_vboxlayout1.addWidget(radio2)
+        radio_vboxlayout1.addWidget(radio5)
+        radio_vboxlayout1.addWidget(radio6)
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        radio3 = QRadioButton("Tak")
-        radio4 = QRadioButton("Nie")
-        radio3.toggled.connect(self.on_radio_button_lower_panel_clicked)
-        radio4.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio7 = QRadioButton("Tak")
+        radio8 = QRadioButton("Nie")
+        radio7.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio8.toggled.connect(self.on_radio_button_lower_panel_clicked)
 
         radio_groupbox2 = QGroupBox()
         radio_vboxlayout2 = QVBoxLayout()
 
-        radio_vboxlayout2.addWidget(radio3)
-        radio_vboxlayout2.addWidget(radio4)
+        radio_vboxlayout2.addWidget(radio7)
+        radio_vboxlayout2.addWidget(radio8)
+
+        self.list_of_radio_buttons.extend([radio5, radio6, radio7, radio8])
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
@@ -402,16 +439,18 @@ class GUI(QMainWindow):
         label_color = QLabel("Kolor")
         label_color.setStyleSheet(style_sheet_label)
 
-        radio1 = QRadioButton("Tak")
-        radio2 = QRadioButton("Nie")
-        radio1.toggled.connect(self.on_radio_button_armrest_clicked)
-        radio2.toggled.connect(self.on_radio_button_armrest_clicked)
+        radio9 = QRadioButton("Tak")
+        radio10 = QRadioButton("Nie")
+        radio9.toggled.connect(self.on_radio_button_armrest_clicked)
+        radio10.toggled.connect(self.on_radio_button_armrest_clicked)
+
+        self.list_of_radio_buttons.extend([radio9, radio10])
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
 
-        radio_vboxlayout1.addWidget(radio1)
-        radio_vboxlayout1.addWidget(radio2)
+        radio_vboxlayout1.addWidget(radio9)
+        radio_vboxlayout1.addWidget(radio10)
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
@@ -468,16 +507,18 @@ class GUI(QMainWindow):
         label_color = QLabel("Kolor")
         label_color.setStyleSheet(style_sheet_label)
 
-        radio1 = QRadioButton("Tak")
-        radio2 = QRadioButton("Nie")
-        radio1.toggled.connect(self.on_radio_button_cup_holder_clicked)
-        radio2.toggled.connect(self.on_radio_button_cup_holder_clicked)
+        radio11 = QRadioButton("Tak")
+        radio12 = QRadioButton("Nie")
+        radio11.toggled.connect(self.on_radio_button_cup_holder_clicked)
+        radio12.toggled.connect(self.on_radio_button_cup_holder_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
 
-        radio_vboxlayout1.addWidget(radio1)
-        radio_vboxlayout1.addWidget(radio2)
+        radio_vboxlayout1.addWidget(radio11)
+        radio_vboxlayout1.addWidget(radio12)
+
+        self.list_of_radio_buttons.extend([radio11, radio12])
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
@@ -510,120 +551,126 @@ class GUI(QMainWindow):
         sub_layout1.addWidget(group_box1)
         sub_tab_cup_holder.setLayout(sub_layout1)
 
-
         return sub_tab_cup_holder
     
     def create_group_box_body(self):
-        self.car_body_group_box = CarBodyGroupBox(self.body)
-        self.car_body_group_box.button_schedule.pressed.connect(self.on_schedule_clicked)
+        self.car_body_group_box = CarBodyGroupBox(self.body_counter, self.list_of_bodys[self.body_counter - 1])
+        # self.car_body_group_box.button_schedule.pressed.connect(self.pb_schedule_clicked)
+        self.car_body_group_box.button_ready.pressed.connect(self.pb_ready_clicked)
+
+    def update_bodys_list_size(self):
+        if len(self.list_of_bodys) == 0:
+            body_tmp = Body(self.body_counter, upper_panel=UpperPanel("", ""), 
+                middle_panel=MiddlePanel(""), 
+                lower_panel=LowerPanel("", "", ""),
+                armrest=Armrest("", "", ""),
+                cup_holder=CupHolder("", ""))
+            self.list_of_bodys.append(body_tmp)
+            self.body_counter += 1
+        # if len(self.list_of_bodys) < self.body_counter:
+        #     body_tmp = Body(self.body_counter - 1, upper_panel=UpperPanel("", ""), 
+        #         middle_panel=MiddlePanel(""), 
+        #         lower_panel=LowerPanel("", "", ""),
+        #         armrest=Armrest("", "", ""),
+        #         cup_holder=CupHolder("", ""))
+        #     self.list_of_bodys.append(body_tmp)
 
     def on_change_cbox_lower_panel_color(self, index):
         # print(f"Selected size index: {index}")
+        self.update_bodys_list_size()
+
         if index == 0:
-            self.body.lower_panel.color = "Czerwony"
+            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Czerwony"
         elif index == 1:
-            self.body.lower_panel.color = "Zielony"
+            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Zielony"
         elif index == 2:
-            self.body.lower_panel.color = "Niebieski"
-        self.body.lower_panel.check_activation()
+            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Niebieski"
     
     def on_change_cbox_armrest_material(self, index):
         # print(f"Selected size index: {index}")
+        self.update_bodys_list_size()
+
         if index == 0:
-            self.body.armrest.material = "Skóra"
+            self.list_of_bodys[self.body_counter - 1].armrest.material = "Skóra"
         elif index == 1:
-            self.body.armrest.material = "Eko skóra"
+            self.list_of_bodys[self.body_counter - 1].armrest.material = "Eko skóra"
         elif index == 2:
-            self.body.armrest.material = "Sztuczna skóra"
-        self.body.armrest.check_activation()
+            self.list_of_bodys[self.body_counter - 1].armrest.material = "Sztuczna skóra"
 
     def on_change_cbox_armrest_color(self, index):
         # print(f"Selected size index: {index}")
+        self.update_bodys_list_size()
+
         if index == 0:
-            self.body.armrest.color = "Czerwony"
+            self.list_of_bodys[self.body_counter - 1].armrest.color = "Czerwony"
         elif index == 1:
-            self.body.armrest.color = "Zielony"
+            self.list_of_bodys[self.body_counter - 1].armrest.color = "Zielony"
         elif index == 2:
-            self.body.armrest.color = "Niebieski"
-        self.body.armrest.check_activation()
+            self.list_of_bodys[self.body_counter - 1].armrest.color = "Niebieski"
 
     def on_change_cbox_cup_holder_color(self, index):
         # print(f"Selected size index: {index}")
+        self.update_bodys_list_size()
+
         if index == 0:
-            self.body.cup_holder.color = "Czerwony"
+            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Czerwony"
         elif index == 1:
-            self.body.cup_holder.color = "Zielony"
+            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Zielony"
         elif index == 2:
-            self.body.cup_holder.color = "Niebieski"
-        self.body.cup_holder.check_activation()
-
-    def on_change_pb_screen(self):
-        print(f"Screen added with parameters: {self.body.car_screen.type}, {self.body.car_screen.size}")
-
-        self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.outer_layout.count() == self.body_counter:
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Niebieski"
 
     def on_radio_button_upper_panel_clicked(self):
+        self.update_bodys_list_size()
+
         sender = self.sender()
 
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
-                self.body.upper_panel.is_controlable = sender.text()
+                self.list_of_bodys[self.body_counter - 1].upper_panel.is_controlable = sender.text()
                 pass
             else:
-                self.body.upper_panel.type = sender.text()
+                self.list_of_bodys[self.body_counter - 1].upper_panel.type = sender.text()
             print(f'Selected option: {sender.text()}')
-
-        self.body.upper_panel.check_activation()
 
     def on_radio_button_middle_panel_clicked(self):
+        self.update_bodys_list_size()
+
         sender = self.sender()
 
         if sender.isChecked():
-            self.body.middle_panel.functionality = sender.text()
+            self.list_of_bodys[self.body_counter - 1].middle_panel.functionality = sender.text()
             print(f'Selected option: {sender.text()}')
 
-        self.body.middle_panel.check_activation()
-
     def on_radio_button_lower_panel_clicked(self):
+        self.update_bodys_list_size()
+
         sender = self.sender()
 
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
-                self.body.lower_panel.is_cup = sender.text()
+                self.list_of_bodys[self.body_counter - 1].lower_panel.is_cup = sender.text()
                 pass
             else:
-                self.body.lower_panel.functionality = sender.text()
+                self.list_of_bodys[self.body_counter - 1].lower_panel.functionality = sender.text()
             print(f'Selected option: {sender.text()}')
 
-        self.body.lower_panel.check_activation()
-
     def on_radio_button_armrest_clicked(self):
+        self.update_bodys_list_size()
+
         sender = self.sender()
 
         if sender.isChecked():
-            self.body.armrest.heating = sender.text()
+            self.list_of_bodys[self.body_counter - 1].armrest.heating = sender.text()
         print(f'Selected option: {sender.text()}')
-
-        self.body.armrest.check_activation()
 
     def on_radio_button_cup_holder_clicked(self):
+        self.update_bodys_list_size()
+
         sender = self.sender()
 
         if sender.isChecked():
-            self.body.cup_holder.usb_socket = sender.text()
+            self.list_of_bodys[self.body_counter - 1].cup_holder.usb_socket = sender.text()
         print(f'Selected option: {sender.text()}')
-
-        self.body.cup_holder.check_activation()
 
     def pb_add_clicked(self):
 
@@ -638,9 +685,25 @@ class GUI(QMainWindow):
         if self.outer_layout.count() == self.body_counter:
             self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
         self.outer_layout.addWidget(self.car_body_group_box.group_box)
+
+    def pb_read_json(self):
+        self.json_reader = ReadJSON(self.json_file_name)
+        self.json_reader.parse_json(self)
+        # for body in self.list_of_bodys:
+        #     print(body)
+
+    # def pb_debug(self):
+    #     for body in self.list_of_bodys:
+    #         print(body)
+
+    def pb_debug(self):
+        # self.update_bodys_list_size()
+        for body in self.list_of_bodys:
+            print(body)
+
     
     @pyqtSlot()
-    def on_schedule_clicked(self):
+    def pb_schedule_clicked(self):
         print(f"\nScheduled body nr: {self.body_counter}")
 
         new_petri_net_thread = PetriNetThread(self.body_counter, self.body, self.mpl_widget)
@@ -654,9 +717,29 @@ class GUI(QMainWindow):
 
         self.body_counter += 1
 
+    @pyqtSlot()
+    def pb_ready_clicked(self):
+        print("Przycisk gotowe wcisniety")
+        print(len(self.list_of_bodys))
+        self.list_of_bodys.append(Body(self.body_counter,
+                upper_panel=UpperPanel("", ""), 
+                middle_panel=MiddlePanel(""), 
+                lower_panel=LowerPanel("", "", ""),
+                armrest=Armrest("", "", ""),
+                cup_holder=CupHolder("", "")))
+        self.body_counter += 1
+        self.reset_radio_buttons()
+        # self.car_body_group_box.button_ready.setEnabled(False)
+
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
         print(f"Thread {thread_id} has finished.")
+
+    def reset_radio_buttons(self):
+        for radio in self.list_of_radio_buttons:
+            radio.setAutoExclusive(False)
+            radio.setChecked(False)
+            radio.setAutoExclusive(True)
 
 def main():
     app = QApplication([])
