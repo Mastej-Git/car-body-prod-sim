@@ -12,6 +12,35 @@ QPushButton:hover {
 }
 """
 
+style_sheet_QRadioButton = """
+QRadioButton {
+    color: #00ffff;
+    padding: 5px;
+}
+
+# QRadioButton::indicator {
+#     width: 15px;
+#     height: 15px;
+#     border-radius: 7px;
+#     border: 2px solid #00ffff;
+#     background-color: #404040;
+# }
+
+QRadioButton::indicator:checked {
+    background-color: #00ffff;
+    border: 2px solid #00ffff;
+}
+
+QRadioButton:hover {
+    background-color: #2e2e2e;
+    border: 1px solid #00ffff;
+}
+
+QRadioButton::indicator:hover {
+    border: 2px solid #00ffff;
+}
+"""
+
 style_sheet_QComboBox = """
 QComboBox {
     background-color: #404040;

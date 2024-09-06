@@ -7,16 +7,18 @@ from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
     QLabel,
-    QPushButton,
     QHBoxLayout,
     QStackedWidget,
     QFrame,
     QGroupBox,
     QComboBox,
     QScrollArea,
-    QRadioButton
+    QRadioButton,
 )
-from PyQt5.QtCore import Qt, pyqtSlot, QMutex
+
+from PyQt5.QtCore import (Qt,
+                          pyqtSlot,
+                          QMutex)
 
 from Body import Body
 from body_parts.UpperPanel import UpperPanel
@@ -28,25 +30,20 @@ from body_parts.CupHolder import CupHolder
 from petri_nets.PetriNetThread import PetriNetThread
 
 from other.MatPlotlibWidget import MatplotlibWidget
+from qt_classes.AnimatedButton import AnimatedButton
+from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
 from other.StyleSheets import (
     style_sheet_central_widget,
     style_sheet_app,
     style_sheet_label,
     style_sheet_QComboBox,
-    style_sheet_QPushButton,
     style_sheet_sub_tab,
-    style_sheet_tab
+    style_sheet_tab,
+    style_sheet_QRadioButton
 )
 
 from CupPetriNet import cup_main_petri_net
-
-def create_push_button(name, size_x, size_y):
-        button = QPushButton(name)
-        button.setStyleSheet(style_sheet_QPushButton)
-        button.setFixedSize(size_x, size_y)
-
-        return button
 
 class ReadJSON():
 
@@ -93,42 +90,6 @@ class ReadJSON():
                 gui.starting_label.deleteLater()
             gui.outer_layout.addWidget(car_body_group_box.group_box)
             gui.body_counter += 1
-
-class CarBodyGroupBox():
-
-    def __init__(self, id: int, body: Body) -> None:
-        
-        self.group_box = QGroupBox()
-        self.body = body
-        self.id = id
-
-        label_text = self.body.__str__()
-
-        label = QLabel(label_text)
-        label.setWordWrap(True)
-        label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        label.setStyleSheet(style_sheet_label)
-
-        self.button_schedule = create_push_button("Planuj", 200, 40)
-        self.button_ready = create_push_button("Gotowe", 200, 40)
-        self.button_edit = create_push_button("Edytuj", 200, 40)
-        self.button_remove = create_push_button("Usuń", 200, 40)
-
-        buttons_layout = QVBoxLayout()
-        buttons_layout.addWidget(self.button_schedule)
-        buttons_layout.addWidget(self.button_ready)
-        buttons_layout.addWidget(self.button_edit)
-        buttons_layout.addWidget(self.button_remove)
-
-        main_layout = QHBoxLayout()
-
-        main_layout.addWidget(label)
-        main_layout.addLayout(buttons_layout)
-
-        self.group_box.setLayout(main_layout)
-
-    def get_car_body_group_box(self):
-        return self.group_box
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -192,10 +153,8 @@ class GUI(QMainWindow):
         overlay_layout = QVBoxLayout(overlay_widget)
         overlay_layout.addWidget(stacked_widget)
 
-        plus_button = QPushButton("+")
+        plus_button = AnimatedButton("+", 40, 40)
         plus_button.clicked.connect(self.pb_debug)
-        plus_button.setFixedSize(40, 40)
-        plus_button.setStyleSheet(style_sheet_QPushButton)
 
         button_layout = QHBoxLayout()
         button_layout.addStretch()
@@ -231,7 +190,7 @@ class GUI(QMainWindow):
         self.tab3.setLayout(layout3)
 
         layout4 = QVBoxLayout()
-        read_from_file_button = create_push_button("Wczytaj", 400, 80)
+        read_from_file_button = AnimatedButton("Wczytaj")
         read_from_file_button.clicked.connect(self.pb_read_json)
         layout4.addWidget(read_from_file_button)
         self.tab4.setLayout(layout4)
@@ -250,6 +209,8 @@ class GUI(QMainWindow):
 
         radio1 = QRadioButton("Tak")
         radio2 = QRadioButton("Nie")
+        radio1.setStyleSheet(style_sheet_QRadioButton)
+        radio2.setStyleSheet(style_sheet_QRadioButton)
         radio1.toggled.connect(self.on_radio_button_upper_panel_clicked)
         radio2.toggled.connect(self.on_radio_button_upper_panel_clicked)
 
@@ -263,6 +224,8 @@ class GUI(QMainWindow):
 
         radio_upac_4 = QRadioButton("4-strefowa")
         radio_upac_2 = QRadioButton("2-strefowa")
+        radio_upac_4.setStyleSheet(style_sheet_QRadioButton)
+        radio_upac_2.setStyleSheet(style_sheet_QRadioButton)
         radio_upac_4.toggled.connect(self.on_radio_button_upper_panel_clicked)
         radio_upac_2.toggled.connect(self.on_radio_button_upper_panel_clicked)
 
@@ -276,8 +239,7 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse = AnimatedButton("Dodaj")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -316,6 +278,8 @@ class GUI(QMainWindow):
 
         radio3 = QRadioButton("Interfejs multimedialny")
         radio4 = QRadioButton("Schowek")
+        radio3.setStyleSheet(style_sheet_QRadioButton)
+        radio4.setStyleSheet(style_sheet_QRadioButton)
         radio3.toggled.connect(self.on_radio_button_middle_panel_clicked)
         radio4.toggled.connect(self.on_radio_button_middle_panel_clicked)
         self.list_of_radio_buttons.extend([radio3, radio4])
@@ -328,8 +292,7 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse = AnimatedButton("Dodaj")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -365,6 +328,8 @@ class GUI(QMainWindow):
 
         radio5 = QRadioButton("Ładowarka bezprzewodowa")
         radio6 = QRadioButton("Półka")
+        radio5.setStyleSheet(style_sheet_QRadioButton)
+        radio6.setStyleSheet(style_sheet_QRadioButton)
         radio5.toggled.connect(self.on_radio_button_lower_panel_clicked)
         radio6.toggled.connect(self.on_radio_button_lower_panel_clicked)
 
@@ -378,6 +343,8 @@ class GUI(QMainWindow):
 
         radio7 = QRadioButton("Tak")
         radio8 = QRadioButton("Nie")
+        radio7.setStyleSheet(style_sheet_QRadioButton)
+        radio8.setStyleSheet(style_sheet_QRadioButton)
         radio7.toggled.connect(self.on_radio_button_lower_panel_clicked)
         radio8.toggled.connect(self.on_radio_button_lower_panel_clicked)
 
@@ -391,8 +358,7 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse = AnimatedButton("Dodaj")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         combo_box_color = QComboBox()
@@ -441,6 +407,8 @@ class GUI(QMainWindow):
 
         radio9 = QRadioButton("Tak")
         radio10 = QRadioButton("Nie")
+        radio9.setStyleSheet(style_sheet_QRadioButton)
+        radio10.setStyleSheet(style_sheet_QRadioButton)
         radio9.toggled.connect(self.on_radio_button_armrest_clicked)
         radio10.toggled.connect(self.on_radio_button_armrest_clicked)
 
@@ -466,8 +434,7 @@ class GUI(QMainWindow):
         combo_box_color.currentIndexChanged.connect(self.on_change_cbox_armrest_color)
         combo_box_color.activated.connect(self.on_change_cbox_armrest_color)
 
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse = AnimatedButton("Dodaj")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -509,6 +476,8 @@ class GUI(QMainWindow):
 
         radio11 = QRadioButton("Tak")
         radio12 = QRadioButton("Nie")
+        radio11.setStyleSheet(style_sheet_QRadioButton)
+        radio12.setStyleSheet(style_sheet_QRadioButton)
         radio11.toggled.connect(self.on_radio_button_cup_holder_clicked)
         radio12.toggled.connect(self.on_radio_button_cup_holder_clicked)
 
@@ -528,8 +497,7 @@ class GUI(QMainWindow):
         combo_box_color.currentIndexChanged.connect(self.on_change_cbox_cup_holder_color)
         combo_box_color.activated.connect(self.on_change_cbox_cup_holder_color)
 
-        button_add_to_corpse = QPushButton("Dodaj")
-        button_add_to_corpse.setStyleSheet(style_sheet_QPushButton)
+        button_add_to_corpse = AnimatedButton("Dodaj")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
