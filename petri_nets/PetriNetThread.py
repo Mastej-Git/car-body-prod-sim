@@ -4,7 +4,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex
 
 from Body import Body
 
-from CupPetriNet import cup_main_petri_net
+from BodyPetriNet import body_main_petri_net
 
 from other.MatPlotlibWidget import MatplotlibWidget
 from other.Enums import CupMaterial
@@ -15,29 +15,31 @@ class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, thread_id, body: Body, mpl_widget: MatplotlibWidget):
+    def __init__(self, body: Body, mpl_widget: MatplotlibWidget):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
-        self.petri_net = cup_main_petri_net
+        self.petri_net = body_main_petri_net
         self.body = body
-        self.thread_id = thread_id
         self.available_transitions = []
         self.executed_transitions = []
         self.mpl_widget = mpl_widget
 
-        if self.body.cup.material == CupMaterial.ALUMINUM:
-            self.available_transitions = ["T2", "T3", "T6", "T9", "T12",
-                                          "T15", "T18", "T21", "T24", "T27",
-                                          "T28"]
-        elif self.body.cup.material == CupMaterial.STAINLESS_STEEL:
-            self.available_transitions = ["T2", "T4", "T7", "T10", "T13", 
-                                          "T16", "T19", "T22", "T25", "T27", 
-                                          "T28"]  
+        self.available_transitions.append("T2")
+
+        if self.body.upper_panel.is_controlable == "Tak":
+            if self.body.upper_panel.type == "4-strefowa":
+                self.available_transitions.extend(["T3", "T4", "T5"])
+            elif self.body.upper_panel.type == "2-strefowa":
+                self.available_transitions.extend(["T3", "T9", "T10"])
+        elif self.body.upper_panel.is_controlable == "Nie":
+            self.available_transitions.extend(["T11", "T12"])
+
+        self.available_transitions.extend(["T6", "T7", "T8"])  
 
         self.petri_net.fire_transition("T1")
 
-        print(self.thread_id)
+        print(self.available_transitions)
 
     def run(self):
         i = 0
@@ -46,7 +48,8 @@ class PetriNetThread(QThread):
             mutex.lock()
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                    print(f"\nThread id: {self.thread_id} - Firing Transition {self.available_transitions[i]}")
+                    print(f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}")
+                    # print(self.petri_net)
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
                     self.mpl_widget.plot()
@@ -59,7 +62,7 @@ class PetriNetThread(QThread):
 
             time.sleep(2)
 
-        self.finished_signal.emit(self.thread_id)
+        self.finished_signal.emit(self.body.id)
 
     def stop(self):
         self._running = False

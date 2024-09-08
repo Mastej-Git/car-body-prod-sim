@@ -12,11 +12,10 @@ from other.StyleSheets import style_sheet_label
 
 class CarBodyGroupBox():
 
-    def __init__(self, id: int, body: Body) -> None:
+    def __init__(self, body: Body) -> None:
         
         self.group_box = QGroupBox()
         self.body = body
-        self.id = id
 
         label_text = self.body.__str__()
 

@@ -43,7 +43,7 @@ from other.StyleSheets import (
     style_sheet_QRadioButton
 )
 
-from CupPetriNet import cup_main_petri_net
+from BodyPetriNet import body_main_petri_net
 
 class ReadJSON():
 
@@ -55,6 +55,10 @@ class ReadJSON():
 
         with open(self.file_name, "r") as file:
             body_configs = json.load(file)
+
+        if gui.body_counter == 0:
+            gui.outer_layout.removeWidget(gui.starting_label)
+            gui.starting_label.deleteLater()
 
         for index, body_config in enumerate(body_configs):
 
@@ -78,18 +82,18 @@ class ReadJSON():
             body_tmp.armrest.color = body_config['body']['armrest']['color']
 
             body_tmp.cup_holder.usb_socket = body_config['body']['cup_holder']['usb_socket']
-            body_tmp.cup_holder.color = body_config['body']['cup_holder']['color']
+            body_tmp.cup_holder.color = body_config['body']['cup_holder']['color']  
 
             gui.list_of_bodys.append(body_tmp)
 
-            car_body_group_box = CarBodyGroupBox(gui.body_counter, body_tmp)
-            # car_body_group_box.button_schedule.pressed.connect(gui.pb_schedule_clicked)
-            car_body_group_box.button_ready.pressed.connect(gui.pb_ready_clicked)
-            if gui.body_counter == 0:
-                gui.outer_layout.removeWidget(gui.starting_label)
-                gui.starting_label.deleteLater()
+            car_body_group_box = CarBodyGroupBox(body_tmp)
+            car_body_group_box.button_schedule.clicked.connect(lambda _, x=car_body_group_box.body.id: gui.pb_schedule_clicked(x))
+            car_body_group_box.button_ready.clicked.connect(gui.pb_ready_clicked)
+            
             gui.outer_layout.addWidget(car_body_group_box.group_box)
+
             gui.body_counter += 1
+
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -98,9 +102,10 @@ class GUI(QMainWindow):
         self.body_counter = 0
         self.list_of_threads = []
         self.list_of_radio_buttons = []
+        self.list_of_car_body_group_box = []
 
         self.list_of_bodys = []
-        self.petri_net = cup_main_petri_net
+        self.petri_net = body_main_petri_net
 
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 1300, 1000)
@@ -522,8 +527,8 @@ class GUI(QMainWindow):
         return sub_tab_cup_holder
     
     def create_group_box_body(self):
-        self.car_body_group_box = CarBodyGroupBox(self.body_counter, self.list_of_bodys[self.body_counter - 1])
-        # self.car_body_group_box.button_schedule.pressed.connect(self.pb_schedule_clicked)
+        self.car_body_group_box = CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1])
+        self.car_body_group_box.button_schedule.pressed.connect(lambda: self.pb_schedule_clicked(self.car_body_group_box.id))
         self.car_body_group_box.button_ready.pressed.connect(self.pb_ready_clicked)
 
     def update_bodys_list_size(self):
@@ -666,24 +671,20 @@ class GUI(QMainWindow):
 
     def pb_debug(self):
         # self.update_bodys_list_size()
-        for body in self.list_of_bodys:
-            print(body)
+        self.body_counter += 1
 
     
     @pyqtSlot()
-    def pb_schedule_clicked(self):
-        print(f"\nScheduled body nr: {self.body_counter}")
+    def pb_schedule_clicked(self, body_id):
+        print(f"\nID: {body_id} - Rozpoczęto produkcję korpusu.")
 
-        new_petri_net_thread = PetriNetThread(self.body_counter, self.body, self.mpl_widget)
+        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.mpl_widget)
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
-        self.list_of_threads[self.body_counter - 1].start()
+        self.list_of_threads[body_id].start()
 
-        self.body.remove_parameters()
-        self.car_body_group_box.button_schedule.setEnabled(False)
-
-        self.body_counter += 1
+        # self.car_body_group_box.button_schedule.setEnabled(False)
 
     @pyqtSlot()
     def pb_ready_clicked(self):

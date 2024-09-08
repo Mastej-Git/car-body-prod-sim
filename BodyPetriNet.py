@@ -1,0 +1,26 @@
+from petri_nets.PetrisNet import PetriNet
+
+body_main_petri_net = PetriNet()
+
+body_main_petri_net.add_place("P1", "Zlecenie panelu", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P2", "Zlecenie panelu górnego", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P3", "Zlecenie sterowania klimatyzacją", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P4", "Tworzenie i instalacja sterowania klimatyzacją 4-warstwową", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P5", "Gotowy panel górny", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P6", "Gotowy panel", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P7", "Gotowy korpus", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P8", "Tworzenie i instalacja sterowania klimatyzacją 4-warstwową", tokens=0, max_tokens=5)
+body_main_petri_net.add_place("P9", "Tworzenie i instalacja panelu górnego bez sterowania klimatyzacją", tokens=0, max_tokens=5)
+
+body_main_petri_net.add_transition("T1", {}, {"P1": 1})
+body_main_petri_net.add_transition("T2", {"P1": 1}, {"P2": 1})
+body_main_petri_net.add_transition("T3", {"P2": 1}, {"P3": 1})
+body_main_petri_net.add_transition("T4", {"P3": 1}, {"P4": 1})
+body_main_petri_net.add_transition("T5", {"P4": 1}, {"P5": 1})
+body_main_petri_net.add_transition("T6", {"P5": 1}, {"P6": 1})
+body_main_petri_net.add_transition("T7", {"P6": 1}, {"P7": 1})
+body_main_petri_net.add_transition("T8", {"P7": 1}, {})
+body_main_petri_net.add_transition("T9", {"P3": 1}, {"P8": 1})
+body_main_petri_net.add_transition("T10", {"P8": 1}, {"P5": 1})
+body_main_petri_net.add_transition("T11", {"P2": 1}, {"P9": 1})
+body_main_petri_net.add_transition("T12", {"P9": 1}, {"P5": 1})

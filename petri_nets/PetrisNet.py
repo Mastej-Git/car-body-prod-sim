@@ -1,6 +1,7 @@
 class Place:
-    def __init__(self, name, tokens=0, max_tokens=1) -> None:
+    def __init__(self, name, description="", tokens=0, max_tokens=1) -> None:
         self.name = name
+        self.description = description
         self.tokens = tokens
         self.max_tokens = max_tokens
 
@@ -53,10 +54,10 @@ class PetriNet:
         self.places = {}
         self.transitions = {}
 
-    def add_place(self, name, tokens=0, max_tokens=1):
+    def add_place(self, name, description="", tokens=0, max_tokens=5):
         if name in self.places:
             raise Exception(f"Place {name} already exists")
-        self.places[name] = Place(name, tokens, max_tokens)
+        self.places[name] = Place(name, description, tokens, max_tokens)
 
     def add_transition(self, name, input_palces, output_places):
         if name in self.transitions:
