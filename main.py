@@ -682,7 +682,7 @@ class GUI(QMainWindow):
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
-        self.list_of_threads[body_id].start()
+        self.list_of_threads[len(self.list_of_threads) - 1].start()
 
         self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)
 

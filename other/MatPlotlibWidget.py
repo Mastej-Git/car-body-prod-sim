@@ -7,6 +7,7 @@ from petri_nets.PetrisNet import PetriNet
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from matplotlib.pyplot import subplots_adjust
 
 class MatplotlibWidget(QWidget):
     def __init__(self, petri_net: PetriNet, parent=None):
@@ -27,10 +28,12 @@ class MatplotlibWidget(QWidget):
         self.start_times = []
         self.durations = []
         self.current_time = 0
+
+        for name, place in self.petri_net.places.items():
+            self.tasks.append(f"{place.description}")
         
     def plot(self):
-
-        self.tasks = self.petri_net.places.keys()
+        
         self.start_times = [0 for place in self.petri_net.places.keys()]
         self.durations = [place.tokens for place in self.petri_net.places.values()]
 
@@ -55,8 +58,8 @@ class MatplotlibWidget(QWidget):
         
         ax.invert_yaxis()
         
-        ax.set_xlabel('Time')
-        ax.set_ylabel('Tokens')
-        ax.set_title('Tokens distribution')
+        ax.set_xlabel('Ilość ładunków')
+        ax.set_ylabel('Akcja')
+        ax.set_title('Stan korpusów')
         
         self.canvas.draw()
