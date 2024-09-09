@@ -86,11 +86,11 @@ class ReadJSON():
 
             gui.list_of_bodys.append(body_tmp)
 
-            car_body_group_box = CarBodyGroupBox(body_tmp)
-            car_body_group_box.button_schedule.clicked.connect(lambda _, x=car_body_group_box.body.id: gui.pb_schedule_clicked(x))
-            car_body_group_box.button_ready.clicked.connect(gui.pb_ready_clicked)
+            gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
+            gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
+            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(gui.pb_ready_clicked)
             
-            gui.outer_layout.addWidget(car_body_group_box.group_box)
+            gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
 
             gui.body_counter += 1
 
@@ -527,9 +527,9 @@ class GUI(QMainWindow):
         return sub_tab_cup_holder
     
     def create_group_box_body(self):
-        self.car_body_group_box = CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1])
-        self.car_body_group_box.button_schedule.pressed.connect(lambda: self.pb_schedule_clicked(self.car_body_group_box.id))
-        self.car_body_group_box.button_ready.pressed.connect(self.pb_ready_clicked)
+        self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.pressed.connect(lambda: self.pb_schedule_clicked(self.list_of_car_body_group_box[self.body_counter - 1].id))
+        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.pressed.connect(self.pb_ready_clicked)
 
     def update_bodys_list_size(self):
         if len(self.list_of_bodys) == 0:
@@ -684,7 +684,7 @@ class GUI(QMainWindow):
         # self.petri_net_thread.start()
         self.list_of_threads[body_id].start()
 
-        # self.car_body_group_box.button_schedule.setEnabled(False)
+        self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)
 
     @pyqtSlot()
     def pb_ready_clicked(self):
