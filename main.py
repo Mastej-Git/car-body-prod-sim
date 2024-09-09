@@ -88,7 +88,7 @@ class ReadJSON():
 
             gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
             gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
-            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(gui.pb_ready_clicked)
+            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
             
             gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
 
@@ -528,8 +528,8 @@ class GUI(QMainWindow):
     
     def create_group_box_body(self):
         self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
-        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.pressed.connect(lambda: self.pb_schedule_clicked(self.list_of_car_body_group_box[self.body_counter - 1].id))
-        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.pressed.connect(self.pb_ready_clicked)
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.pressed.connect(lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_schedule_clicked(x))
+        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.pressed.connect(lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_ready_clicked(x))
 
     def update_bodys_list_size(self):
         if len(self.list_of_bodys) == 0:
@@ -687,7 +687,7 @@ class GUI(QMainWindow):
         self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)
 
     @pyqtSlot()
-    def pb_ready_clicked(self):
+    def pb_ready_clicked(self, body_id):
         print("Przycisk gotowe wcisniety")
         print(len(self.list_of_bodys))
         self.list_of_bodys.append(Body(self.body_counter,
@@ -696,9 +696,10 @@ class GUI(QMainWindow):
                 lower_panel=LowerPanel("", "", ""),
                 armrest=Armrest("", "", ""),
                 cup_holder=CupHolder("", "")))
+        
         self.body_counter += 1
         self.reset_radio_buttons()
-        # self.car_body_group_box.button_ready.setEnabled(False)
+        self.list_of_car_body_group_box[body_id].button_ready.setEnabled(False)
 
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
