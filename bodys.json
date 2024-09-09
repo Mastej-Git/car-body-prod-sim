@@ -48,5 +48,30 @@
                     "color": "Niebieski"
             }
         }
-    } 
+    },
+    {
+        "body": {
+            "upper_panel": {
+                    "is_controllable": "Nie",
+                    "type": "2-strefowa"
+            },
+            "middle_panel": {
+                    "functionality": "Interfejs multimedialny"
+            },
+            "lower_panel": {
+                    "functionality": "Ładowarka bezprzewodowa",
+                    "is_cup": "Tak",
+                    "color": "Zielony"
+            },
+            "armrest": {
+                    "heating": "Nie",
+                    "material": "Sztuczna skóra",
+                    "color": "Zielony"
+            },
+            "cup_holder": {
+                    "usb_socket": "Tak",
+                    "color": "Zielony"
+            }
+        }
+    }
 ]
