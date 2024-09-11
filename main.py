@@ -89,6 +89,7 @@ class ReadJSON():
             gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
             gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
             gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
+            gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_delete_clicked(x))
             
             gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
 
@@ -688,8 +689,7 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_ready_clicked(self, body_id):
-        print("Przycisk gotowe wcisniety")
-        print(len(self.list_of_bodys))
+        print(f"\nKorpus ID: {body_id} gotowy do produkcji")
         self.list_of_bodys.append(Body(self.body_counter,
                 upper_panel=UpperPanel("", ""), 
                 middle_panel=MiddlePanel(""), 
@@ -700,6 +700,27 @@ class GUI(QMainWindow):
         self.body_counter += 1
         self.reset_radio_buttons()
         self.list_of_car_body_group_box[body_id].button_ready.setEnabled(False)
+
+    @pyqtSlot()
+    def pb_delete_clicked(self, body_id):
+        print(f"Korpus ID: {body_id} został usunięty")
+
+        index_remove = -1
+        i = 0
+
+        for body in self.list_of_bodys:
+            if body.id == body_id:
+                index_remove = i
+            i += 1
+            
+        
+        self.list_of_bodys.pop(index_remove)
+        self.outer_layout.removeWidget(self.list_of_car_body_group_box[index_remove].group_box)
+        self.list_of_car_body_group_box.pop(index_remove)        
+
+        self.body_counter -= 1
+        self.reset_radio_buttons()
+        
 
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
