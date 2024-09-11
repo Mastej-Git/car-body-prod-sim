@@ -717,10 +717,10 @@ class GUI(QMainWindow):
         self.list_of_bodys.pop(index_remove)
         self.outer_layout.removeWidget(self.list_of_car_body_group_box[index_remove].group_box)
         self.list_of_car_body_group_box.pop(index_remove)        
-
         self.body_counter -= 1
+
         self.reset_radio_buttons()
-        
+        self.check_body_group_box_number()
 
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
@@ -731,6 +731,13 @@ class GUI(QMainWindow):
             radio.setAutoExclusive(False)
             radio.setChecked(False)
             radio.setAutoExclusive(True)
+
+    def check_body_group_box_number(self):
+        if self.body_counter == 0 and len(self.list_of_car_body_group_box) == 0:
+            self.starting_label = QLabel("Brak korpusów w produkcji")
+            self.starting_label.setStyleSheet(style_sheet_label)
+            self.starting_label.setAlignment(Qt.AlignCenter)
+            self.outer_layout.addWidget(self.starting_label)
 
 def main():
     app = QApplication([])
