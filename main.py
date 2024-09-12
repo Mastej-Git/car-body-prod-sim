@@ -566,112 +566,103 @@ class GUI(QMainWindow):
         #     self.list_of_bodys.append(body_tmp)
 
     def on_change_cbox_lower_panel_color(self, index):
-        # print(f"Selected size index: {index}")
-        self.update_bodys_list_size()
 
         if index == 0:
-            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Czerwony"
+            self.body_tmp.lower_panel.color = "Czerwony"
         elif index == 1:
-            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Zielony"
+            self.body_tmp.lower_panel.color = "Zielony"
         elif index == 2:
-            self.list_of_bodys[self.body_counter - 1].lower_panel.color = "Niebieski"
+            self.body_tmp.lower_panel.color = "Niebieski"
     
     def on_change_cbox_armrest_material(self, index):
-        # print(f"Selected size index: {index}")
-        self.update_bodys_list_size()
 
         if index == 0:
-            self.list_of_bodys[self.body_counter - 1].armrest.material = "Skóra"
+            self.body_tmp.armrest.material = "Skóra"
         elif index == 1:
-            self.list_of_bodys[self.body_counter - 1].armrest.material = "Eko skóra"
+            self.body_tmp.armrest.material = "Eko skóra"
         elif index == 2:
-            self.list_of_bodys[self.body_counter - 1].armrest.material = "Sztuczna skóra"
+            self.body_tmp.armrest.material = "Sztuczna skóra"
 
     def on_change_cbox_armrest_color(self, index):
-        # print(f"Selected size index: {index}")
-        self.update_bodys_list_size()
 
         if index == 0:
-            self.list_of_bodys[self.body_counter - 1].armrest.color = "Czerwony"
+            self.body_tmp.armrest.color = "Czerwony"
         elif index == 1:
-            self.list_of_bodys[self.body_counter - 1].armrest.color = "Zielony"
+            self.body_tmp.armrest.color = "Zielony"
         elif index == 2:
-            self.list_of_bodys[self.body_counter - 1].armrest.color = "Niebieski"
+            self.body_tmp.armrest.color = "Niebieski"
 
     def on_change_cbox_cup_holder_color(self, index):
-        # print(f"Selected size index: {index}")
-        self.update_bodys_list_size()
 
         if index == 0:
-            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Czerwony"
+            self.body_tmp.cup_holder.color = "Czerwony"
         elif index == 1:
-            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Zielony"
+            self.body_tmp.cup_holder.color = "Zielony"
         elif index == 2:
-            self.list_of_bodys[self.body_counter - 1].cup_holder.color = "Niebieski"
+            self.body_tmp.cup_holder.color = "Niebieski"
 
     def on_radio_button_upper_panel_clicked(self):
-        self.update_bodys_list_size()
 
         sender = self.sender()
 
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
-                self.list_of_bodys[self.body_counter - 1].upper_panel.is_controlable = sender.text()
+                self.body_tmp.upper_panel.is_controlable = sender.text()
             else:
-                self.list_of_bodys[self.body_counter - 1].upper_panel.type = sender.text()
+                self.body_tmp.upper_panel.type = sender.text()
             print(f'Selected option: {sender.text()}')
 
     def on_radio_button_middle_panel_clicked(self):
-        self.update_bodys_list_size()
 
         sender = self.sender()
 
         if sender.isChecked():
-            self.list_of_bodys[self.body_counter - 1].middle_panel.functionality = sender.text()
+            self.body_tmp.middle_panel.functionality = sender.text()
             print(f'Selected option: {sender.text()}')
 
     def on_radio_button_lower_panel_clicked(self):
-        self.update_bodys_list_size()
 
         sender = self.sender()
 
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
-                self.list_of_bodys[self.body_counter - 1].lower_panel.is_cup = sender.text()
+                self.body_tmp.lower_panel.is_cup = sender.text()
             else:
-                self.list_of_bodys[self.body_counter - 1].lower_panel.functionality = sender.text()
+                self.body_tmp.lower_panel.functionality = sender.text()
             print(f'Selected option: {sender.text()}')
 
     def on_radio_button_armrest_clicked(self):
-        self.update_bodys_list_size()
 
         sender = self.sender()
 
         if sender.isChecked():
-            self.list_of_bodys[self.body_counter - 1].armrest.heating = sender.text()
+            self.body_tmp.armrest.heating = sender.text()
         print(f'Selected option: {sender.text()}')
 
     def on_radio_button_cup_holder_clicked(self):
-        self.update_bodys_list_size()
 
         sender = self.sender()
 
         if sender.isChecked():
-            self.list_of_bodys[self.body_counter - 1].cup_holder.usb_socket = sender.text()
+            self.body_tmp.cup_holder.usb_socket = sender.text()
         print(f'Selected option: {sender.text()}')
 
     def pb_add_clicked(self):
 
-        self.create_group_box_body()
-        self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
-        
         if self.body_counter == 0:
-            # self.body_counter += 1
+            self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
 
-        if self.outer_layout.count() == self.body_counter:
+        if self.body_counter > len(self.list_of_bodys):
+            self.list_of_bodys.append(self.body_tmp)
+            self.create_group_box_body()
+            self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
+        elif self.body_counter == len(self.list_of_bodys):
+            self.list_of_bodys[self.body_counter - 1] = self.body_tmp
+            self.list_of_car_body_group_box[self.body_counter - 1].recreate_label()
             self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+            
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
 
     def pb_read_json(self):
@@ -685,7 +676,8 @@ class GUI(QMainWindow):
     def pb_debug(self):
         print(self.body_counter)
         print(len(self.list_of_bodys))
-        # print(self.list_of_bodys[self.body_counter - 1])
+        print(self.list_of_bodys[self.body_counter - 1])
+        print(self.outer_layout.count())
 
     
     @pyqtSlot()
@@ -703,15 +695,10 @@ class GUI(QMainWindow):
     @pyqtSlot()
     def pb_ready_clicked(self, body_id):
         print(f"\nKorpus ID: {body_id} gotowy do produkcji")
-        self.list_of_bodys.append(Body(self.body_counter,
-                upper_panel=UpperPanel("", ""), 
-                middle_panel=MiddlePanel(""), 
-                lower_panel=LowerPanel("", "", ""),
-                armrest=Armrest("", "", ""),
-                cup_holder=CupHolder("", "")))
         
         self.body_counter += 1
         self.reset_radio_buttons()
+        self.body_tmp.remove_parameters()
         self.list_of_car_body_group_box[body_id].button_ready.setEnabled(False)
 
     @pyqtSlot()
@@ -732,6 +719,7 @@ class GUI(QMainWindow):
         self.body_counter -= 1
 
         self.reset_radio_buttons()
+        self.body_tmp.remove_parameters()
         self.check_body_group_box_number()
 
     @pyqtSlot(int)
