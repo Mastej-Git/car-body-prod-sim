@@ -145,3 +145,9 @@ QFrame {
     background-color: #2e2e2e;
 }
 """
+
+style_sheet_QGroupBox = """
+QGroupBox {
+    border: 1px solid #b1b1b1;
+}
+"""

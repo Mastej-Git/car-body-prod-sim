@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QLabel,
 from Body import Body
 from qt_classes.AnimatedButton import AnimatedButton
 
-from other.StyleSheets import style_sheet_label
+from other.StyleSheets import style_sheet_label, style_sheet_QGroupBox
 
 
 class CarBodyGroupBox():
@@ -15,14 +15,15 @@ class CarBodyGroupBox():
     def __init__(self, body: Body) -> None:
         
         self.group_box = QGroupBox()
+        # self.group_box.setStyleSheet(style_sheet_QGroupBox)
         self.body = body
 
         label_text = self.body.__str__()
 
-        label = QLabel(label_text)
-        label.setWordWrap(True)
-        label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        label.setStyleSheet(style_sheet_label)
+        self.label = QLabel(label_text)
+        self.label.setWordWrap(True)
+        self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
+        self.label.setStyleSheet(style_sheet_label)
 
         self.button_schedule = AnimatedButton("Planuj", 200, 40)
         self.button_ready = AnimatedButton("Gotowe", 200, 40)
@@ -37,7 +38,7 @@ class CarBodyGroupBox():
 
         main_layout = QHBoxLayout()
 
-        main_layout.addWidget(label)
+        main_layout.addWidget(self.label)
         main_layout.addLayout(buttons_layout)
 
         self.group_box.setLayout(main_layout)

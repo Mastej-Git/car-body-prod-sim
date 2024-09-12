@@ -1,4 +1,4 @@
-import json, copy
+import json
 
 from PyQt5.QtWidgets import (
     QApplication,
@@ -87,9 +87,12 @@ class ReadJSON():
             gui.list_of_bodys.append(body_tmp)
 
             gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
-            gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
-            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
-            gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_delete_clicked(x))
+            gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
+            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
+            gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_delete_clicked(x))
             
             gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
 
@@ -101,11 +104,17 @@ class GUI(QMainWindow):
         super().__init__()
 
         self.body_counter = 0
+        self.body_tmp = Body(self.body_counter, upper_panel=UpperPanel("", ""), 
+                middle_panel=MiddlePanel(""), 
+                lower_panel=LowerPanel("", "", ""),
+                armrest=Armrest("", "", ""),
+                cup_holder=CupHolder("", ""))
+        
         self.list_of_threads = []
         self.list_of_radio_buttons = []
         self.list_of_car_body_group_box = []
-
         self.list_of_bodys = []
+
         self.petri_net = body_main_petri_net
 
         self.setWindowTitle("Tab Example")
@@ -529,8 +538,15 @@ class GUI(QMainWindow):
     
     def create_group_box_body(self):
         self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
-        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.pressed.connect(lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_schedule_clicked(x))
-        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.pressed.connect(lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_ready_clicked(x))
+
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_schedule_clicked(x))
+        
+        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_ready_clicked(x))
+        
+        self.list_of_car_body_group_box[self.body_counter - 1].button_remove.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_delete_clicked(x))
 
     def update_bodys_list_size(self):
         if len(self.list_of_bodys) == 0:
@@ -601,7 +617,6 @@ class GUI(QMainWindow):
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
                 self.list_of_bodys[self.body_counter - 1].upper_panel.is_controlable = sender.text()
-                pass
             else:
                 self.list_of_bodys[self.body_counter - 1].upper_panel.type = sender.text()
             print(f'Selected option: {sender.text()}')
@@ -623,7 +638,6 @@ class GUI(QMainWindow):
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
                 self.list_of_bodys[self.body_counter - 1].lower_panel.is_cup = sender.text()
-                pass
             else:
                 self.list_of_bodys[self.body_counter - 1].lower_panel.functionality = sender.text()
             print(f'Selected option: {sender.text()}')
@@ -649,30 +663,29 @@ class GUI(QMainWindow):
     def pb_add_clicked(self):
 
         self.create_group_box_body()
-        # self.car_body_group_box.group_box.setFixedSize(738, 200)
-        self.car_body_group_box.group_box.setMinimumWidth(738)
+        self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
+        
         if self.body_counter == 0:
-            self.body_counter += 1
+            # self.body_counter += 1
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
 
         if self.outer_layout.count() == self.body_counter:
             self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-        self.outer_layout.addWidget(self.car_body_group_box.group_box)
+        self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
 
     def pb_read_json(self):
         self.json_reader = ReadJSON(self.json_file_name)
         self.json_reader.parse_json(self)
-        # for body in self.list_of_bodys:
-        #     print(body)
 
     # def pb_debug(self):
     #     for body in self.list_of_bodys:
     #         print(body)
 
     def pb_debug(self):
-        # self.update_bodys_list_size()
-        self.body_counter += 1
+        print(self.body_counter)
+        print(len(self.list_of_bodys))
+        # print(self.list_of_bodys[self.body_counter - 1])
 
     
     @pyqtSlot()
@@ -712,7 +725,6 @@ class GUI(QMainWindow):
             if body.id == body_id:
                 index_remove = i
             i += 1
-            
         
         self.list_of_bodys.pop(index_remove)
         self.outer_layout.removeWidget(self.list_of_car_body_group_box[index_remove].group_box)
