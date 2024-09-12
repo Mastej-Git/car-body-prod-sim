@@ -5,11 +5,11 @@ from petri_nets.PetrisNet import Place, Transition
 class TestTransition(unittest.TestCase):
     
     def setUp(self) -> None:
-        self.place1 = Place("P1", 3, 3)
-        self.place2 = Place("P2", 2, 2)
-        self.place3 = Place("P3", 0, 2)
-        self.place4 = Place("P4", 0, 2)
-        self.place5 = Place("P5", 1, 2)
+        self.place1 = Place("P1", "Description1", 3, 3)
+        self.place2 = Place("P2", "Description2", 2, 2)
+        self.place3 = Place("P3", "Description3", 0, 2)
+        self.place4 = Place("P4", "Description4", 0, 2)
+        self.place5 = Place("P5", "Description5", 1, 2)
         
         self.transition1 = Transition("T1", {self.place1: 1, self.place2: 2}, {self.place3: 2})
         self.transition2 = Transition("T2", {}, {})

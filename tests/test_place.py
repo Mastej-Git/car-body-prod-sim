@@ -5,18 +5,21 @@ from petri_nets.PetrisNet import Place
 class TestPlace(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.place = Place("P1", tokens=3, max_tokens=5)
+        self.place = Place("P1", "Description1", tokens=3, max_tokens=5)
 
     def test_init(self):
         self.assertEqual(self.place.name, "P1")
+        self.assertEqual(self.place.description, "Description1")
         self.assertEqual(self.place.tokens, 3)
         self.assertEqual(self.place.max_tokens, 5)
 
         self.place.name = "P2"
+        self.place.description = "Description2"
         self.place.tokens = 2
         self.place.max_tokens = 7
 
         self.assertEqual(self.place.name, "P2")
+        self.assertEqual(self.place.description, "Description2")
         self.assertEqual(self.place.tokens, 2)
         self.assertEqual(self.place.max_tokens, 7)
 
