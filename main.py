@@ -256,7 +256,7 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = AnimatedButton("Dodaj")
+        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -310,7 +310,7 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        button_add_to_corpse = AnimatedButton("Dodaj")
+        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -381,7 +381,7 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = AnimatedButton("Dodaj")
+        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         combo_box_color = QComboBox()
@@ -461,7 +461,7 @@ class GUI(QMainWindow):
         combo_box_color.currentIndexChanged.connect(self.on_change_cbox_armrest_color)
         combo_box_color.activated.connect(self.on_change_cbox_armrest_color)
 
-        button_add_to_corpse = AnimatedButton("Dodaj")
+        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()
@@ -526,7 +526,7 @@ class GUI(QMainWindow):
         combo_box_color.currentIndexChanged.connect(self.on_change_cbox_cup_holder_color)
         combo_box_color.activated.connect(self.on_change_cbox_cup_holder_color)
 
-        button_add_to_corpse = AnimatedButton("Dodaj")
+        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
 
         vbox_main = QVBoxLayout()

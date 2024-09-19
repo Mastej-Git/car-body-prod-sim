@@ -40,6 +40,21 @@ class PetriNetThread(QThread):
         elif self.body.middle_panel.functionality == "Schowek":
             self.available_transitions.extend(["T15", "T16"])
 
+        if self.body.lower_panel.functionality == "Ładowarka bezprzewodowa":
+            self.available_transitions.extend(["T17", "T18"])
+        elif self.body.lower_panel.functionality == "Półka":
+            self.available_transitions.extend(["T23", "T24"])
+        if self.body.lower_panel.is_cup == "Tak":
+            self.available_transitions.extend(["T19", "T20"])
+        elif self.body.lower_panel.is_cup == "Nie":
+            self.available_transitions.extend(["T25", "T26"])
+        if self.body.lower_panel.color == "Czerwony":
+            self.available_transitions.extend(["T21", "T22"])
+        elif self.body.lower_panel.color == "Zielony":
+            self.available_transitions.extend(["T27", "T28"])
+        elif self.body.lower_panel.color == "Niebieski":
+            self.available_transitions.extend(["T29", "T30"])
+
         self.available_transitions.extend(["T6", "T7", "T8"])  
 
         self.petri_net.fire_transition("T1")
