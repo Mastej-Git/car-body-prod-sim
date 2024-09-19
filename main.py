@@ -219,8 +219,10 @@ class GUI(QMainWindow):
         group_box1 = QGroupBox("Parametry panelu górnego")
         label_material = QLabel("Sterowanie klimatyzacją")
         label_material.setStyleSheet(style_sheet_label)
-        label_size = QLabel("Klimatyzacja")
+        label_material.setMaximumHeight(70)
+        label_size = QLabel("Rodzaj klimatyzacji")
         label_size.setStyleSheet(style_sheet_label)
+        label_size.setMaximumHeight(70)
 
         radio1 = QRadioButton("Tak")
         radio2 = QRadioButton("Nie")
@@ -290,6 +292,7 @@ class GUI(QMainWindow):
         group_box1 = QGroupBox("Parametry panelu środkowego")
         label_material = QLabel("Funkcjonalność")
         label_material.setStyleSheet(style_sheet_label)
+        label_material.setMaximumHeight(70)
 
         radio3 = QRadioButton("Interfejs multimedialny")
         radio4 = QRadioButton("Schowek")
@@ -336,10 +339,15 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry panelu dolnego")
-        label_material = QLabel("Funkcjonalność")
-        label_material.setStyleSheet(style_sheet_label)
-        label_size = QLabel("Miejsce na kubek")
-        label_size.setStyleSheet(style_sheet_label)
+        label_functionality = QLabel("Funkcjonalność")
+        label_functionality.setStyleSheet(style_sheet_label)
+        label_functionality.setMaximumHeight(70)
+        label_cup_place = QLabel("Miejsce na kubek")
+        label_cup_place.setStyleSheet(style_sheet_label)
+        label_cup_place.setMaximumHeight(70)
+        label_color = QLabel("Miejsce na kubek")
+        label_color.setStyleSheet(style_sheet_label)
+        label_color.setMaximumHeight(70)
 
         radio5 = QRadioButton("Ładowarka bezprzewodowa")
         radio6 = QRadioButton("Półka")
@@ -386,16 +394,17 @@ class GUI(QMainWindow):
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
 
-        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(label_functionality)
         vbox_sub1.addWidget(radio_groupbox1)
         vbox_sub1.setSpacing(5)
 
-        vbox_sub2.addWidget(label_size)
+        vbox_sub2.addWidget(label_cup_place)
         vbox_sub2.addWidget(radio_groupbox2)
         vbox_sub2.setSpacing(5)
 
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(label_color)
         vbox_main.addWidget(combo_box_color)
         vbox_main.addWidget(button_add_to_corpse)
 
@@ -415,10 +424,13 @@ class GUI(QMainWindow):
         group_box1 = QGroupBox("Parametry podłokietnika")
         label_heating = QLabel("Grzanie")
         label_heating.setStyleSheet(style_sheet_label)
+        label_heating.setMaximumHeight(70)
         label_material = QLabel("Materiał")
         label_material.setStyleSheet(style_sheet_label)
+        label_material.setMaximumHeight(70)
         label_color = QLabel("Kolor")
         label_color.setStyleSheet(style_sheet_label)
+        label_color.setMaximumHeight(70)
 
         radio9 = QRadioButton("Tak")
         radio10 = QRadioButton("Nie")
@@ -484,10 +496,12 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry miejsca na kubki")
-        label_heating = QLabel("Wejście USB")
-        label_heating.setStyleSheet(style_sheet_label)
+        label_usb_socket = QLabel("Wejście USB")
+        label_usb_socket.setStyleSheet(style_sheet_label)
+        label_usb_socket.setMaximumHeight(70)
         label_color = QLabel("Kolor")
         label_color.setStyleSheet(style_sheet_label)
+        label_color.setMaximumHeight(70)
 
         radio11 = QRadioButton("Tak")
         radio12 = QRadioButton("Nie")
@@ -519,7 +533,7 @@ class GUI(QMainWindow):
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
 
-        vbox_sub1.addWidget(label_heating)
+        vbox_sub1.addWidget(label_usb_socket)
         vbox_sub1.addWidget(radio_groupbox1)
         vbox_sub1.setSpacing(5)
 

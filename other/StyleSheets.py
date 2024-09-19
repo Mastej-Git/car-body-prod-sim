@@ -16,6 +16,7 @@ style_sheet_QRadioButton = """
 QRadioButton {
     color: #00ffff;
     padding: 5px;
+    background-color: #2d2d2d;
 }
 
 # QRadioButton::indicator {
@@ -90,6 +91,7 @@ QLabel {
     padding: 5px;
     border-radius: 3px;
     height: 30px;
+    background-color: #2d2d2d;
 }
 """
 
