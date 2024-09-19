@@ -35,6 +35,11 @@ class PetriNetThread(QThread):
         elif self.body.upper_panel.is_controlable == "Nie":
             self.available_transitions.extend(["T11", "T12"])
 
+        if self.body.middle_panel.functionality == "Interfejs multimedialny":
+            self.available_transitions.extend(["T13", "T14"])
+        elif self.body.middle_panel.functionality == "Schowek":
+            self.available_transitions.extend(["T15", "T16"])
+
         self.available_transitions.extend(["T6", "T7", "T8"])  
 
         self.petri_net.fire_transition("T1")

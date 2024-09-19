@@ -663,19 +663,10 @@ class GUI(QMainWindow):
 
     def pb_add_clicked(self):
 
-        if self.body_counter == 0:
-            self.body_counter += 1
-            self.outer_layout.removeWidget(self.starting_label)
-            self.starting_label.deleteLater()
-
-        if self.body_counter > len(self.list_of_bodys):
-            self.list_of_bodys.append(self.body_tmp)
-            self.create_group_box_body()
-            self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
-        elif self.body_counter == len(self.list_of_bodys):
-            self.list_of_bodys[self.body_counter - 1] = self.body_tmp
-            self.list_of_car_body_group_box[self.body_counter - 1].recreate_label()
-            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+        self.body_tmp.id = self.body_counter - 1
+        self.list_of_bodys[self.body_counter - 1] = self.body_tmp
+        self.list_of_car_body_group_box[self.body_counter - 1].recreate_label()
+        self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
             
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
 
@@ -688,11 +679,21 @@ class GUI(QMainWindow):
     #         print(body)
 
     def pb_debug(self):
-        print(self.body_counter)
-        print(len(self.list_of_bodys))
-        print(self.list_of_bodys[self.body_counter - 1])
-        print(self.outer_layout.count())
+        if self.body_counter == 0:
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
 
+        self.body_counter += 1
+        self.body_tmp.id = self.body_counter - 1
+
+        self.body_tmp.remove_parameters()
+        self.reset_radio_buttons()
+
+        self.list_of_bodys.append(self.body_tmp)
+        self.create_group_box_body()
+        self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
+
+        self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
     
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):
