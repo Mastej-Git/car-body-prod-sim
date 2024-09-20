@@ -188,10 +188,10 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
-        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
-        button_add_corpse = AnimatedButton("Dodaj korpus")
-        button_add_corpse.clicked.connect(self.pb_add_corpse)
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -207,8 +207,8 @@ class GUI(QMainWindow):
 
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
-        vbox_main.addWidget(button_add_to_corpse)
-        vbox_main.addWidget(button_add_corpse)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
 
         group_box1.setLayout(vbox_main)
 
@@ -238,10 +238,10 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
-        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
-        button_add_corpse = AnimatedButton("Dodaj korpus")
-        button_add_corpse.clicked.connect(self.pb_add_corpse)
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -253,8 +253,8 @@ class GUI(QMainWindow):
 
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
-        vbox_main.addWidget(button_add_to_corpse)
-        vbox_main.addWidget(button_add_corpse)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
 
         group_box1.setLayout(vbox_main)
 
@@ -298,16 +298,12 @@ class GUI(QMainWindow):
 
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
-        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
-        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
-        button_add_corpse = AnimatedButton("Dodaj korpus")
-        button_add_corpse.clicked.connect(self.pb_add_corpse)
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
 
-        combo_box_color = QComboBox()
-        combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
-        combo_box_color.setStyleSheet(style_sheet_QComboBox)
-        combo_box_color.currentIndexChanged.connect(self.on_change_cbox_lower_panel_color)
-        combo_box_color.activated.connect(self.on_change_cbox_lower_panel_color)
+        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_lower_panel_color)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -325,8 +321,8 @@ class GUI(QMainWindow):
         vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(label_color)
         vbox_main.addWidget(combo_box_color)
-        vbox_main.addWidget(button_add_to_corpse)
-        vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
 
         group_box1.setLayout(vbox_main)
 
@@ -358,22 +354,13 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        combo_box_material = QComboBox()
-        combo_box_material.addItems(["Skóra", "Eko skóra", "Sztuczna skóra"])
-        combo_box_material.setStyleSheet(style_sheet_QComboBox)
-        combo_box_material.currentIndexChanged.connect(self.on_change_cbox_armrest_material)
-        combo_box_material.activated.connect(self.on_change_cbox_armrest_material)
+        combo_box_material = self.create_combo_box(["Skóra", "Eko skóra", "Sztuczna skóra"], self.on_change_cbox_armrest_material)
+        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_armrest_color)
 
-        combo_box_color = QComboBox()
-        combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
-        combo_box_color.setStyleSheet(style_sheet_QComboBox)
-        combo_box_color.currentIndexChanged.connect(self.on_change_cbox_armrest_color)
-        combo_box_color.activated.connect(self.on_change_cbox_armrest_color)
-
-        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
-        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
-        button_add_corpse = AnimatedButton("Dodaj korpus")
-        button_add_corpse.clicked.connect(self.pb_add_corpse)
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -391,7 +378,8 @@ class GUI(QMainWindow):
         vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(label_color)
         vbox_main.addWidget(combo_box_color)
-        vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
 
         group_box1.setLayout(vbox_main)
 
@@ -423,16 +411,12 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        combo_box_color = QComboBox()
-        combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
-        combo_box_color.setStyleSheet(style_sheet_QComboBox)
-        combo_box_color.currentIndexChanged.connect(self.on_change_cbox_cup_holder_color)
-        combo_box_color.activated.connect(self.on_change_cbox_cup_holder_color)
+        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_cup_holder_color)
 
-        button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
-        button_add_to_corpse.clicked.connect(self.pb_add_clicked)
-        button_add_corpse = AnimatedButton("Dodaj korpus")
-        button_add_corpse.clicked.connect(self.pb_add_corpse)
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -446,7 +430,8 @@ class GUI(QMainWindow):
         vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(label_color)
         vbox_main.addWidget(combo_box_color)
-        vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
 
         group_box1.setLayout(vbox_main)
 
@@ -562,7 +547,7 @@ class GUI(QMainWindow):
         self.json_reader = ReadJSON(self.json_file_name)
         self.json_reader.parse_json(self)
 
-    def pb_add_corpse(self):
+    def pb_add_body(self):
         if self.body_counter == 0:
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
@@ -651,6 +636,15 @@ class GUI(QMainWindow):
         radio_button.toggled.connect(signal_function)
 
         return radio_button
+    
+    def create_combo_box(self, list_of_elements: list, signal_function):
+        combo_box = QComboBox()
+        combo_box.addItems(list_of_elements)
+        combo_box.setStyleSheet(style_sheet_QComboBox)
+        combo_box.currentIndexChanged.connect(signal_function)
+        combo_box.activated.connect(signal_function)
+
+        return combo_box
 
 def main():
     app = QApplication([])
