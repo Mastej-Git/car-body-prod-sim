@@ -17,8 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import (Qt,
-                          pyqtSlot,
-                          QMutex)
+                          pyqtSlot)
 
 from Body import Body
 from body_parts.UpperPanel import UpperPanel
@@ -34,13 +33,13 @@ from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
 from other.StyleSheets import (
-    style_sheet_central_widget,
     style_sheet_app,
+    style_sheet_central_widget,
     style_sheet_label,
     style_sheet_QComboBox,
+    style_sheet_QRadioButton,
     style_sheet_sub_tab,
     style_sheet_tab,
-    style_sheet_QRadioButton
 )
 
 from BodyPetriNet import body_main_petri_net
@@ -53,7 +52,7 @@ class ReadJSON():
 
     def parse_json(self, gui):
 
-        with open(self.file_name, "r") as file:
+        with open(self.file_name, "r", encoding="UTF-8") as file:
             body_configs = json.load(file)
 
         if gui.body_counter == 0:

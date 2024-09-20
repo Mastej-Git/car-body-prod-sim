@@ -7,7 +7,6 @@ from Body import Body
 from BodyPetriNet import body_main_petri_net
 
 from other.MatPlotlibWidget import MatplotlibWidget
-from other.Enums import CupMaterial
 
 mutex = QMutex()
 
@@ -68,7 +67,9 @@ class PetriNetThread(QThread):
             mutex.lock()
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                    print(f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}")
+                    print(
+                        f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}"
+                    )
                     # print(self.petri_net)
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])

@@ -3,11 +3,10 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from petri_nets.PetriNet import PetriNet
-
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
-from matplotlib.pyplot import subplots_adjust
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+
+from petri_nets.PetriNet import PetriNet
 
 class MatplotlibWidget(QWidget):
     def __init__(self, petri_net: PetriNet, parent=None):
@@ -29,7 +28,7 @@ class MatplotlibWidget(QWidget):
         self.durations = []
         self.current_time = 0
 
-        for name, place in self.petri_net.places.items():
+        for place in self.petri_net.places.values():
             self.tasks.append(f"{place.description}")
         
     def plot(self):

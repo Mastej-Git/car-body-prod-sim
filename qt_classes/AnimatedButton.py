@@ -46,3 +46,4 @@ class AnimatedButton(QPushButton):
         self.animation.setEasingCurve(QEasingCurve.InQuad)
         
         self.animation.start()
+        

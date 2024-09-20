@@ -62,4 +62,3 @@ body_main_petri_net.add_transition("T27", {"P18": 1}, {"P23": 1})
 body_main_petri_net.add_transition("T28", {"P23": 1}, {"P20": 1})
 body_main_petri_net.add_transition("T29", {"P18": 1}, {"P24": 1})
 body_main_petri_net.add_transition("T30", {"P24": 1}, {"P20": 1})
-
