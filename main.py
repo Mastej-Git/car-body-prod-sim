@@ -1,5 +1,3 @@
-import json
-
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -19,16 +17,18 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import (Qt,
                           pyqtSlot)
 
-from Body import Body
 from body_parts.UpperPanel import UpperPanel
 from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
 from body_parts.Armrest import Armrest
 from body_parts.CupHolder import CupHolder
+from Body import Body
 
 from petri_nets.PetriNetThread import PetriNetThread
 
 from other.MatPlotlibWidget import MatplotlibWidget
+from other.ReadJSON import ReadJSON
+
 from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
@@ -43,60 +43,6 @@ from other.StyleSheets import (
 )
 
 from BodyPetriNet import body_main_petri_net
-
-class ReadJSON():
-
-    def __init__(self, file_name: str):
-
-        self.file_name = file_name
-
-    def parse_json(self, gui):
-
-        with open(self.file_name, "r", encoding="UTF-8") as file:
-            body_configs = json.load(file)
-
-        if gui.body_counter == 0:
-            gui.outer_layout.removeWidget(gui.starting_label)
-            gui.starting_label.deleteLater()
-
-        for index, body_config in enumerate(body_configs):
-
-            body_tmp = Body(gui.body_counter, upper_panel=UpperPanel("", ""), 
-                middle_panel=MiddlePanel(""), 
-                lower_panel=LowerPanel("", "", ""),
-                armrest=Armrest("", "", ""),
-                cup_holder=CupHolder("", ""))
-
-            body_tmp.upper_panel.is_controlable = body_config['body']['upper_panel']['is_controllable']
-            body_tmp.upper_panel.type = body_config['body']['upper_panel']['type']
-
-            body_tmp.middle_panel.functionality = body_config['body']['middle_panel']['functionality']
-
-            body_tmp.lower_panel.functionality = body_config['body']['lower_panel']['functionality']
-            body_tmp.lower_panel.is_cup = body_config['body']['lower_panel']['is_cup']
-            body_tmp.lower_panel.color = body_config['body']['lower_panel']['color']
-
-            body_tmp.armrest.heating = body_config['body']['armrest']['heating']
-            body_tmp.armrest.material = body_config['body']['armrest']['material']
-            body_tmp.armrest.color = body_config['body']['armrest']['color']
-
-            body_tmp.cup_holder.usb_socket = body_config['body']['cup_holder']['usb_socket']
-            body_tmp.cup_holder.color = body_config['body']['cup_holder']['color']  
-
-            gui.list_of_bodys.append(body_tmp)
-
-            gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
-            gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
-            gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
-            gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_delete_clicked(x))
-            
-            gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
-
-            gui.body_counter += 1
-
 
 class GUI(QMainWindow):
     def __init__(self):
@@ -167,12 +113,7 @@ class GUI(QMainWindow):
         overlay_layout = QVBoxLayout(overlay_widget)
         overlay_layout.addWidget(stacked_widget)
 
-        plus_button = AnimatedButton("+", 40, 40)
-        plus_button.clicked.connect(self.pb_debug)
-
         button_layout = QHBoxLayout()
-        button_layout.addStretch()
-        button_layout.addWidget(plus_button)
         overlay_layout.addLayout(button_layout)
 
         layout1.addWidget(overlay_widget)
@@ -216,19 +157,11 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry panelu górnego")
-        label_material = QLabel("Sterowanie klimatyzacją")
-        label_material.setStyleSheet(style_sheet_label)
-        label_material.setMaximumHeight(70)
-        label_size = QLabel("Rodzaj klimatyzacji")
-        label_size.setStyleSheet(style_sheet_label)
-        label_size.setMaximumHeight(70)
+        label_material = self.create_label("Sterowanie klimatyzacją")
+        label_size = self.create_label("Rodzaj klimatyzacji")
 
-        radio1 = QRadioButton("Tak")
-        radio2 = QRadioButton("Nie")
-        radio1.setStyleSheet(style_sheet_QRadioButton)
-        radio2.setStyleSheet(style_sheet_QRadioButton)
-        radio1.toggled.connect(self.on_radio_button_upper_panel_clicked)
-        radio2.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio1 = self.create_radio_button("Tak", self.on_radio_button_upper_panel_clicked)
+        radio2 = self.create_radio_button("Nie", self.on_radio_button_upper_panel_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
@@ -257,6 +190,8 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
+        button_add_corpse = AnimatedButton("Dodaj korpus")
+        button_add_corpse.clicked.connect(self.pb_add_corpse)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -270,10 +205,10 @@ class GUI(QMainWindow):
         vbox_sub2.addWidget(radio_groupbox2)
         vbox_sub2.setSpacing(5)
 
-
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_corpse)
 
         group_box1.setLayout(vbox_main)
 
@@ -289,16 +224,10 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry panelu środkowego")
-        label_material = QLabel("Funkcjonalność")
-        label_material.setStyleSheet(style_sheet_label)
-        label_material.setMaximumHeight(70)
+        label_functionality = self.create_label("Funkcjonalność")
 
-        radio3 = QRadioButton("Interfejs multimedialny")
-        radio4 = QRadioButton("Schowek")
-        radio3.setStyleSheet(style_sheet_QRadioButton)
-        radio4.setStyleSheet(style_sheet_QRadioButton)
-        radio3.toggled.connect(self.on_radio_button_middle_panel_clicked)
-        radio4.toggled.connect(self.on_radio_button_middle_panel_clicked)
+        radio3 = self.create_radio_button("Interfejs multimedialny", self.on_radio_button_middle_panel_clicked)
+        radio4 = self.create_radio_button("Schowek", self.on_radio_button_middle_panel_clicked)
         self.list_of_radio_buttons.extend([radio3, radio4])
 
         radio_groupbox1 = QGroupBox()
@@ -311,18 +240,21 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
+        button_add_corpse = AnimatedButton("Dodaj korpus")
+        button_add_corpse.clicked.connect(self.pb_add_corpse)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
 
-        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(label_functionality)
         vbox_sub1.addWidget(radio_groupbox1)
         vbox_sub1.setSpacing(5)
 
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
         vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_corpse)
 
         group_box1.setLayout(vbox_main)
 
@@ -338,22 +270,12 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry panelu dolnego")
-        label_functionality = QLabel("Funkcjonalność")
-        label_functionality.setStyleSheet(style_sheet_label)
-        label_functionality.setMaximumHeight(70)
-        label_cup_place = QLabel("Miejsce na kubek")
-        label_cup_place.setStyleSheet(style_sheet_label)
-        label_cup_place.setMaximumHeight(70)
-        label_color = QLabel("Miejsce na kubek")
-        label_color.setStyleSheet(style_sheet_label)
-        label_color.setMaximumHeight(70)
+        label_functionality = self.create_label("Funkcjonalność")
+        label_cup_place = self.create_label("Miejsce na kubek")
+        label_color = self.create_label("Kolor")
 
-        radio5 = QRadioButton("Ładowarka bezprzewodowa")
-        radio6 = QRadioButton("Półka")
-        radio5.setStyleSheet(style_sheet_QRadioButton)
-        radio6.setStyleSheet(style_sheet_QRadioButton)
-        radio5.toggled.connect(self.on_radio_button_lower_panel_clicked)
-        radio6.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio5 = self.create_radio_button("Ładowarka bezprzewodowa", self.on_radio_button_lower_panel_clicked)
+        radio6 = self.create_radio_button("Półka", self.on_radio_button_lower_panel_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
@@ -363,12 +285,8 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        radio7 = QRadioButton("Tak")
-        radio8 = QRadioButton("Nie")
-        radio7.setStyleSheet(style_sheet_QRadioButton)
-        radio8.setStyleSheet(style_sheet_QRadioButton)
-        radio7.toggled.connect(self.on_radio_button_lower_panel_clicked)
-        radio8.toggled.connect(self.on_radio_button_lower_panel_clicked)
+        radio7 = self.create_radio_button("Tak", self.on_radio_button_lower_panel_clicked)
+        radio8 = self.create_radio_button("Nie", self.on_radio_button_lower_panel_clicked)
 
         radio_groupbox2 = QGroupBox()
         radio_vboxlayout2 = QVBoxLayout()
@@ -382,6 +300,8 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
+        button_add_corpse = AnimatedButton("Dodaj korpus")
+        button_add_corpse.clicked.connect(self.pb_add_corpse)
 
         combo_box_color = QComboBox()
         combo_box_color.addItems(["Czerwony", "Zielony", "Niebieski"])
@@ -406,6 +326,7 @@ class GUI(QMainWindow):
         vbox_main.addWidget(label_color)
         vbox_main.addWidget(combo_box_color)
         vbox_main.addWidget(button_add_to_corpse)
+        vbox_main.addWidget(button_add_to_corpse)
 
         group_box1.setLayout(vbox_main)
 
@@ -421,23 +342,12 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry podłokietnika")
-        label_heating = QLabel("Grzanie")
-        label_heating.setStyleSheet(style_sheet_label)
-        label_heating.setMaximumHeight(70)
-        label_material = QLabel("Materiał")
-        label_material.setStyleSheet(style_sheet_label)
-        label_material.setMaximumHeight(70)
-        label_color = QLabel("Kolor")
-        label_color.setStyleSheet(style_sheet_label)
-        label_color.setMaximumHeight(70)
+        label_heating = self.create_label("Grzanie")
+        label_material = self.create_label("Materiał")
+        label_color = self.create_label("Kolor")
 
-        radio9 = QRadioButton("Tak")
-        radio10 = QRadioButton("Nie")
-        radio9.setStyleSheet(style_sheet_QRadioButton)
-        radio10.setStyleSheet(style_sheet_QRadioButton)
-        radio9.toggled.connect(self.on_radio_button_armrest_clicked)
-        radio10.toggled.connect(self.on_radio_button_armrest_clicked)
-
+        radio9 = self.create_radio_button("Tak", self.on_radio_button_armrest_clicked)
+        radio10 = self.create_radio_button("Nie", self.on_radio_button_armrest_clicked)
         self.list_of_radio_buttons.extend([radio9, radio10])
 
         radio_groupbox1 = QGroupBox()
@@ -462,6 +372,8 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
+        button_add_corpse = AnimatedButton("Dodaj korpus")
+        button_add_corpse.clicked.connect(self.pb_add_corpse)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -495,19 +407,11 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry miejsca na kubki")
-        label_usb_socket = QLabel("Wejście USB")
-        label_usb_socket.setStyleSheet(style_sheet_label)
-        label_usb_socket.setMaximumHeight(70)
-        label_color = QLabel("Kolor")
-        label_color.setStyleSheet(style_sheet_label)
-        label_color.setMaximumHeight(70)
+        label_usb_socket = self.create_label("Wejście USB")
+        label_color = self.create_label("Kolor")
 
-        radio11 = QRadioButton("Tak")
-        radio12 = QRadioButton("Nie")
-        radio11.setStyleSheet(style_sheet_QRadioButton)
-        radio12.setStyleSheet(style_sheet_QRadioButton)
-        radio11.toggled.connect(self.on_radio_button_cup_holder_clicked)
-        radio12.toggled.connect(self.on_radio_button_cup_holder_clicked)
+        radio11 = self.create_radio_button("Tak", self.on_radio_button_cup_holder_clicked)
+        radio12 = self.create_radio_button("Nie", self.on_radio_button_cup_holder_clicked)
 
         radio_groupbox1 = QGroupBox()
         radio_vboxlayout1 = QVBoxLayout()
@@ -527,6 +431,8 @@ class GUI(QMainWindow):
 
         button_add_to_corpse = AnimatedButton("Dodaj do korpusu")
         button_add_to_corpse.clicked.connect(self.pb_add_clicked)
+        button_add_corpse = AnimatedButton("Dodaj korpus")
+        button_add_corpse.clicked.connect(self.pb_add_corpse)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -560,23 +466,6 @@ class GUI(QMainWindow):
         
         self.list_of_car_body_group_box[self.body_counter - 1].button_remove.clicked.connect(
             lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_delete_clicked(x))
-
-    def update_bodys_list_size(self):
-        if len(self.list_of_bodys) == 0:
-            body_tmp = Body(self.body_counter, upper_panel=UpperPanel("", ""), 
-                middle_panel=MiddlePanel(""), 
-                lower_panel=LowerPanel("", "", ""),
-                armrest=Armrest("", "", ""),
-                cup_holder=CupHolder("", ""))
-            self.list_of_bodys.append(body_tmp)
-            self.body_counter += 1
-        # if len(self.list_of_bodys) < self.body_counter:
-        #     body_tmp = Body(self.body_counter - 1, upper_panel=UpperPanel("", ""), 
-        #         middle_panel=MiddlePanel(""), 
-        #         lower_panel=LowerPanel("", "", ""),
-        #         armrest=Armrest("", "", ""),
-        #         cup_holder=CupHolder("", ""))
-        #     self.list_of_bodys.append(body_tmp)
 
     def on_change_cbox_lower_panel_color(self, index):
 
@@ -673,11 +562,7 @@ class GUI(QMainWindow):
         self.json_reader = ReadJSON(self.json_file_name)
         self.json_reader.parse_json(self)
 
-    # def pb_debug(self):
-    #     for body in self.list_of_bodys:
-    #         print(body)
-
-    def pb_debug(self):
+    def pb_add_corpse(self):
         if self.body_counter == 0:
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
@@ -752,6 +637,20 @@ class GUI(QMainWindow):
             self.starting_label.setStyleSheet(style_sheet_label)
             self.starting_label.setAlignment(Qt.AlignCenter)
             self.outer_layout.addWidget(self.starting_label)
+
+    def create_label(self, label_str: str, maximuxm_height=70):
+        label = QLabel(label_str)
+        label.setStyleSheet(style_sheet_label)
+        label.setMaximumHeight(maximuxm_height)
+
+        return label
+    
+    def create_radio_button(self, label_str: str, signal_function):
+        radio_button = QRadioButton(label_str)
+        radio_button.setStyleSheet(style_sheet_QRadioButton)
+        radio_button.toggled.connect(signal_function)
+
+        return radio_button
 
 def main():
     app = QApplication([])
