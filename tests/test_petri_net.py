@@ -1,6 +1,6 @@
 import unittest
 
-from petri_nets.PetrisNet import PetriNet
+from petri_nets.PetriNet import PetriNet
 
 class TestPetriNet(unittest.TestCase):
 

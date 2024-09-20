@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
 )
 
-from petri_nets.PetrisNet import PetriNet
+from petri_nets.PetriNet import PetriNet
 
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure

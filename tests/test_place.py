@@ -1,6 +1,6 @@
 import unittest
 
-from petri_nets.PetrisNet import Place
+from petri_nets.Place import Place
 
 class TestPlace(unittest.TestCase):
 

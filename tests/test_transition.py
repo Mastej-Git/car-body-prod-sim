@@ -1,6 +1,7 @@
 import unittest
 
-from petri_nets.PetrisNet import Place, Transition
+from petri_nets.Place import Place
+from petri_nets.Transition import Transition
 
 class TestTransition(unittest.TestCase):
     

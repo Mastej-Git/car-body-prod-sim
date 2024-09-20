@@ -1,4 +1,4 @@
-from petri_nets.PetrisNet import PetriNet
+from petri_nets.PetriNet import PetriNet
 
 cup_main_petri_net = PetriNet()
 
