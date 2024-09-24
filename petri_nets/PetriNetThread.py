@@ -54,6 +54,23 @@ class PetriNetThread(QThread):
         elif self.body.lower_panel.color == "Niebieski":
             self.available_transitions.extend(["T29", "T30"])
 
+        if self.body.armrest.material == "Skóra":
+            self.available_transitions.extend(["T31", "T32"])
+        elif self.body.armrest.material == "Eko skóra":
+            self.available_transitions.extend(["T37", "T38"])
+        elif self.body.armrest.material == "Sztuczna skóra":
+            self.available_transitions.extend(["T43", "T44"])
+        if self.body.armrest.heating == "Tak":
+            self.available_transitions.extend(["T33", "T34"])
+        elif self.body.armrest.heating == "Nie":
+            self.available_transitions.extend(["T39", "T40"])
+        if self.body.armrest.color == "Czerwony":
+            self.available_transitions.extend(["T35", "T36"])
+        elif self.body.armrest.color == "Zielony":
+            self.available_transitions.extend(["T41", "T42"])
+        elif self.body.armrest.color == "Niebieski":
+            self.available_transitions.extend(["T45", "T46"])
+
         self.available_transitions.extend(["T6", "T7", "T8"])  
 
         self.petri_net.fire_transition("T1")
