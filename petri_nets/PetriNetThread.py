@@ -34,10 +34,12 @@ class PetriNetThread(QThread):
 
         self.define_available_tr()
 
-        self.available_transitions.extend(["T6", "T7", "T8"])  
+        self.available_transitions.extend(["T901", "T902", "T903"])  
 
-        self.petri_net.fire_transition("T1")
-        self.petri_net.fire_transition("T2")
+        self.petri_net.fire_transition("T001")
+        self.petri_net.fire_transition("T002")
+        self.petri_net.fire_transition("T003")
+        self.petri_net.fire_transition("T004")
 
         print(self.available_transitions)
 
@@ -109,48 +111,48 @@ class PetriNetThread(QThread):
 
         if self.body.upper_panel.is_controlable == "Tak":
             if self.body.upper_panel.type == "4-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T3", "T4", "T5"])
+                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T103"])
             elif self.body.upper_panel.type == "2-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T3", "T9", "T10"])
+                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T104", "T105"])
         elif self.body.upper_panel.is_controlable == "Nie":
-            self.available_body_parts_transitions["upper_panel"].extend(["T11", "T12"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T106", "T107"])
 
         if self.body.middle_panel.functionality == "Interfejs multimedialny":
-            self.available_body_parts_transitions["middle_panel"].extend(["T13", "T14"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
         elif self.body.middle_panel.functionality == "Schowek":
-            self.available_body_parts_transitions["middle_panel"].extend(["T15", "T16"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T203", "T204"])
 
         if self.body.lower_panel.functionality == "Ładowarka bezprzewodowa":
-            self.available_body_parts_transitions["lower_panel"].extend(["T17", "T18"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T301", "T302"])
         elif self.body.lower_panel.functionality == "Półka":
-            self.available_body_parts_transitions["lower_panel"].extend(["T23", "T24"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T303", "T304"])
         if self.body.lower_panel.is_cup == "Tak":
-            self.available_body_parts_transitions["lower_panel"].extend(["T19", "T20"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T305", "T306"])
         elif self.body.lower_panel.is_cup == "Nie":
-            self.available_body_parts_transitions["lower_panel"].extend(["T25", "T26"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T307", "T308"])
         if self.body.lower_panel.color == "Czerwony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T21", "T22"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T309", "T310"])
         elif self.body.lower_panel.color == "Zielony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T27", "T28"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T311", "T312"])
         elif self.body.lower_panel.color == "Niebieski":
-            self.available_body_parts_transitions["lower_panel"].extend(["T29", "T30"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T313", "T314"])
 
         if self.body.armrest.material == "Skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T31", "T32"])
+            self.available_body_parts_transitions["armrest"].extend(["T401", "T402"])
         elif self.body.armrest.material == "Eko skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T37", "T38"])
+            self.available_body_parts_transitions["armrest"].extend(["T403", "T404"])
         elif self.body.armrest.material == "Sztuczna skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T43", "T44"])
+            self.available_body_parts_transitions["armrest"].extend(["T405", "T406"])
         if self.body.armrest.heating == "Tak":
-            self.available_body_parts_transitions["armrest"].extend(["T33", "T34"])
+            self.available_body_parts_transitions["armrest"].extend(["T407", "T408"])
         elif self.body.armrest.heating == "Nie":
-            self.available_body_parts_transitions["armrest"].extend(["T39", "T40"])
+            self.available_body_parts_transitions["armrest"].extend(["T409", "T410"])
         if self.body.armrest.color == "Czerwony":
-            self.available_body_parts_transitions["armrest"].extend(["T35", "T36"])
+            self.available_body_parts_transitions["armrest"].extend(["T411", "T412"])
         elif self.body.armrest.color == "Zielony":
-            self.available_body_parts_transitions["armrest"].extend(["T41", "T42"])
+            self.available_body_parts_transitions["armrest"].extend(["T413", "T414"])
         elif self.body.armrest.color == "Niebieski":
-            self.available_body_parts_transitions["armrest"].extend(["T45", "T46"])
+            self.available_body_parts_transitions["armrest"].extend(["T415", "T416"])
 
 
 class PetriNetSubThread(QThread):
