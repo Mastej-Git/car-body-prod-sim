@@ -47,14 +47,17 @@ class PetriNetThread(QThread):
         self.pn_mp_thread = PetriNetSubThread(float(self.body.id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"], mpl_widget)
         self.pn_lp_thread = PetriNetSubThread(float(self.body.id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"], mpl_widget)
         self.pn_ar_thread = PetriNetSubThread(float(self.body.id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"], mpl_widget)
+        self.pn_ch_thread = PetriNetSubThread(float(self.body.id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"], mpl_widget)
         self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_ar_thread.finished_signal.connect(self.on_thread_finished)
+        self.pn_ch_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_mp_thread.start()
         self.pn_up_thread.start()
         self.pn_lp_thread.start()
         self.pn_ar_thread.start()
+        self.pn_ch_thread.start()
 
     def run(self):
         i = 0
@@ -94,6 +97,8 @@ class PetriNetThread(QThread):
             return self.pn_lp_thread
         elif round(id - int(id), 10) == 0.4:
             return self.pn_ar_thread
+        elif round(id - int(id), 10) == 0.5:
+            return self.pn_ch_thread
 
     def on_thread_finished(self, thread_id, thread_name):
         thread = self.thread_finder(thread_id)
@@ -154,6 +159,17 @@ class PetriNetThread(QThread):
         elif self.body.armrest.color == "Niebieski":
             self.available_body_parts_transitions["armrest"].extend(["T415", "T416"])
 
+        self.available_body_parts_transitions["cup_holder"].extend(["T501", "T502"])
+        if self.body.cup_holder.usb_socket == "Tak":
+            self.available_body_parts_transitions["cup_holder"].extend(["T503", "T504"])
+        elif self.body.cup_holder.usb_socket == "Nie":
+            self.available_body_parts_transitions["cup_holder"].extend(["T505", "T506"])
+        if self.body.cup_holder.color == "Czerwony":
+            self.available_body_parts_transitions["cup_holder"].extend(["T507", "T508"])
+        elif self.body.cup_holder.color == "Zielony":
+            self.available_body_parts_transitions["cup_holder"].extend(["T509", "T510"])
+        elif self.body.cup_holder.color == "Niebieski":
+            self.available_body_parts_transitions["cup_holder"].extend(["T511", "T512"])
 
 class PetriNetSubThread(QThread):
 
