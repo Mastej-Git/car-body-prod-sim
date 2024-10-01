@@ -152,6 +152,6 @@ body_main_petri_net.add_transition("T613", {"P606": 1}, {"P609": 1})
 body_main_petri_net.add_transition("T614", {"P609": 1}, {"P699": 1})
 
 body_main_petri_net.add_transition("T901", {"P199": 1, "P299": 1, "P399": 1}, {"P900": 1})
-body_main_petri_net.add_transition("T902", {"P900": 1, "P499": 1, "P599": 1}, {"P901": 1})
+body_main_petri_net.add_transition("T902", {"P900": 1, "P499": 1, "P599": 1, "P699": 1}, {"P901": 1})
 body_main_petri_net.add_transition("T903", {"P901": 1}, {"P902": 1})
 body_main_petri_net.add_transition("T904", {"P902": 1}, {})

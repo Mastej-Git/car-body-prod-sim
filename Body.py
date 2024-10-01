@@ -3,15 +3,17 @@ from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
 from body_parts.Armrest import Armrest
 from body_parts.CupHolder import CupHolder
+from body_parts.Framework import Framework
 
 class Body():
 
     def __init__(self, id,
-                upper_panel: UpperPanel,
-                middle_panel: MiddlePanel, 
-                lower_panel: LowerPanel,
-                armrest: Armrest,
-                cup_holder: CupHolder):
+                 framework: Framework,
+                 upper_panel: UpperPanel,
+                 middle_panel: MiddlePanel,
+                 lower_panel: LowerPanel,
+                 armrest: Armrest,
+                 cup_holder: CupHolder):
         
         self.id = id
 
@@ -20,6 +22,7 @@ class Body():
         self.lower_panel = lower_panel
         self.armrest = armrest
         self.cup_holder = cup_holder
+        self.framework = framework
 
     def remove_parameters(self):
 
@@ -28,6 +31,7 @@ class Body():
         self.lower_panel.remove_parameters()
         self.armrest.remove_parameters()
         self.cup_holder.remove_parameters()
+        self.framework.remove_parameters()
 
     def check_parts_activation(self):
         self.upper_panel.check_activation()
@@ -35,12 +39,15 @@ class Body():
         self.lower_panel.check_activation()
         self.armrest.check_activation()
         self.cup_holder.check_activation()
+        self.framework.check_activation()
 
     def __str__(self) -> str:
         self.check_parts_activation()
 
         label = f"ID:{self.id}: Korpus zawiera następujące elementy:\n"
 
+        if self.framework.is_activated is True:
+            label += f"▸  Szkielet:\n\t ▪ Pokrycie (materiał): {self.upper_panel.is_controlable}\n\t ▪ Kolor: {self.upper_panel.type}\n"
         if self.upper_panel.is_activated is True:
             label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.upper_panel.is_controlable}\n\t ▪ Typ: {self.upper_panel.type}\n"
         if self.middle_panel.is_activated is True:

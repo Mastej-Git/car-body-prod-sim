@@ -1,5 +1,6 @@
 import json
 
+from body_parts.Framework import Framework
 from body_parts.UpperPanel import UpperPanel
 from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
@@ -30,7 +31,12 @@ class ReadJSON():
                 middle_panel=MiddlePanel(""), 
                 lower_panel=LowerPanel("", "", ""),
                 armrest=Armrest("", "", ""),
-                cup_holder=CupHolder("", ""))
+                cup_holder=CupHolder("", ""),
+                framework=Framework("", "")
+                )
+            
+            body_tmp.framework.material = body_config['body']['framework']['material']
+            body_tmp.framework.color = body_config['body']['framework']['color']
 
             body_tmp.upper_panel.is_controlable = body_config['body']['upper_panel']['is_controllable']
             body_tmp.upper_panel.type = body_config['body']['upper_panel']['type']

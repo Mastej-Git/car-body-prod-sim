@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import (Qt,
                           pyqtSlot)
 
+from body_parts.Framework import Framework
 from body_parts.UpperPanel import UpperPanel
 from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
@@ -49,11 +50,14 @@ class GUI(QMainWindow):
         super().__init__()
 
         self.body_counter = 0
-        self.body_tmp = Body(self.body_counter, upper_panel=UpperPanel("", ""), 
-                middle_panel=MiddlePanel(""), 
-                lower_panel=LowerPanel("", "", ""),
-                armrest=Armrest("", "", ""),
-                cup_holder=CupHolder("", ""))
+        self.body_tmp = Body(self.body_counter,
+                             framework=Framework("", ""),
+                             upper_panel=UpperPanel("", ""),
+                             middle_panel=MiddlePanel(""),
+                             lower_panel=LowerPanel("", "", ""),
+                             armrest=Armrest("", "", ""),
+                             cup_holder=CupHolder("", "")
+                            )
         
         self.list_of_threads = []
         self.list_of_radio_buttons = []
@@ -94,12 +98,14 @@ class GUI(QMainWindow):
         sub_tab_widget.setTabPosition(QTabWidget.West)
         sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
 
+        sub_tab0 = self.create_sub_tab_framework_content()
         sub_tab1 = self.create_sub_tab_upper_panel_content()
         sub_tab2 = self.create_sub_tab_middle_panel_content()
         sub_tab3 = self.create_sub_tab_lower_panel_content()
         sub_tab4 = self.create_sub_tab_armrest_content()
         sub_tab5 = self.create_sub_tab_cup_holder_content()
 
+        sub_tab_widget.addTab(sub_tab0, "Szkielet")
         sub_tab_widget.addTab(sub_tab1, "Panel górny")
         sub_tab_widget.addTab(sub_tab2, "Panel środkowy")
         sub_tab_widget.addTab(sub_tab3, "Panel dolny")
@@ -149,6 +155,48 @@ class GUI(QMainWindow):
         read_from_file_button.clicked.connect(self.pb_read_json)
         layout4.addWidget(read_from_file_button)
         self.tab4.setLayout(layout4)
+
+    def create_sub_tab_framework_content(self):
+
+        sub_tab_upper_panel = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry szkieletu")
+        label_material = self.create_label("Materiał")
+        label_color = self.create_label("Kolor")
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        combo_box_material = self.create_combo_box(["Skóra", "Eko skóra", "Sztuczna skóra"], self.on_change_cbox_framework_material)
+        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_framework_color)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(combo_box_material)
+        vbox_sub1.setSpacing(500)
+
+        vbox_sub2.addWidget(label_color)
+        vbox_sub2.addWidget(combo_box_color)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_upper_panel.setLayout(sub_layout1)
+
+        return sub_tab_upper_panel
     
     def create_sub_tab_upper_panel_content(self):
 
@@ -451,6 +499,23 @@ class GUI(QMainWindow):
         
         self.list_of_car_body_group_box[self.body_counter - 1].button_remove.clicked.connect(
             lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_delete_clicked(x))
+        
+    def on_change_cbox_framework_material(self, index):
+        if index == 0:
+            self.body_tmp.framework.material = "Skóra"
+        elif index == 1:
+            self.body_tmp.framework.material = "Eko skóra"
+        elif index == 2:
+            self.body_tmp.framework.material = "Sztuczna skóra"
+
+    def on_change_cbox_framework_color(self, index):
+
+        if index == 0:
+            self.body_tmp.framework.color = "Czerwony"
+        elif index == 1:
+            self.body_tmp.framework.color = "Zielony"
+        elif index == 2:
+            self.body_tmp.framework.color = "Niebieski"
 
     def on_change_cbox_lower_panel_color(self, index):
 
