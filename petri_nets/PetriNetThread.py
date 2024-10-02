@@ -35,7 +35,7 @@ class PetriNetThread(QThread):
 
         self.define_available_tr()
 
-        self.available_transitions.extend(["T901", "T902", "T903"])  
+        self.available_transitions.extend(["T901", "T902", "T903", "T904"])  
 
         self.petri_net.fire_transition("T001")
         self.petri_net.fire_transition("T002")
