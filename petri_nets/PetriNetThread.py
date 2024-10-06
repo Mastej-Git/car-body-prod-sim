@@ -35,12 +35,12 @@ class PetriNetThread(QThread):
 
         self.define_available_tr()
 
-        self.available_transitions.extend(["T901", "T902", "T903", "T904"])  
+        self.available_transitions.extend(["T002", "T003", "T004", "T901", "T902", "T903", "T904"])  
 
         self.petri_net.fire_transition("T001")
-        self.petri_net.fire_transition("T002")
-        self.petri_net.fire_transition("T003")
-        self.petri_net.fire_transition("T004")
+        # self.petri_net.fire_transition("T002")
+        # self.petri_net.fire_transition("T003")
+        # self.petri_net.fire_transition("T004")
 
         print(self.available_transitions)
 
@@ -67,22 +67,23 @@ class PetriNetThread(QThread):
         i = 0
 
         while self._running:
-            if self.check_sub_thread_finish():
-                mutex.lock()
-                try:
-                    if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                        print(
-                            f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}"
-                        )
-                        self.petri_net.fire_transition(self.available_transitions[i])
-                        self.executed_transitions.append(self.available_transitions[i])
-                        self.mpl_widget.plot()
-                        i += 1
+            # print(self.available_transitions)
+            # if self.check_sub_thread_finish():
+            mutex.lock()
+            try:
+                if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
+                    print(
+                        f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}"
+                    )
+                    self.petri_net.fire_transition(self.available_transitions[i])
+                    self.executed_transitions.append(self.available_transitions[i])
+                    self.mpl_widget.plot()
+                    i += 1
 
-                    if self.executed_transitions == self.available_transitions:
-                        break
-                finally:
-                    mutex.unlock()
+                if self.executed_transitions == self.available_transitions:
+                    break
+            finally:
+                mutex.unlock()
 
             time.sleep(0.5)
 

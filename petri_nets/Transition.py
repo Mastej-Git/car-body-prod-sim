@@ -5,11 +5,11 @@ class Transition:
         self.outputs = outputs
 
     def is_enabled(self):
-        return all(place.tokens >= weight for place, weight in self.inputs.items())
+        return all(place.ready_tokens >= weight for place, weight in self.inputs.items())
     
     def can_fire(self):
         for place, count in self.outputs.items():
-            if place.max_tokens is not None and place.tokens + count > place.max_tokens:
+            if place.max_tokens is not None and place.ready_tokens + count > place.max_tokens:
                 return False
         return True
     
@@ -20,7 +20,7 @@ class Transition:
             raise Exception(f"Transition {self.name} cannot fire due to max token constraints")
         
         for place, weight in self.inputs.items():
-            place.tokens -= weight
+            place.ready_tokens -= weight
 
         for place, weight in self.outputs.items():
             place.tokens += weight
@@ -36,4 +36,3 @@ class Transition:
         inputs = ", ".join(f"{place.name}: {weight}" for place, weight in self.inputs.items())
         outputs = ", ".join(f"{place.name}: {weight}" for place, weight in self.outputs.items())
         return f"Transition({self.name}, inputs=[{inputs}], outputs=[{outputs}])"
-    

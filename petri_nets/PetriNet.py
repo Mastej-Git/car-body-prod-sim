@@ -6,10 +6,10 @@ class PetriNet:
         self.places = {}
         self.transitions = {}
 
-    def add_place(self, name, description="", tokens=0, max_tokens=5):
+    def add_place(self, name, description, tokens=0, max_tokens=1, cooldown=3000):
         if name in self.places:
             raise Exception(f"Place {name} already exists")
-        self.places[name] = Place(name, description, tokens, max_tokens)
+        self.places[name] = Place(name, description, tokens, max_tokens, cooldown)
 
     def add_transition(self, name, input_palces, output_places):
         if name in self.transitions:

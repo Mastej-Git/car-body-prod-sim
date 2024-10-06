@@ -1,10 +1,37 @@
-class Place:
-    def __init__(self, name, description="", tokens=0, max_tokens=1) -> None:
+from PyQt5.QtCore import QObject, pyqtSignal, QTimer
+
+class Place(QObject):
+    tokens_changed = pyqtSignal()
+
+    def __init__(self, name, description="", tokens=0, max_tokens=1, cooldown=1):
+        super().__init__()
         self.name = name
         self.description = description
-        self.tokens = tokens
+        self._tokens = tokens
+        self.ready_tokens = 0
+        self.cooldown = cooldown
         self.max_tokens = max_tokens
 
+        self.tokens_changed.connect(self.on_tokens_changed)
+
+    @property
+    def tokens(self):
+        return self._tokens
+
+    @tokens.setter
+    def tokens(self, value):
+        if value != self._tokens:
+            self._tokens = value
+            
+            self.tokens_changed.emit()
+
+    def on_tokens_changed(self):
+        QTimer.singleShot(self.cooldown, self.print_hello_world)
+
+    def print_hello_world(self):
+        self.ready_tokens += self._tokens
+        self._tokens = 0
+        print(f"For Place: {self.name} tokens are ready")
+
     def __str__(self) -> str:
-        return f"Place({self.name}, tokens={self.tokens}, max_tokens={self.max_tokens})"
-    
+        return f"Place({self.name}, tokens={self._tokens}, ready_tokens={self.ready_tokens}, max_tokens={self.max_tokens}, cooldown={self.cooldown})"
