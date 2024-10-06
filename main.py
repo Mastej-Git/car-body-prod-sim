@@ -27,7 +27,7 @@ from Body import Body
 
 from petri_nets.PetriNetThread import PetriNetThread
 
-from other.MatPlotlibWidget import MatplotlibWidget
+from other.MatPlotlibWidget import MatplotlibWidget, PlotWidget
 from other.ReadJSON import ReadJSON
 
 from qt_classes.AnimatedButton import AnimatedButton
@@ -143,11 +143,12 @@ class GUI(QMainWindow):
         self.layout.addWidget(self.scroll_area)
         self.tab2.setLayout(self.layout)
 
-        self.mpl_widget = MatplotlibWidget(self.petri_net, self)
+        # self.mpl_widget = MatplotlibWidget(self.petri_net, self)
+        self.mpl_widget = PlotWidget(self.petri_net)
 
         layout3 = QVBoxLayout()
         layout3.addWidget(self.mpl_widget)
-        self.mpl_widget.plot()
+        # self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
 
         layout4 = QVBoxLayout()
