@@ -74,7 +74,6 @@ class PetriNetThread(QThread):
                         print(
                             f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}"
                         )
-                        # print(self.petri_net)
                         self.petri_net.fire_transition(self.available_transitions[i])
                         self.executed_transitions.append(self.available_transitions[i])
                         self.mpl_widget.plot()
@@ -85,7 +84,7 @@ class PetriNetThread(QThread):
                 finally:
                     mutex.unlock()
 
-            time.sleep(2)
+            time.sleep(0.5)
 
         self.finished_signal.emit(self.body.id)
 
@@ -220,7 +219,6 @@ class PetriNetSubThread(QThread):
                     print(
                         f"\nSub-Thread id: {self.id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
-                    # print(self.petri_net)
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
                     self.mpl_widget.plot()
@@ -231,6 +229,6 @@ class PetriNetSubThread(QThread):
             finally:
                 mutex.unlock()
 
-            time.sleep(2)
+            time.sleep(0.5)
 
         self.finished_signal.emit(self.id, self.name)
