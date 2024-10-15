@@ -1,3 +1,5 @@
+import os
+
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -15,7 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 from PyQt5.QtCore import (Qt,
-                          pyqtSlot)
+                          pyqtSlot,)
 
 from body_parts.Framework import Framework
 from body_parts.UpperPanel import UpperPanel
@@ -29,6 +31,7 @@ from petri_nets.PetriNetThread import PetriNetThread
 
 from other.MatPlotlibWidget import MatplotlibWidget, PlotWidget
 from other.ReadJSON import ReadJSON
+from other.FileDialog import FileDialog
 
 from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
@@ -65,7 +68,11 @@ class GUI(QMainWindow):
         self.list_of_bodys = []
 
         self.petri_net = body_main_petri_net
+        self.json_file_name = [""]
 
+        self.json_reader = ReadJSON(self.json_file_name)
+        self.file_dialog = None
+        
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 1300, 1000)
 
@@ -89,8 +96,6 @@ class GUI(QMainWindow):
         self.create_tabs_content()
         layout.addWidget(self.tabs)
         self.setCentralWidget(central_widget)
-
-        self.json_file_name = "bodys.json"
 
     def create_tabs_content(self):
         layout1 = QVBoxLayout()
@@ -152,9 +157,32 @@ class GUI(QMainWindow):
         self.tab3.setLayout(layout3)
 
         layout4 = QVBoxLayout()
-        read_from_file_button = AnimatedButton("Wczytaj")
-        read_from_file_button.clicked.connect(self.pb_read_json)
-        layout4.addWidget(read_from_file_button)
+
+        group_box = QGroupBox("Wczytaj konfigurację")
+        group_box.setFixedHeight(200)
+
+        label = QLabel("No file selected")
+
+        hbox_layout = QHBoxLayout()
+        vbox_layout = QVBoxLayout()
+
+        read_file_button = AnimatedButton("Wczytaj")
+        read_file_button.clicked.connect(self.pb_read_json)
+
+        self.file_dialog = FileDialog(self.json_file_name, label)
+
+        chose_file_button = AnimatedButton("Wybierz plik")
+        chose_file_button.clicked.connect(self.pb_chose_file)
+
+        vbox_layout.addWidget(chose_file_button)
+        vbox_layout.addWidget(read_file_button)
+
+        hbox_layout.addWidget(label)
+        hbox_layout.addLayout(vbox_layout)
+
+        group_box.setLayout(hbox_layout)
+
+        layout4.addWidget(group_box)
         self.tab4.setLayout(layout4)
 
     def create_sub_tab_framework_content(self):
@@ -610,8 +638,10 @@ class GUI(QMainWindow):
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
 
     def pb_read_json(self):
-        self.json_reader = ReadJSON(self.json_file_name)
         self.json_reader.parse_json(self)
+
+    def pb_chose_file(self):
+        self.file_dialog.showFileDialog()
 
     def pb_add_body(self):
         if self.body_counter == 0:
@@ -634,7 +664,7 @@ class GUI(QMainWindow):
     def pb_schedule_clicked(self, body_id):
         print(f"\nID: {body_id} - Rozpoczęto produkcję korpusu.")
 
-        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.mpl_widget)
+        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id])
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()

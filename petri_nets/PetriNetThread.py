@@ -14,7 +14,7 @@ class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, body: Body, mpl_widget: MatplotlibWidget):
+    def __init__(self, body: Body):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
@@ -31,7 +31,6 @@ class PetriNetThread(QThread):
             "framework": []}
 
         self.executed_transitions = []
-        self.mpl_widget = mpl_widget
 
         self.define_available_tr()
 
@@ -44,12 +43,12 @@ class PetriNetThread(QThread):
 
         print(self.available_transitions)
 
-        self.pn_up_thread = PetriNetSubThread(float(self.body.id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"], mpl_widget)
-        self.pn_mp_thread = PetriNetSubThread(float(self.body.id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"], mpl_widget)
-        self.pn_lp_thread = PetriNetSubThread(float(self.body.id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"], mpl_widget)
-        self.pn_ar_thread = PetriNetSubThread(float(self.body.id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"], mpl_widget)
-        self.pn_ch_thread = PetriNetSubThread(float(self.body.id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"], mpl_widget)
-        self.pn_fw_thread = PetriNetSubThread(float(self.body.id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"], mpl_widget)
+        self.pn_up_thread = PetriNetSubThread(float(self.body.id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"])
+        self.pn_mp_thread = PetriNetSubThread(float(self.body.id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"])
+        self.pn_lp_thread = PetriNetSubThread(float(self.body.id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"])
+        self.pn_ar_thread = PetriNetSubThread(float(self.body.id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"])
+        self.pn_ch_thread = PetriNetSubThread(float(self.body.id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"])
+        self.pn_fw_thread = PetriNetSubThread(float(self.body.id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"])
         self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
@@ -77,7 +76,6 @@ class PetriNetThread(QThread):
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
-                    self.mpl_widget.plot()
                     i += 1
 
                 if self.executed_transitions == self.available_transitions:
@@ -197,7 +195,7 @@ class PetriNetSubThread(QThread):
 
     finished_signal = pyqtSignal(float, str)
 
-    def __init__(self, id: float, name: str,available_transitions: list, mpl_widget: MatplotlibWidget):
+    def __init__(self, id: float, name: str,available_transitions: list):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
@@ -206,7 +204,6 @@ class PetriNetSubThread(QThread):
         self.petri_net = body_main_petri_net
         self.available_transitions = available_transitions
         self.executed_transitions = []
-        self.mpl_widget = mpl_widget
 
         print(self.available_transitions)
 
@@ -222,7 +219,6 @@ class PetriNetSubThread(QThread):
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
-                    self.mpl_widget.plot()
                     i += 1
 
                 if self.executed_transitions == self.available_transitions:
