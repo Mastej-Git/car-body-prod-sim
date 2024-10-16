@@ -6,8 +6,6 @@ from Body import Body
 
 from BodyPetriNet import body_main_petri_net
 
-from other.MatPlotlibWidget import MatplotlibWidget
-
 mutex = QMutex()
 
 class PetriNetThread(QThread):
@@ -90,18 +88,18 @@ class PetriNetThread(QThread):
     def stop(self):
         self._running = False
 
-    def thread_finder(self, id):
-        if round(id - int(id), 10) == 0.1:
+    def thread_finder(self, thread_id):
+        if round(thread_id - int(thread_id), 10) == 0.1:
             return self.pn_up_thread
-        elif round(id - int(id), 10) == 0.2:
+        if round(thread_id - int(thread_id), 10) == 0.2:
             return self.pn_mp_thread
-        elif round(id - int(id), 10) == 0.3:
+        if round(thread_id - int(thread_id), 10) == 0.3:
             return self.pn_lp_thread
-        elif round(id - int(id), 10) == 0.4:
+        if round(thread_id - int(thread_id), 10) == 0.4:
             return self.pn_ar_thread
-        elif round(id - int(id), 10) == 0.5:
+        if round(thread_id - int(thread_id), 10) == 0.5:
             return self.pn_ch_thread
-        elif round(id - int(id), 10) == 0.6:
+        if round(thread_id - int(thread_id), 10) == 0.6:
             return self.pn_fw_thread
 
     def on_thread_finished(self, thread_id, thread_name):
