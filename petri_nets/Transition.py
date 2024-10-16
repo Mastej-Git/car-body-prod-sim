@@ -27,7 +27,7 @@ class Transition:
 
     def reverse_fire(self):
         for place, weight in self.inputs.items():
-            place.tokens += weight
+            place.ready_tokens += weight
 
         for place, weight in self.outputs.items():
             place.tokens -= weight

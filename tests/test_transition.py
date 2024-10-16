@@ -1,16 +1,18 @@
 import unittest
 
+import time
+
 from petri_nets.Place import Place
 from petri_nets.Transition import Transition
 
 class TestTransition(unittest.TestCase):
     
     def setUp(self) -> None:
-        self.place1 = Place("P1", "Description1", 3, 3)
-        self.place2 = Place("P2", "Description2", 2, 2)
-        self.place3 = Place("P3", "Description3", 0, 2)
-        self.place4 = Place("P4", "Description4", 0, 2)
-        self.place5 = Place("P5", "Description5", 1, 2)
+        self.place1 = Place("P1", "Description1", tokens=0, ready_tokens=1, max_tokens=3, cooldown_ms=1)
+        self.place2 = Place("P2", "Description2", tokens=0, ready_tokens=2, max_tokens=2, cooldown_ms=1)
+        self.place3 = Place("P3", "Description3", tokens=0, ready_tokens=0, max_tokens=2, cooldown_ms=1)
+        self.place4 = Place("P4", "Description4", tokens=0, ready_tokens=0, max_tokens=2, cooldown_ms=1)
+        self.place5 = Place("P5", "Description5", tokens=0, ready_tokens=1, max_tokens=2, cooldown_ms=1)
         
         self.transition1 = Transition("T1", {self.place1: 1, self.place2: 2}, {self.place3: 2})
         self.transition2 = Transition("T2", {}, {})
@@ -46,9 +48,9 @@ class TestTransition(unittest.TestCase):
     def test_fire_working(self):
         self.transition1.fire()
 
-        self.assertEqual(list(self.transition1.inputs.keys())[0].tokens, 2)
-        self.assertEqual(list(self.transition1.inputs.keys())[1].tokens, 0)
-        self.assertEqual(list(self.transition1.outputs.keys())[0].tokens, 2)
+        self.assertEqual(list(self.transition1.inputs.keys())[0].ready_tokens, 0)
+        self.assertEqual(list(self.transition1.inputs.keys())[1].ready_tokens, 0)
+        self.assertEqual(list(self.transition1.outputs.keys())[0].ready_tokens, 0)
 
     def test_fire_exception_not_enabled(self):
         output = "Transition T3 is not enabled"
@@ -70,8 +72,8 @@ class TestTransition(unittest.TestCase):
         self.transition1.fire()
         self.transition1.reverse_fire()
 
-        self.assertEqual(list(self.transition1.inputs.keys())[0].tokens, 3)
-        self.assertEqual(list(self.transition1.inputs.keys())[1].tokens, 2)
+        self.assertEqual(list(self.transition1.inputs.keys())[0].ready_tokens, 1)
+        self.assertEqual(list(self.transition1.inputs.keys())[1].ready_tokens, 2)
         self.assertEqual(list(self.transition1.outputs.keys())[0].tokens, 0)
 
     def test_transition_str(self):

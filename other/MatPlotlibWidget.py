@@ -24,7 +24,7 @@ class MatplotlibWidget(QWidget):
         for place in self.petri_net.places.values():
             self.tasks.append(f"{place.name}")
         self.start_times = [0 for place in self.petri_net.places.keys()]
-        self.durations = [place.cooldown for place in self.petri_net.places.values()]
+        self.durations = [place.cooldown_ms for place in self.petri_net.places.values()]
         
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
@@ -77,7 +77,7 @@ class PlotWidget(QWidget):
         
         # self.categories = ['A', 'B', 'C', 'D']
         self.categories = [place for place in self.petri_net.places.keys()]
-        self.values = [place.cooldown/1000 for place in self.petri_net.places.values()]
+        self.values = [place.cooldown_ms/1000 for place in self.petri_net.places.values()]
 
         j = 0
         for place1 in self.petri_net.places.keys():
@@ -86,7 +86,7 @@ class PlotWidget(QWidget):
             for place2 in self.petri_net.places.values():
                 if i == j: 
                     break
-                left += place2.cooldown/1000
+                left += place2.cooldown_ms/1000
                 i += 1
             self.left.append(left)
             j += 1
