@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import patch, call
-from PyQt5.QtCore import QCoreApplication
+from unittest.mock import patch
+
 from petri_nets.Place import Place
 
 class TestPlace(unittest.TestCase):
@@ -35,11 +35,6 @@ class TestPlace(unittest.TestCase):
         self.place.tokens = 5
 
         self.assertEqual(mock_singleShot.call_count, 0)
-
-if __name__ == '__main__':
-    import sys
-    app = QCoreApplication(sys.argv)
-    unittest.main()
 
 if __name__ == '__main__':
     unittest.main()

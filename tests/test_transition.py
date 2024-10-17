@@ -1,6 +1,6 @@
 import unittest
-from unittest.mock import patch, call
-from PyQt5.QtCore import QCoreApplication
+from unittest.mock import patch
+
 from petri_nets.Place import Place
 from petri_nets.Transition import Transition
 
