@@ -46,7 +46,7 @@ from other.StyleSheets import (
     style_sheet_tab,
 )
 
-from BodyPetriNet import body_main_petri_net
+from BodyPetriNet_v1 import body_main_petri_net
 
 class GUI(QMainWindow):
     def __init__(self):

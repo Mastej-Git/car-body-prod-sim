@@ -4,7 +4,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex
 
 from Body import Body
 
-from BodyPetriNet import body_main_petri_net
+from BodyPetriNet_v1 import body_main_petri_net
 
 mutex = QMutex()
 
@@ -42,7 +42,7 @@ class PetriNetThread(QThread):
         print(self.available_transitions)
 
         self.pn_up_thread = PetriNetSubThread(float(self.body.body_id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"])
-        self.pn_mp_thread = PetriNetSubThread(float(self.body.body_id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["mbody_iddle_panel"])
+        self.pn_mp_thread = PetriNetSubThread(float(self.body.body_id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"])
         self.pn_lp_thread = PetriNetSubThread(float(self.body.body_id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"])
         self.pn_ar_thread = PetriNetSubThread(float(self.body.body_id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"])
         self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"])
@@ -81,7 +81,7 @@ class PetriNetThread(QThread):
             finally:
                 mutex.unlock()
 
-            time.sleep(0.5)
+            time.sleep(0.3)
 
         self.finished_signal.emit(self.body.body_id)
 
@@ -120,13 +120,15 @@ class PetriNetThread(QThread):
         
     def define_available_tr(self):
 
+        
+        if self.body.upper_panel.type == "2-strefowa":
+            self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T103", "T105", "T107"])
+        elif self.body.upper_panel.type == "4-strefowa":
+            self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T104", "T106", "T108"])
         if self.body.upper_panel.is_controlable == "Tak":
-            if self.body.upper_panel.type == "4-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T103"])
-            elif self.body.upper_panel.type == "2-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T104", "T105"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T109", "T111", "T113"])
         elif self.body.upper_panel.is_controlable == "Nie":
-            self.available_body_parts_transitions["upper_panel"].extend(["T106", "T107"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T110", "T112", "T114"])
 
         if self.body.middle_panel.functionality == "Interfejs multimedialny":
             self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
