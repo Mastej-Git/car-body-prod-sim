@@ -13,7 +13,7 @@ class FileDialog(QWidget):
         self.file_name = file_name
         self.label = label
 
-    def showFileDialog(self):
+    def show_file_dialog(self):
         home_dir = os.environ.get('HOME')
 
         options = QFileDialog.Options()

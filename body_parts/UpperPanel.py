@@ -1,15 +1,15 @@
 class UpperPanel():
 
-    def __init__(self, is_controlable, type) -> None:
+    def __init__(self, is_controlable, ac_type) -> None:
         self.is_activated = False
         self.is_controlable = is_controlable
-        self.type = type
+        self.ac_type = ac_type
 
     def check_activation(self):
-        if self.is_controlable != "" and self.type != "":
+        if self.is_controlable != "" and self.ac_type != "":
             self.is_activated = True
 
     def remove_parameters(self):
         self.is_controlable = ""
-        self.type = ""
+        self.ac_type = ""
         self.is_activated = False

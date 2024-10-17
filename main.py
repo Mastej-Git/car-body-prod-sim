@@ -521,13 +521,13 @@ class GUI(QMainWindow):
         self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
 
         self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.clicked.connect(
-            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_schedule_clicked(x))
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_schedule_clicked(x))
         
         self.list_of_car_body_group_box[self.body_counter - 1].button_ready.clicked.connect(
-            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_ready_clicked(x))
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_ready_clicked(x))
         
         self.list_of_car_body_group_box[self.body_counter - 1].button_remove.clicked.connect(
-            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.id: self.pb_delete_clicked(x))
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_delete_clicked(x))
         
     def on_change_cbox_framework_material(self, index):
         if index == 0:
@@ -590,7 +590,7 @@ class GUI(QMainWindow):
             if (sender.text() == "Tak" or sender.text() == "Nie"):
                 self.body_tmp.upper_panel.is_controlable = sender.text()
             else:
-                self.body_tmp.upper_panel.type = sender.text()
+                self.body_tmp.upper_panel.ac_type = sender.text()
             print(f'Selected option: {sender.text()}')
 
     def on_radio_button_middle_panel_clicked(self):
@@ -641,7 +641,7 @@ class GUI(QMainWindow):
         self.json_reader.parse_json(self)
 
     def pb_chose_file(self):
-        self.file_dialog.showFileDialog()
+        self.file_dialog.show_file_dialog()
 
     def pb_add_body(self):
         if self.body_counter == 0:
@@ -689,7 +689,7 @@ class GUI(QMainWindow):
         i = 0
 
         for body in self.list_of_bodys:
-            if body.id == body_id:
+            if body.body_id == body_id:
                 index_remove = i
             i += 1
         

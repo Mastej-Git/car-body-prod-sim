@@ -58,11 +58,11 @@ class ReadJSON():
 
             gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
             gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_schedule_clicked(x))
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_schedule_clicked(x))
             gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_ready_clicked(x))
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_ready_clicked(x))
             gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(
-                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.id: gui.pb_delete_clicked(x))
+                lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_delete_clicked(x))
             
             gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
 

@@ -1,7 +1,5 @@
 import unittest
 
-import time
-
 from petri_nets.Place import Place
 from petri_nets.Transition import Transition
 

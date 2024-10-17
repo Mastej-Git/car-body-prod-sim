@@ -7,7 +7,7 @@ from body_parts.Framework import Framework
 
 class Body():
 
-    def __init__(self, id,
+    def __init__(self, body_id,
                  framework: Framework,
                  upper_panel: UpperPanel,
                  middle_panel: MiddlePanel,
@@ -15,7 +15,7 @@ class Body():
                  armrest: Armrest,
                  cup_holder: CupHolder):
         
-        self.id = id
+        self.body_id = body_id
 
         self.upper_panel = upper_panel
         self.middle_panel = middle_panel
@@ -44,7 +44,7 @@ class Body():
     def __str__(self) -> str:
         self.check_parts_activation()
 
-        label = f"ID:{self.id}: Korpus zawiera następujące elementy:\n"
+        label = f"ID:{self.body_id}: Korpus zawiera następujące elementy:\n"
 
         if self.framework.is_activated is True:
             label += f"▸  Szkielet:\n\t ▪ Pokrycie (materiał): {self.upper_panel.is_controlable}\n\t ▪ Kolor: {self.upper_panel.type}\n"

@@ -5,7 +5,9 @@ from petri_nets.Place import Place
 class TestPlace(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.place = Place("P1", "Description1", tokens=3, ready_tokens=1, max_tokens=5, cooldown_ms=1)
+        self.place = Place(
+            "P1", "Description1", tokens=3, ready_tokens=1, max_tokens=5, cooldown_ms=1
+        )
 
     def test_init(self):
         self.assertEqual(self.place.name, "P1")
