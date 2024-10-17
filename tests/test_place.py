@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import patch, call
-from PyQt5.QtCore import QCoreApplication, QObject
+from PyQt5.QtCore import QCoreApplication
 from petri_nets.Place import Place
 
 class TestPlace(unittest.TestCase):

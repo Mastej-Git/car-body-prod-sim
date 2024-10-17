@@ -1,5 +1,6 @@
 import unittest
-
+from unittest.mock import patch, call
+from PyQt5.QtCore import QCoreApplication
 from petri_nets.Place import Place
 from petri_nets.Transition import Transition
 
@@ -43,12 +44,18 @@ class TestTransition(unittest.TestCase):
     def test_can_fire_no(self):
         self.assertFalse(self.transition4.can_fire())
 
-    def test_fire_working(self):
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    def test_fire_working(self, mock_singleShot):
+        def fake_singleShot(_ms, callback):
+            callback()
+
+        mock_singleShot.side_effect = fake_singleShot
+
         self.transition1.fire()
 
         self.assertEqual(list(self.transition1.inputs.keys())[0].ready_tokens, 0)
         self.assertEqual(list(self.transition1.inputs.keys())[1].ready_tokens, 0)
-        self.assertEqual(list(self.transition1.outputs.keys())[0].ready_tokens, 0)
+        self.assertEqual(list(self.transition1.outputs.keys())[0].ready_tokens, 2)
 
     def test_fire_exception_not_enabled(self):
         output = "Transition T3 is not enabled"
@@ -66,7 +73,13 @@ class TestTransition(unittest.TestCase):
         
         self.assertEqual(str(context.exception), output)
 
-    def test_reverse_fire(self):
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    def test_reverse_fire(self, mock_singleShot):
+        def fake_singleShot(_ms, callback):
+            callback()
+
+        mock_singleShot.side_effect = fake_singleShot
+
         self.transition1.fire()
         self.transition1.reverse_fire()
 
