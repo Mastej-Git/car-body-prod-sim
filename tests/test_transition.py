@@ -45,11 +45,11 @@ class TestTransition(unittest.TestCase):
         self.assertFalse(self.transition4.can_fire())
 
     @patch('PyQt5.QtCore.QTimer.singleShot')
-    def test_fire_working(self, mock_singleShot):
-        def fake_singleShot(_ms, callback):
+    def test_fire_working(self, mock_single_shot):
+        def fake_single_shot(_ms, callback):
             callback()
 
-        mock_singleShot.side_effect = fake_singleShot
+        mock_single_shot.side_effect = fake_single_shot
 
         self.transition1.fire()
 
@@ -74,11 +74,11 @@ class TestTransition(unittest.TestCase):
         self.assertEqual(str(context.exception), output)
 
     @patch('PyQt5.QtCore.QTimer.singleShot')
-    def test_reverse_fire(self, mock_singleShot):
-        def fake_singleShot(_ms, callback):
+    def test_reverse_fire(self, mock_single_shot):
+        def fake_single_shot(_ms, callback):
             callback()
 
-        mock_singleShot.side_effect = fake_singleShot
+        mock_single_shot.side_effect = fake_single_shot
 
         self.transition1.fire()
         self.transition1.reverse_fire()

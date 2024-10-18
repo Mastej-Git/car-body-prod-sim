@@ -115,11 +115,11 @@ class TestPetriNet(unittest.TestCase):
         self.assertEqual(list(self.petri_net.transitions["T2"].inputs.values())[0], 3)
 
     @patch('PyQt5.QtCore.QTimer.singleShot')
-    def test_fire_transition(self, mock_singleShot):
-        def fake_singleShot(_ms, callback):
+    def test_fire_transition(self, mock_single_shot):
+        def fake_single_shot(_ms, callback):
             callback()
 
-        mock_singleShot.side_effect = fake_singleShot
+        mock_single_shot.side_effect = fake_single_shot
 
         output = "Transition T2 does not exist"
 

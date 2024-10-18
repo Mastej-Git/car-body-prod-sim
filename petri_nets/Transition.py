@@ -36,3 +36,4 @@ class Transition:
         inputs = ", ".join(f"{place.name}: {weight}" for place, weight in self.inputs.items())
         outputs = ", ".join(f"{place.name}: {weight}" for place, weight in self.outputs.items())
         return f"Transition({self.name}, inputs=[{inputs}], outputs=[{outputs}])"
+    

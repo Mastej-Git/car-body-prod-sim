@@ -1,5 +1,3 @@
-import os
-
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -29,13 +27,12 @@ from Body import Body
 
 from petri_nets.PetriNetThread import PetriNetThread
 
-from other.MatPlotlibWidget import MatplotlibWidget, PlotWidget
-from other.ReadJSON import ReadJSON
-from other.FileDialog import FileDialog
-
 from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
+from other.MatPlotlibWidget import PlotWidget
+from other.ReadJSON import ReadJSON
+from other.FileDialog import FileDialog
 from other.StyleSheets import (
     style_sheet_app,
     style_sheet_central_widget,

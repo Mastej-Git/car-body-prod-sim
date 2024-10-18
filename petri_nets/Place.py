@@ -35,3 +35,4 @@ class Place(QObject):
 
     def __str__(self) -> str:
         return f"Place({self.name}, tokens={self._tokens}, ready_tokens={self.ready_tokens}, max_tokens={self.max_tokens}, cooldown_ms={self.cooldown_ms})"
+    
