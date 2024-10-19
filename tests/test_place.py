@@ -1,4 +1,5 @@
 import unittest
+from unittest.mock import patch
 
 from petri_nets.Place import Place
 
@@ -6,31 +7,34 @@ class TestPlace(unittest.TestCase):
 
     def setUp(self) -> None:
         self.place = Place(
-            "P1", "Description1", tokens=3, ready_tokens=1, max_tokens=5, cooldown_ms=1
+            "P1", "Description1", tokens=5, ready_tokens=0, max_tokens=10, cooldown_ms=1000
         )
 
-    def test_init(self):
-        self.assertEqual(self.place.name, "P1")
-        self.assertEqual(self.place.description, "Description1")
-        self.assertEqual(self.place.tokens, 3)
-        self.assertEqual(self.place.ready_tokens, 1)
-        self.assertEqual(self.place.max_tokens, 5)
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    def test_tokens_changed(self, mock_single_shot):
+        self.place.tokens = 7        
 
-        self.place.name = "P2"
-        self.place.description = "Description2"
-        self.place.tokens += 2
-        self.place.max_tokens = 7
+        self.assertEqual(mock_single_shot.call_count, 1)
+        mock_single_shot.assert_called_with(1000, self.place.print_info)
 
-        self.assertEqual(self.place.name, "P2")
-        self.assertEqual(self.place.description, "Description2")
-        self.assertEqual(self.place.tokens, 2)
-        self.assertEqual(self.place.ready_tokens, 1)
-        self.assertEqual(self.place.max_tokens, 7)
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    def test_print_info_called_immediately(self, mock_single_shot):
 
-    def test_place_str(self):
-        output = "Place(P1, tokens=3, ready_tokens=1, max_tokens=5, cooldown_ms=1)"
+        def fake_single_shot(_ms, callback):
+            callback()
 
-        self.assertEqual(str(self.place), output)
+        mock_single_shot.side_effect = fake_single_shot
+
+        self.place.tokens = 7
+
+        self.assertEqual(self.place.ready_tokens, 7)
+        self.assertEqual(self.place.tokens, 0)
+
+    @patch('PyQt5.QtCore.QTimer.singleShot')
+    def test_no_signal_when_tokens_same(self, mock_single_shot):
+        self.place.tokens = 5
+
+        self.assertEqual(mock_single_shot.call_count, 0)
 
 if __name__ == '__main__':
     unittest.main()

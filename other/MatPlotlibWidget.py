@@ -1,12 +1,13 @@
+import numpy as np
+
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
 )
+from PyQt5.QtCore import QTimer
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtCore import QTimer
-import numpy as np
 
 from petri_nets.PetriNet import PetriNet
 
@@ -75,7 +76,6 @@ class PlotWidget(QWidget):
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
         
-        # self.categories = ['A', 'B', 'C', 'D']
         self.categories = [place for place in self.petri_net.places.keys()]
         self.values = [place.cooldown_ms/1000 for place in self.petri_net.places.values()]
 
@@ -90,8 +90,6 @@ class PlotWidget(QWidget):
                 i += 1
             self.left.append(left)
             j += 1
-        
-        # self.bars = self.ax.barh(self.categories, self.values, color='skyblue')
         
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
@@ -130,13 +128,10 @@ class PlotWidget(QWidget):
         self.i = 0
     
     def update_plot(self):
-        # Update the bar widths dynamically
         self.i += 1
         new_values = [val + np.sin(self.i / 10.0) for val in self.values]
         
-        # Update each bar's width
         for bar, new_val in zip(self.bars, new_values):
             bar.set_width(new_val)
         
-        # Redraw the canvas
         self.canvas.draw()

@@ -70,7 +70,7 @@ class PetriNetThread(QThread):
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
                     print(
-                        f"\nThread id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}"
+                        f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
@@ -197,11 +197,11 @@ class PetriNetSubThread(QThread):
 
     finished_signal = pyqtSignal(float, str)
 
-    def __init__(self, id: float, name: str,available_transitions: list):
+    def __init__(self, thread_id: float, name: str,available_transitions: list):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
-        self.id = id
+        self.thread_id = thread_id
         self.name = name
         self.petri_net = body_main_petri_net
         self.available_transitions = available_transitions
@@ -217,7 +217,7 @@ class PetriNetSubThread(QThread):
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
                     print(
-                        f"\nSub-Thread id: {self.id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
+                        f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
@@ -230,4 +230,4 @@ class PetriNetSubThread(QThread):
 
             time.sleep(0.5)
 
-        self.finished_signal.emit(self.id, self.name)
+        self.finished_signal.emit(self.thread_id, self.name)
