@@ -95,6 +95,16 @@ QLabel {
 }
 """
 
+style_sheet_info_label = """
+QLabel {
+    color: #00ffff;
+    padding: 5px;
+    border-radius: 3px;
+    height: 30px;
+    background-color: #2e2e2e;
+}
+"""
+
 style_sheet_tab = """
 QTabWidget::pane { 
     border: none; 

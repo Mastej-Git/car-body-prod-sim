@@ -3,6 +3,7 @@ import time
 from PyQt5.QtCore import QThread, pyqtSignal, QMutex
 
 from Body import Body
+from qt_classes.InfoTerminal import InfoTerminal
 
 from BodyPetriNet_v1 import body_main_petri_net
 
@@ -11,13 +12,15 @@ mutex = QMutex()
 class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
+    add_text_signal = pyqtSignal(str)
 
-    def __init__(self, body: Body):
+    def __init__(self, body: Body, info_terminal: InfoTerminal):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
         self.petri_net = body_main_petri_net
         self.body = body
+        self.info_terminal = info_terminal
         self.available_transitions = []
 
         self.available_body_parts_transitions = {
@@ -39,14 +42,15 @@ class PetriNetThread(QThread):
         # self.petri_net.fire_transition("T003")
         # self.petri_net.fire_transition("T004")
 
-        print(self.available_transitions)
+        # print(self.available_transitions)
+        self.info_terminal.add_text_info(str(self.available_transitions))
 
-        self.pn_up_thread = PetriNetSubThread(float(self.body.body_id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"])
-        self.pn_mp_thread = PetriNetSubThread(float(self.body.body_id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"])
-        self.pn_lp_thread = PetriNetSubThread(float(self.body.body_id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"])
-        self.pn_ar_thread = PetriNetSubThread(float(self.body.body_id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"])
-        self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"])
-        self.pn_fw_thread = PetriNetSubThread(float(self.body.body_id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"])
+        self.pn_up_thread = PetriNetSubThread(float(self.body.body_id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"], self.info_terminal)
+        self.pn_mp_thread = PetriNetSubThread(float(self.body.body_id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"], self.info_terminal)
+        self.pn_lp_thread = PetriNetSubThread(float(self.body.body_id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"], self.info_terminal)
+        self.pn_ar_thread = PetriNetSubThread(float(self.body.body_id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"], self.info_terminal)
+        self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"], self.info_terminal)
+        self.pn_fw_thread = PetriNetSubThread(float(self.body.body_id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"], self.info_terminal)
         self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
@@ -72,6 +76,8 @@ class PetriNetThread(QThread):
                     print(
                         f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
+                    # self.info_terminal.add_text_info(f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}")
+                    self.add_text_signal.emit(f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
                     i += 1
@@ -106,7 +112,8 @@ class PetriNetThread(QThread):
     def on_thread_finished(self, thread_id, thread_name):
         thread = self.thread_finder(thread_id)
         thread._running = False
-        print(f"Sub-Thread {thread_id} - {thread_name} has finished.")
+        # print(f"Sub-Thread {thread_id} - {thread_name} has finished.")
+        self.info_terminal.add_text_info(f"Podwątek {thread_id} - {thread_name} został zakończony")
 
     def check_sub_thread_finish(self):
         if (self.pn_up_thread._running is False and 
@@ -197,7 +204,7 @@ class PetriNetSubThread(QThread):
 
     finished_signal = pyqtSignal(float, str)
 
-    def __init__(self, thread_id: float, name: str,available_transitions: list):
+    def __init__(self, thread_id: float, name: str,available_transitions: list, info_terminal: InfoTerminal):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
@@ -207,7 +214,10 @@ class PetriNetSubThread(QThread):
         self.available_transitions = available_transitions
         self.executed_transitions = []
 
-        print(self.available_transitions)
+        self.info_terminal = info_terminal
+
+        self.info_terminal.add_text_info(str(self.available_transitions))
+        # print(self.available_transitions)
 
     def run(self):
         i = 0
@@ -219,6 +229,7 @@ class PetriNetSubThread(QThread):
                     print(
                         f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
+                    # self.info_terminal.add_text_info(f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
                     i += 1

@@ -29,6 +29,7 @@ from petri_nets.PetriNetThread import PetriNetThread
 
 from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
+from qt_classes.InfoTerminal import InfoTerminal
 
 from other.MatPlotlibWidget import PlotWidget
 from other.ReadJSON import ReadJSON
@@ -46,6 +47,7 @@ from other.StyleSheets import (
 from BodyPetriNet_v1 import body_main_petri_net
 
 class GUI(QMainWindow):
+
     def __init__(self):
         super().__init__()
 
@@ -62,6 +64,7 @@ class GUI(QMainWindow):
         self.list_of_threads = []
         self.list_of_radio_buttons = []
         self.list_of_car_body_group_box = []
+        self.list_of_info_group_box = []
         self.list_of_bodys = []
 
         self.petri_net = body_main_petri_net
@@ -69,9 +72,11 @@ class GUI(QMainWindow):
 
         self.json_reader = ReadJSON(self.json_file_name)
         self.file_dialog = None
+
+        self.info_terminal = InfoTerminal(self.list_of_info_group_box)
         
         self.setWindowTitle("Tab Example")
-        self.setGeometry(100, 100, 1300, 1000)
+        self.setGeometry(100, 100, 1400, 1000)
 
         central_widget = QFrame()
         central_widget.setStyleSheet(style_sheet_central_widget)
@@ -85,10 +90,12 @@ class GUI(QMainWindow):
         self.tab2 = QWidget()
         self.tab3 = QWidget()
         self.tab4 = QWidget()
+        self.tab5 = QWidget()
         self.tabs.addTab(self.tab1, "Dodaj korpus")
         self.tabs.addTab(self.tab2, "Stan korpusów")
         self.tabs.addTab(self.tab3, "Wykres Gantta")
         self.tabs.addTab(self.tab4, "Dodaj korpusy z pliku")
+        self.tabs.addTab(self.tab5, "Info")
 
         self.create_tabs_content()
         layout.addWidget(self.tabs)
@@ -150,7 +157,6 @@ class GUI(QMainWindow):
 
         layout3 = QVBoxLayout()
         layout3.addWidget(self.mpl_widget)
-        # self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
 
         layout4 = QVBoxLayout()
@@ -181,6 +187,8 @@ class GUI(QMainWindow):
 
         layout4.addWidget(group_box)
         self.tab4.setLayout(layout4)
+
+        self.tab5.setLayout(self.info_terminal.layout_info)
 
     def create_sub_tab_framework_content(self):
 
@@ -586,9 +594,10 @@ class GUI(QMainWindow):
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
                 self.body_tmp.upper_panel.is_controlable = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Górny panel - Sterowanie klimatyzacją: {sender.text()}')
             else:
                 self.body_tmp.upper_panel.ac_type = sender.text()
-            print(f'Selected option: {sender.text()}')
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Górny panel - Typ klimatyzacji: {sender.text()}')
 
     def on_radio_button_middle_panel_clicked(self):
 
@@ -596,7 +605,7 @@ class GUI(QMainWindow):
 
         if sender.isChecked():
             self.body_tmp.middle_panel.functionality = sender.text()
-            print(f'Selected option: {sender.text()}')
+            self.info_terminal.add_text_info(f'Wybrana opcja dla: Środkowy panel - Funkcjonalność: {sender.text()}')
 
     def on_radio_button_lower_panel_clicked(self):
 
@@ -605,9 +614,10 @@ class GUI(QMainWindow):
         if sender.isChecked():
             if (sender.text() == "Tak" or sender.text() == "Nie"):
                 self.body_tmp.lower_panel.is_cup = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Dolny panel - Miejsce na kubki: {sender.text()}')
             else:
                 self.body_tmp.lower_panel.functionality = sender.text()
-            print(f'Selected option: {sender.text()}')
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Dolny panel - Funkcjonalność: {sender.text()}')
 
     def on_radio_button_armrest_clicked(self):
 
@@ -615,7 +625,8 @@ class GUI(QMainWindow):
 
         if sender.isChecked():
             self.body_tmp.armrest.heating = sender.text()
-        print(f'Selected option: {sender.text()}')
+        self.info_terminal.add_text_info(f'Wybrana opcja dla: Podłokietnika - Ogrzewanie: {sender.text()}')
+
 
     def on_radio_button_cup_holder_clicked(self):
 
@@ -623,7 +634,8 @@ class GUI(QMainWindow):
 
         if sender.isChecked():
             self.body_tmp.cup_holder.usb_socket = sender.text()
-        print(f'Selected option: {sender.text()}')
+            self.info_terminal.add_text_info(f'Wybrana opcja dla: Miejsce na kubki - Wejście USB: {sender.text()}')
+
 
     def pb_add_clicked(self):
 
@@ -659,10 +671,12 @@ class GUI(QMainWindow):
     
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):
-        print(f"\nID: {body_id} - Rozpoczęto produkcję korpusu.")
+        # print(f"\nID: {body_id} - Rozpoczęto produkcję korpusu.")
+        self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
 
-        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id])
+        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
+        new_petri_net_thread.add_text_signal.connect(self.emit_thread_add_text)
         self.list_of_threads.append(new_petri_net_thread)
         # self.petri_net_thread.start()
         self.list_of_threads[len(self.list_of_threads) - 1].start()
@@ -671,7 +685,8 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_ready_clicked(self, body_id):
-        print(f"\nKorpus ID: {body_id} gotowy do produkcji")
+        # print(f"\nKorpus ID: {body_id} gotowy do produkcji")
+        self.info_terminal.add_text_info(f"\nKorpus ID: {body_id} gotowy do produkcji")
         
         self.body_counter += 1
         self.reset_radio_buttons()
@@ -680,7 +695,8 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_delete_clicked(self, body_id):
-        print(f"Korpus ID: {body_id} został usunięty")
+        # print(f"Korpus ID: {body_id} został usunięty")
+        self.info_terminal.add_text_info(f"Korpus ID: {body_id} został usunięty")
 
         index_remove = -1
         i = 0
@@ -701,7 +717,8 @@ class GUI(QMainWindow):
 
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
-        print(f"Thread {thread_id} has finished.")
+        # print(f"Thread {thread_id} has finished.")
+        self.info_terminal.add_text_info(f"Wątek: {thread_id} został zakończony")
 
     def reset_radio_buttons(self):
         for radio in self.list_of_radio_buttons:
@@ -738,6 +755,9 @@ class GUI(QMainWindow):
         combo_box.activated.connect(signal_function)
 
         return combo_box
+    
+    def emit_thread_add_text(self, text):
+        self.info_terminal.add_text_info(text)
 
 def main():
     app = QApplication([])
