@@ -32,6 +32,11 @@ class InfoTerminal:
             self.outer_layout_info.removeWidget(self.starting_label_info)
             self.starting_label_info.deleteLater()
 
+        if self.outer_layout_info.count() >= 50:
+            label = self.outer_layout_info.itemAt(0).widget()
+            self.outer_layout_info.removeWidget(self.outer_layout_info.itemAt(0).widget())
+            label.deleteLater()
+
         group_box1 = QGroupBox()
         group_box1.setFixedHeight(300)
 

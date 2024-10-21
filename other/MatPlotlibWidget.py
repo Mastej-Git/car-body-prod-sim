@@ -98,7 +98,7 @@ class PlotWidget(QWidget):
         self.fig.set_facecolor("#2e2e2e")
 
         self.ax.invert_yaxis()
-        self.ax.set_xlim(left=0, right=200)
+        self.ax.set_xlim(left=0, right=60)
 
         self.ax.set_facecolor('#2e2e2e')
         self.ax.tick_params(axis='x', colors='#00ffff')
