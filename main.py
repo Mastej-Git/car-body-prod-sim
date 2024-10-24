@@ -74,6 +74,7 @@ class GUI(QMainWindow):
         self.file_dialog = None
 
         self.info_terminal = InfoTerminal(self.list_of_info_group_box)
+        self.petri_net.set_info_terminal(self.info_terminal)
         
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 1400, 1000)

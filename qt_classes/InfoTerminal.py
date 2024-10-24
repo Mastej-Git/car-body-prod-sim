@@ -6,6 +6,8 @@ from other.StyleSheets import style_sheet_info_label
 class InfoTerminal:
 
     def __init__(self, list_of_info_group_box) -> None:
+
+        self.buffor_size = 100
         
         self.list_of_info_group_box = list_of_info_group_box
 
@@ -32,7 +34,7 @@ class InfoTerminal:
             self.outer_layout_info.removeWidget(self.starting_label_info)
             self.starting_label_info.deleteLater()
 
-        if self.outer_layout_info.count() >= 50:
+        if self.outer_layout_info.count() >= self.buffor_size:
             label = self.outer_layout_info.itemAt(0).widget()
             self.outer_layout_info.removeWidget(self.outer_layout_info.itemAt(0).widget())
             label.deleteLater()

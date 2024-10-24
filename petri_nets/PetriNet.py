@@ -26,6 +26,10 @@ class PetriNet:
     def reverse_fire_transition(self, name):
         self.transitions[name].reverse_fire()
 
+    def set_info_terminal(self, info_terminal):
+        for place in self.places.values():
+            place.set_terminal(info_terminal)
+
     def __str__(self) -> str:
         places_str = "\n".join(str(place) for place in self.places.values())
         transitions_str = "\n".join(str(transition) for transition in self.transitions.values())
