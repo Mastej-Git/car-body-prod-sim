@@ -144,7 +144,7 @@ class GUI(QMainWindow):
         self.tab2.setLayout(self.layout)
 
         # self.mpl_widget = MatplotlibWidget(self.petri_net, self)
-        self.mpl_widget = PlotWidget(self.petri_net)
+        self.mpl_widget = PlotWidget()
 
         layout3 = QVBoxLayout()
         layout3.addWidget(self.mpl_widget)
