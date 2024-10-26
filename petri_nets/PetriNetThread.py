@@ -58,7 +58,7 @@ class PetriNetThread(QThread):
         self.pn_lp_thread.start()
         self.pn_ar_thread.start()
         self.pn_ch_thread.start()
-        # self.pn_fw_thread.start()
+        self.pn_fw_thread.start()
 
     def run(self):
         i = 0
@@ -188,20 +188,23 @@ class PetriNetThread(QThread):
             self.available_body_parts_transitions["cup_holder"].extend(["T513", "T516"])
         self.available_body_parts_transitions["cup_holder"].extend(["T517"])
 
-
-        self.available_body_parts_transitions["framework"].extend(["T601", "T602"])
+    
+        self.available_body_parts_transitions["framework"].extend(["T601", "T602", "T603", "T604", "T605"])
         if self.body.framework.material == "Skóra":
-            self.available_body_parts_transitions["framework"].extend(["T603", "T604"])
+            self.available_body_parts_transitions["framework"].extend(["T606", "T609"])
         elif self.body.framework.material == "Eko skóra":
-            self.available_body_parts_transitions["framework"].extend(["T605", "T606"])
+            self.available_body_parts_transitions["framework"].extend(["T607", "T610"])
         elif self.body.framework.material == "Sztuczna skóra":
-            self.available_body_parts_transitions["framework"].extend(["T607", "T608"])
+            self.available_body_parts_transitions["framework"].extend(["T608", "T611"])
+        self.available_body_parts_transitions["framework"].extend(["T612"])
         if self.body.framework.color == "Czerwony":
-            self.available_body_parts_transitions["framework"].extend(["T609", "T610"])
+            self.available_body_parts_transitions["framework"].extend(["T613", "T616"])
         elif self.body.framework.color == "Zielony":
-            self.available_body_parts_transitions["framework"].extend(["T611", "T612"])
+            self.available_body_parts_transitions["framework"].extend(["T614", "T617"])
         elif self.body.framework.color == "Niebieski":
-            self.available_body_parts_transitions["framework"].extend(["T613", "T614"])
+            self.available_body_parts_transitions["framework"].extend(["T615", "T618"])
+        self.available_body_parts_transitions["framework"].extend(["T619"])
+
 
 class PetriNetSubThread(QThread):
 
