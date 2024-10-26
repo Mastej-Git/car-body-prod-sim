@@ -47,18 +47,18 @@ class PetriNetThread(QThread):
         self.pn_ar_thread = PetriNetSubThread(float(self.body.body_id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"])
         self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"])
         self.pn_fw_thread = PetriNetSubThread(float(self.body.body_id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"])
-        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
+        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_ar_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_ch_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_fw_thread.finished_signal.connect(self.on_thread_finished)
-        self.pn_mp_thread.start()
         self.pn_up_thread.start()
+        self.pn_mp_thread.start()
         self.pn_lp_thread.start()
         self.pn_ar_thread.start()
         self.pn_ch_thread.start()
-        self.pn_fw_thread.start()
+        # self.pn_fw_thread.start()
 
     def run(self):
         i = 0
@@ -120,64 +120,74 @@ class PetriNetThread(QThread):
         
     def define_available_tr(self):
 
-        
+        self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102"])
         if self.body.upper_panel.type == "2-strefowa":
-            self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T103", "T105", "T107"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T103", "T105", "T107"])
         elif self.body.upper_panel.type == "4-strefowa":
-            self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T104", "T106", "T108"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T104", "T106", "T108"])
         if self.body.upper_panel.is_controlable == "Tak":
-            self.available_body_parts_transitions["upper_panel"].extend(["T109", "T111", "T113"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T109", "T111", "T112"])
         elif self.body.upper_panel.is_controlable == "Nie":
-            self.available_body_parts_transitions["upper_panel"].extend(["T110", "T112", "T114"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T110", "T113"])
 
+        self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
         if self.body.middle_panel.functionality == "Interfejs multimedialny":
-            self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T203", "T205", "T207"])
         elif self.body.middle_panel.functionality == "Schowek":
-            self.available_body_parts_transitions["middle_panel"].extend(["T203", "T204"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T204", "T206", "T208"])
 
+        self.available_body_parts_transitions["lower_panel"].extend(["T301", "T302"])
         if self.body.lower_panel.functionality == "Ładowarka bezprzewodowa":
-            self.available_body_parts_transitions["lower_panel"].extend(["T301", "T302"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T303", "T305", "T307"])
         elif self.body.lower_panel.functionality == "Półka":
-            self.available_body_parts_transitions["lower_panel"].extend(["T303", "T304"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T304", "T306", "T308"])
         if self.body.lower_panel.is_cup == "Tak":
-            self.available_body_parts_transitions["lower_panel"].extend(["T305", "T306"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T309", "T311", "T312"])
         elif self.body.lower_panel.is_cup == "Nie":
-            self.available_body_parts_transitions["lower_panel"].extend(["T307", "T308"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T310", "T313"])
         if self.body.lower_panel.color == "Czerwony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T309", "T310"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T314", "T317"])
         elif self.body.lower_panel.color == "Zielony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T311", "T312"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T315", "T318"])
         elif self.body.lower_panel.color == "Niebieski":
-            self.available_body_parts_transitions["lower_panel"].extend(["T313", "T314"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T316", "T319"])
+        self.available_body_parts_transitions["lower_panel"].extend(["T320"])
 
-        if self.body.armrest.material == "Skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T401", "T402"])
-        elif self.body.armrest.material == "Eko skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T403", "T404"])
-        elif self.body.armrest.material == "Sztuczna skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T405", "T406"])
+
+        self.available_body_parts_transitions["armrest"].extend(["T401", "T402"])
         if self.body.armrest.heating == "Tak":
-            self.available_body_parts_transitions["armrest"].extend(["T407", "T408"])
+            self.available_body_parts_transitions["armrest"].extend(["T403", "T405", "T406"])
         elif self.body.armrest.heating == "Nie":
-            self.available_body_parts_transitions["armrest"].extend(["T409", "T410"])
+            self.available_body_parts_transitions["armrest"].extend(["T404", "T407"])
+        if self.body.armrest.material == "Skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T408", "T411"])
+        elif self.body.armrest.material == "Eko skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T409", "T412"])
+        elif self.body.armrest.material == "Sztuczna skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T410", "T413"])
+        self.available_body_parts_transitions["armrest"].extend(["T414"])
         if self.body.armrest.color == "Czerwony":
-            self.available_body_parts_transitions["armrest"].extend(["T411", "T412"])
+            self.available_body_parts_transitions["armrest"].extend(["T415", "T418"])
         elif self.body.armrest.color == "Zielony":
-            self.available_body_parts_transitions["armrest"].extend(["T413", "T414"])
+            self.available_body_parts_transitions["armrest"].extend(["T416", "T419"])
         elif self.body.armrest.color == "Niebieski":
-            self.available_body_parts_transitions["armrest"].extend(["T415", "T416"])
+            self.available_body_parts_transitions["armrest"].extend(["T417", "T420"])
+        self.available_body_parts_transitions["armrest"].extend(["T421"])
 
-        self.available_body_parts_transitions["cup_holder"].extend(["T501", "T502"])
+
+        self.available_body_parts_transitions["cup_holder"].extend(["T501", "T502", "T503", "T504", "T505"])
         if self.body.cup_holder.usb_socket == "Tak":
-            self.available_body_parts_transitions["cup_holder"].extend(["T503", "T504"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T506", "T508", "T509"])
         elif self.body.cup_holder.usb_socket == "Nie":
-            self.available_body_parts_transitions["cup_holder"].extend(["T505", "T506"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T507", "T510"])
         if self.body.cup_holder.color == "Czerwony":
-            self.available_body_parts_transitions["cup_holder"].extend(["T507", "T508"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T511", "T514"])
         elif self.body.cup_holder.color == "Zielony":
-            self.available_body_parts_transitions["cup_holder"].extend(["T509", "T510"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T512", "T515"])
         elif self.body.cup_holder.color == "Niebieski":
-            self.available_body_parts_transitions["cup_holder"].extend(["T511", "T512"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T513", "T516"])
+        self.available_body_parts_transitions["cup_holder"].extend(["T517"])
+
 
         self.available_body_parts_transitions["framework"].extend(["T601", "T602"])
         if self.body.framework.material == "Skóra":
