@@ -4,9 +4,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex
 
 from Body import Body
 
-from BodyPetriNet import body_main_petri_net
-
-from other.MatPlotlibWidget import MatplotlibWidget
+from BodyPetriNet_v1 import body_main_petri_net
 
 mutex = QMutex()
 
@@ -14,7 +12,7 @@ class PetriNetThread(QThread):
 
     finished_signal = pyqtSignal(int)
 
-    def __init__(self, body: Body, mpl_widget: MatplotlibWidget):
+    def __init__(self, body: Body):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
@@ -31,7 +29,6 @@ class PetriNetThread(QThread):
             "framework": []}
 
         self.executed_transitions = []
-        self.mpl_widget = mpl_widget
 
         self.define_available_tr()
 
@@ -44,20 +41,20 @@ class PetriNetThread(QThread):
 
         print(self.available_transitions)
 
-        self.pn_up_thread = PetriNetSubThread(float(self.body.id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"], mpl_widget)
-        self.pn_mp_thread = PetriNetSubThread(float(self.body.id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"], mpl_widget)
-        self.pn_lp_thread = PetriNetSubThread(float(self.body.id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"], mpl_widget)
-        self.pn_ar_thread = PetriNetSubThread(float(self.body.id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"], mpl_widget)
-        self.pn_ch_thread = PetriNetSubThread(float(self.body.id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"], mpl_widget)
-        self.pn_fw_thread = PetriNetSubThread(float(self.body.id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"], mpl_widget)
-        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
+        self.pn_up_thread = PetriNetSubThread(float(self.body.body_id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"])
+        self.pn_mp_thread = PetriNetSubThread(float(self.body.body_id) + 0.2, "Środkowy panel", self.available_body_parts_transitions["middle_panel"])
+        self.pn_lp_thread = PetriNetSubThread(float(self.body.body_id) + 0.3, "Dolny panel", self.available_body_parts_transitions["lower_panel"])
+        self.pn_ar_thread = PetriNetSubThread(float(self.body.body_id) + 0.4, "Podłokietnik", self.available_body_parts_transitions["armrest"])
+        self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"])
+        self.pn_fw_thread = PetriNetSubThread(float(self.body.body_id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"])
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
+        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_ar_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_ch_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_fw_thread.finished_signal.connect(self.on_thread_finished)
-        self.pn_mp_thread.start()
         self.pn_up_thread.start()
+        self.pn_mp_thread.start()
         self.pn_lp_thread.start()
         self.pn_ar_thread.start()
         self.pn_ch_thread.start()
@@ -73,11 +70,10 @@ class PetriNetThread(QThread):
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
                     print(
-                        f"\nThread id: {self.body.id} - Odpalam Tranzycje {self.available_transitions[i]}"
+                        f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
-                    self.mpl_widget.plot()
                     i += 1
 
                 if self.executed_transitions == self.available_transitions:
@@ -85,26 +81,27 @@ class PetriNetThread(QThread):
             finally:
                 mutex.unlock()
 
-            time.sleep(0.5)
+            time.sleep(0.3)
 
-        self.finished_signal.emit(self.body.id)
+        self.finished_signal.emit(self.body.body_id)
 
     def stop(self):
         self._running = False
 
-    def thread_finder(self, id):
-        if round(id - int(id), 10) == 0.1:
+    def thread_finder(self, thread_id):
+        if round(thread_id - int(thread_id), 10) == 0.1:
             return self.pn_up_thread
-        elif round(id - int(id), 10) == 0.2:
+        if round(thread_id - int(thread_id), 10) == 0.2:
             return self.pn_mp_thread
-        elif round(id - int(id), 10) == 0.3:
+        if round(thread_id - int(thread_id), 10) == 0.3:
             return self.pn_lp_thread
-        elif round(id - int(id), 10) == 0.4:
+        if round(thread_id - int(thread_id), 10) == 0.4:
             return self.pn_ar_thread
-        elif round(id - int(id), 10) == 0.5:
+        if round(thread_id - int(thread_id), 10) == 0.5:
             return self.pn_ch_thread
-        elif round(id - int(id), 10) == 0.6:
+        if round(thread_id - int(thread_id), 10) == 0.6:
             return self.pn_fw_thread
+        return None
 
     def on_thread_finished(self, thread_id, thread_name):
         thread = self.thread_finder(thread_id)
@@ -119,94 +116,109 @@ class PetriNetThread(QThread):
             self.pn_ch_thread._running is False and
             self.pn_fw_thread._running is False):
             return True
+        return False
         
     def define_available_tr(self):
 
+        self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102"])
+        if self.body.upper_panel.type == "2-strefowa":
+            self.available_body_parts_transitions["upper_panel"].extend(["T103", "T105", "T107"])
+        elif self.body.upper_panel.type == "4-strefowa":
+            self.available_body_parts_transitions["upper_panel"].extend(["T104", "T106", "T108"])
         if self.body.upper_panel.is_controlable == "Tak":
-            if self.body.upper_panel.type == "4-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102", "T103"])
-            elif self.body.upper_panel.type == "2-strefowa":
-                self.available_body_parts_transitions["upper_panel"].extend(["T101", "T104", "T105"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T109", "T111", "T112"])
         elif self.body.upper_panel.is_controlable == "Nie":
-            self.available_body_parts_transitions["upper_panel"].extend(["T106", "T107"])
+            self.available_body_parts_transitions["upper_panel"].extend(["T110", "T113"])
 
+        self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
         if self.body.middle_panel.functionality == "Interfejs multimedialny":
-            self.available_body_parts_transitions["middle_panel"].extend(["T201", "T202"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T203", "T205", "T207"])
         elif self.body.middle_panel.functionality == "Schowek":
-            self.available_body_parts_transitions["middle_panel"].extend(["T203", "T204"])
+            self.available_body_parts_transitions["middle_panel"].extend(["T204", "T206", "T208"])
 
+        self.available_body_parts_transitions["lower_panel"].extend(["T301", "T302"])
         if self.body.lower_panel.functionality == "Ładowarka bezprzewodowa":
-            self.available_body_parts_transitions["lower_panel"].extend(["T301", "T302"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T303", "T305", "T307"])
         elif self.body.lower_panel.functionality == "Półka":
-            self.available_body_parts_transitions["lower_panel"].extend(["T303", "T304"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T304", "T306", "T308"])
         if self.body.lower_panel.is_cup == "Tak":
-            self.available_body_parts_transitions["lower_panel"].extend(["T305", "T306"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T309", "T311", "T312"])
         elif self.body.lower_panel.is_cup == "Nie":
-            self.available_body_parts_transitions["lower_panel"].extend(["T307", "T308"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T310", "T313"])
         if self.body.lower_panel.color == "Czerwony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T309", "T310"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T314", "T317"])
         elif self.body.lower_panel.color == "Zielony":
-            self.available_body_parts_transitions["lower_panel"].extend(["T311", "T312"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T315", "T318"])
         elif self.body.lower_panel.color == "Niebieski":
-            self.available_body_parts_transitions["lower_panel"].extend(["T313", "T314"])
+            self.available_body_parts_transitions["lower_panel"].extend(["T316", "T319"])
+        self.available_body_parts_transitions["lower_panel"].extend(["T320"])
 
-        if self.body.armrest.material == "Skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T401", "T402"])
-        elif self.body.armrest.material == "Eko skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T403", "T404"])
-        elif self.body.armrest.material == "Sztuczna skóra":
-            self.available_body_parts_transitions["armrest"].extend(["T405", "T406"])
+
+        self.available_body_parts_transitions["armrest"].extend(["T401", "T402"])
         if self.body.armrest.heating == "Tak":
-            self.available_body_parts_transitions["armrest"].extend(["T407", "T408"])
+            self.available_body_parts_transitions["armrest"].extend(["T403", "T405", "T406"])
         elif self.body.armrest.heating == "Nie":
-            self.available_body_parts_transitions["armrest"].extend(["T409", "T410"])
+            self.available_body_parts_transitions["armrest"].extend(["T404", "T407"])
+        if self.body.armrest.material == "Skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T408", "T411"])
+        elif self.body.armrest.material == "Eko skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T409", "T412"])
+        elif self.body.armrest.material == "Sztuczna skóra":
+            self.available_body_parts_transitions["armrest"].extend(["T410", "T413"])
+        self.available_body_parts_transitions["armrest"].extend(["T414"])
         if self.body.armrest.color == "Czerwony":
-            self.available_body_parts_transitions["armrest"].extend(["T411", "T412"])
+            self.available_body_parts_transitions["armrest"].extend(["T415", "T418"])
         elif self.body.armrest.color == "Zielony":
-            self.available_body_parts_transitions["armrest"].extend(["T413", "T414"])
+            self.available_body_parts_transitions["armrest"].extend(["T416", "T419"])
         elif self.body.armrest.color == "Niebieski":
-            self.available_body_parts_transitions["armrest"].extend(["T415", "T416"])
+            self.available_body_parts_transitions["armrest"].extend(["T417", "T420"])
+        self.available_body_parts_transitions["armrest"].extend(["T421"])
 
-        self.available_body_parts_transitions["cup_holder"].extend(["T501", "T502"])
+
+        self.available_body_parts_transitions["cup_holder"].extend(["T501", "T502", "T503", "T504", "T505"])
         if self.body.cup_holder.usb_socket == "Tak":
-            self.available_body_parts_transitions["cup_holder"].extend(["T503", "T504"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T506", "T508", "T509"])
         elif self.body.cup_holder.usb_socket == "Nie":
-            self.available_body_parts_transitions["cup_holder"].extend(["T505", "T506"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T507", "T510"])
         if self.body.cup_holder.color == "Czerwony":
-            self.available_body_parts_transitions["cup_holder"].extend(["T507", "T508"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T511", "T514"])
         elif self.body.cup_holder.color == "Zielony":
-            self.available_body_parts_transitions["cup_holder"].extend(["T509", "T510"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T512", "T515"])
         elif self.body.cup_holder.color == "Niebieski":
-            self.available_body_parts_transitions["cup_holder"].extend(["T511", "T512"])
+            self.available_body_parts_transitions["cup_holder"].extend(["T513", "T516"])
+        self.available_body_parts_transitions["cup_holder"].extend(["T517"])
 
-        self.available_body_parts_transitions["framework"].extend(["T601", "T602"])
+    
+        self.available_body_parts_transitions["framework"].extend(["T601", "T602", "T603", "T604", "T605"])
         if self.body.framework.material == "Skóra":
-            self.available_body_parts_transitions["framework"].extend(["T603", "T604"])
+            self.available_body_parts_transitions["framework"].extend(["T606", "T609"])
         elif self.body.framework.material == "Eko skóra":
-            self.available_body_parts_transitions["framework"].extend(["T605", "T606"])
+            self.available_body_parts_transitions["framework"].extend(["T607", "T610"])
         elif self.body.framework.material == "Sztuczna skóra":
-            self.available_body_parts_transitions["framework"].extend(["T607", "T608"])
+            self.available_body_parts_transitions["framework"].extend(["T608", "T611"])
+        self.available_body_parts_transitions["framework"].extend(["T612"])
         if self.body.framework.color == "Czerwony":
-            self.available_body_parts_transitions["framework"].extend(["T609", "T610"])
+            self.available_body_parts_transitions["framework"].extend(["T613", "T616"])
         elif self.body.framework.color == "Zielony":
-            self.available_body_parts_transitions["framework"].extend(["T611", "T612"])
+            self.available_body_parts_transitions["framework"].extend(["T614", "T617"])
         elif self.body.framework.color == "Niebieski":
-            self.available_body_parts_transitions["framework"].extend(["T613", "T614"])
+            self.available_body_parts_transitions["framework"].extend(["T615", "T618"])
+        self.available_body_parts_transitions["framework"].extend(["T619"])
+
 
 class PetriNetSubThread(QThread):
 
     finished_signal = pyqtSignal(float, str)
 
-    def __init__(self, id: float, name: str,available_transitions: list, mpl_widget: MatplotlibWidget):
+    def __init__(self, thread_id: float, name: str,available_transitions: list):
         super().__init__()
         self._running = True
         # self.finished_signal.connect(self.stop)
-        self.id = id
+        self.thread_id = thread_id
         self.name = name
         self.petri_net = body_main_petri_net
         self.available_transitions = available_transitions
         self.executed_transitions = []
-        self.mpl_widget = mpl_widget
 
         print(self.available_transitions)
 
@@ -218,11 +230,10 @@ class PetriNetSubThread(QThread):
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
                     print(
-                        f"\nSub-Thread id: {self.id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
+                        f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
                     )
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
-                    self.mpl_widget.plot()
                     i += 1
 
                 if self.executed_transitions == self.available_transitions:
@@ -232,4 +243,4 @@ class PetriNetSubThread(QThread):
 
             time.sleep(0.5)
 
-        self.finished_signal.emit(self.id, self.name)
+        self.finished_signal.emit(self.thread_id, self.name)

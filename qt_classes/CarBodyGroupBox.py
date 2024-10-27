@@ -47,4 +47,4 @@ class CarBodyGroupBox():
         return self.group_box
     
     def recreate_label(self):
-        self.label.setText(self.body.__str__())
+        self.label.setText(str(self.body))

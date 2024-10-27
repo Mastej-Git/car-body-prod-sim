@@ -1,12 +1,13 @@
+import numpy as np
+
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
 )
+from PyQt5.QtCore import QTimer
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-from PyQt5.QtCore import QTimer
-import numpy as np
 
 from petri_nets.PetriNet import PetriNet
 
@@ -24,7 +25,7 @@ class MatplotlibWidget(QWidget):
         for place in self.petri_net.places.values():
             self.tasks.append(f"{place.name}")
         self.start_times = [0 for place in self.petri_net.places.keys()]
-        self.durations = [place.cooldown for place in self.petri_net.places.values()]
+        self.durations = [place.cooldown_ms for place in self.petri_net.places.values()]
         
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
