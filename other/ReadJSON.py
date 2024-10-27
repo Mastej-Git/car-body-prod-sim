@@ -40,6 +40,8 @@ class ReadJSON():
                 gui.list_of_bodys.append(body_tmp)
 
                 gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
+                gui.list_of_car_body_group_box[gui.body_counter].button_plan.clicked.connect(
+                    lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_plan_clicked(x))
                 gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
                     lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_schedule_clicked(x))
                 gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
@@ -57,7 +59,7 @@ class ReadJSON():
         body_tmp.framework.color = body_config['body']['framework']['color']
 
         body_tmp.upper_panel.is_controlable = body_config['body']['upper_panel']['is_controllable']
-        body_tmp.upper_panel.type = body_config['body']['upper_panel']['type']
+        body_tmp.upper_panel.ac_type = body_config['body']['upper_panel']['type']
 
         body_tmp.middle_panel.functionality = body_config['body']['middle_panel']['functionality']
 

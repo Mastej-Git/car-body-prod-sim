@@ -146,10 +146,10 @@ class GUI(QMainWindow):
         self.tab2.setLayout(self.layout)
 
         # self.mpl_widget = MatplotlibWidget(self.petri_net, self)
-        self.mpl_widget = PlotWidget()
+        self.mpl_widget = PlotWidget(self.petri_net)
 
         layout3 = QVBoxLayout()
-        # layout3.addWidget(self.mpl_widget)
+        layout3.addWidget(self.mpl_widget)
         # self.mpl_widget.plot()
         self.tab3.setLayout(layout3)
 
@@ -517,6 +517,9 @@ class GUI(QMainWindow):
     def create_group_box_body(self):
         self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
 
+        self.list_of_car_body_group_box[self.body_counter - 1].button_plan.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_plan_clicked(x))
+
         self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.clicked.connect(
             lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_schedule_clicked(x))
         
@@ -656,6 +659,12 @@ class GUI(QMainWindow):
         self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
 
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+
+    @pyqtSlot()
+    def pb_plan_clicked(self, body_id):
+        print(f"\nPlanowanie korpusu")
+        
+        self.mpl_widget.update_plot1(self.list_of_bodys[body_id])
     
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):

@@ -25,15 +25,15 @@ class CarBodyGroupBox():
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
         self.label.setStyleSheet(style_sheet_label)
 
-        self.button_schedule = AnimatedButton("Planuj", 200, 40)
+        self.button_plan = AnimatedButton("Planuj", 200, 40)
+        self.button_schedule = AnimatedButton("Produkuj", 200, 40)
         self.button_ready = AnimatedButton("Gotowe", 200, 40)
-        self.button_edit = AnimatedButton("Edytuj", 200, 40)
         self.button_remove = AnimatedButton("Usuń", 200, 40)
 
         buttons_layout = QVBoxLayout()
+        buttons_layout.addWidget(self.button_plan)
         buttons_layout.addWidget(self.button_schedule)
         buttons_layout.addWidget(self.button_ready)
-        buttons_layout.addWidget(self.button_edit)
         buttons_layout.addWidget(self.button_remove)
 
         main_layout = QHBoxLayout()

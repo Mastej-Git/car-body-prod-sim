@@ -121,9 +121,9 @@ class PetriNetThread(QThread):
     def define_available_tr(self):
 
         self.available_body_parts_transitions["upper_panel"].extend(["T101", "T102"])
-        if self.body.upper_panel.type == "2-strefowa":
+        if self.body.upper_panel.ac_type == "2-strefowa":
             self.available_body_parts_transitions["upper_panel"].extend(["T103", "T105", "T107"])
-        elif self.body.upper_panel.type == "4-strefowa":
+        elif self.body.upper_panel.ac_type == "4-strefowa":
             self.available_body_parts_transitions["upper_panel"].extend(["T104", "T106", "T108"])
         if self.body.upper_panel.is_controlable == "Tak":
             self.available_body_parts_transitions["upper_panel"].extend(["T109", "T111", "T112"])

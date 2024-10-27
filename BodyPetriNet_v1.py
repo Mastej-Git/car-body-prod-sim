@@ -11,18 +11,19 @@ body_main_petri_net.add_place("P099", "Pracownicy", tokens=0, ready_tokens=50, m
 
 body_main_petri_net.add_place("P100", "Zlecenie panelu górnego", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P101", "Przygotowanie materiałów", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=2*time_unit)
-body_main_petri_net.add_place("P102", "Zlecenie instalacji szybów wentylacji", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=1*time_unit)
-body_main_petri_net.add_place("P103", "Instalacja szybów wentylacji 2-strefowej", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
-body_main_petri_net.add_place("P104", "Instalacja szybów wentylacji 4-strefowej", tokens=0, ready_tokens=1, max_tokens=5, cooldown_ms=3*time_unit)
+body_main_petri_net.add_place("P102", "Zlecenie instalacji szybów klimatyzacji", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=1*time_unit)
+body_main_petri_net.add_place("P103", "Instalacja szybów klimatyzacji 2-strefowej", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
+body_main_petri_net.add_place("P104", "Instalacja szybów klimatyzacji 4-strefowej", tokens=0, ready_tokens=1, max_tokens=5, cooldown_ms=3*time_unit)
 body_main_petri_net.add_place("P105", "Gotowy szkielet z szybami (2-strefowymi)", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P106", "Gotowy szkielet z szybami (4-strefowymi)", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P107", "Zlecenie instalacji sterowania klimatyzacją", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P108", "Instalacja sterowania", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
 body_main_petri_net.add_place("P109", "Gotowy szkielet z zainstalowanymi szybami ze sterowaniem", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=2*time_unit)
 body_main_petri_net.add_place("P110", "Gotowy szkielet z zainstalowanymi szybami bez sterowania", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=2*time_unit)
-body_main_petri_net.add_place("P111", "Maszyna M1 do instalacji szybów wentylacji 2 strefowej", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P112", "Maszyna M2 do instalacji szybów wentylacji 4 strefowej", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P111", "Maszyna M1 - Instalacja szybów klimatyzacji 2 strefowej", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P112", "Maszyna M2 - Instalacja szybów klimatyzacji 4 strefowej", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P199", "Gotowy panel górny", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
+
 
 body_main_petri_net.add_place("P200", "Zlecenie panelu środkowego", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P201", "Przygotowanie materiałów", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=2*time_unit)
@@ -31,8 +32,8 @@ body_main_petri_net.add_place("P203", "Instalacja interfejsu multimedialnego", t
 body_main_petri_net.add_place("P204", "Instalacja schowka", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
 body_main_petri_net.add_place("P205", "Gotowy panel z interfejsem", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P206", "Gotowy panel ze schowkiem", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
-body_main_petri_net.add_place("P207", "Maszyna M3 do instalacji interfejsu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P208", "Maszyna M4 do instalacji schowka", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P207", "Maszyna M3 - Instalacja interfejsu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P208", "Maszyna M4 - Instalacja schowka", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P299", "Gotowy panel środkowy", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
 
 
@@ -52,10 +53,10 @@ body_main_petri_net.add_place("P312", "Malowanie na kolor x", tokens=0, ready_to
 body_main_petri_net.add_place("P313", "Malowanie na kolor y", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P314", "Malowanie na kolor z", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P315", "Gotowy pomalowany panel", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
-body_main_petri_net.add_place("P316", "Mszyna M5 do instalacji ładowarki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P317", "Mszyna M6 do instalacji półki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P318", "Mszyna M7 do instalacji miejsca na kubki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P319", "Mszyna M8 do malowania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P316", "Maszyna M5 - Instalacja ładowarki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P317", "Maszyna M6 - Instalacja półki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P318", "Maszyna M7 - Instalacja miejsca na kubki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P319", "Maszyna M8 - Malowanie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P399", "Gotowy panel", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 
 
@@ -75,9 +76,9 @@ body_main_petri_net.add_place("P412", "Malowanie na kolor x", tokens=0, ready_to
 body_main_petri_net.add_place("P413", "Malowanie na kolor y", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P414", "Malowanie na kolor z", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P415", "Gotowy pomalowany podłokietnik", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
-body_main_petri_net.add_place("P416", "Mszyna M9 do instalacji podgrzewania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P417", "Mszyna M10 do obszycia", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P418", "Mszyna M11 do malowania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P416", "Maszyna M9 - Instalacja podgrzewania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P417", "Maszyna M10 - Obszycie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P418", "Maszyna M11 - Malowanie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P499", "Gotowy podłokietnik", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 
 
@@ -95,10 +96,10 @@ body_main_petri_net.add_place("P510", "Malowanie na kolor x", tokens=0, ready_to
 body_main_petri_net.add_place("P511", "Malowanie na kolor y", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P512", "Malowanie na kolor z", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P513", "Gotowy pomalowany uchwyt", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
-body_main_petri_net.add_place("P514", "Mszyna M12 do instalacji uchwytów", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P515", "Mszyna M13 do instalacji ładowarki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P516", "Mszyna M14 do instalacji wejścia USB", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P517", "Mszyna M15 do malowania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P514", "Maszyna M12 - Instalacja uchwytów", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P515", "Maszyna M13 - Instalacja ładowarki", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P516", "Maszyna M14 - Instalacja wejścia USB", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P517", "Maszyna M15 - Malowanie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P599", "Gotowy uchwyt", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 
 
@@ -117,10 +118,10 @@ body_main_petri_net.add_place("P611", "Malowanie na kolor x", tokens=0, ready_to
 body_main_petri_net.add_place("P612", "Malowanie na kolor y", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P613", "Malowanie na kolor z", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(4*time_unit))
 body_main_petri_net.add_place("P614", "Gotowy pomalowany szkielet", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
-body_main_petri_net.add_place("P615", "Mszyna M16 do złożenia szkieletu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P616", "Mszyna M17 do instalacji szybów", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P617", "Mszyna M18 do obszycia", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
-body_main_petri_net.add_place("P618", "Mszyna M19 do malowania", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P615", "Maszyna M16 - Złożenia szkieletu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P616", "Maszyna M17 - Instalacja szybów", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P617", "Maszyna M18 - Obszycie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P618", "Maszyna M19 - Malowanie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P699", "Gotowy szkielet", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 
 
