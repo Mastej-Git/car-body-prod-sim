@@ -12,69 +12,19 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from petri_nets.PetriNet import PetriNet
 from Body import Body
 
-class MatplotlibWidget(QWidget):
-    def __init__(self, petri_net: PetriNet, parent=None):
-        super(MatplotlibWidget, self).__init__(parent)
-
-        self.petri_net = petri_net
-
-        self.tasks = []
-        self.start_times = []
-        self.durations = []
-        self.current_time = 0
-
-        for place in self.petri_net.places.values():
-            self.tasks.append(f"{place.name}")
-        self.start_times = [0 for place in self.petri_net.places.keys()]
-        self.durations = [place.cooldown_ms for place in self.petri_net.places.values()]
-        
-        self.fig, self.ax = plt.subplots()
-        self.canvas = FigureCanvas(self.fig)
-        self.bars = self.ax.barh(self.tasks, self.durations, left=self.start_times, color='#00ffff')
-
-        self.fig.set_facecolor("#2e2e2e")
-
-        self.ax.invert_yaxis()
-        self.ax.set_xlim(left=0, right=5)
-
-        self.ax.set_facecolor('#2e2e2e')
-        self.ax.tick_params(axis='x', colors='#00ffff')
-        self.ax.tick_params(axis='y', colors='#00ffff')
-        self.ax.spines['top'].set_color('#00ffff')
-        self.ax.spines['bottom'].set_color('#00ffff')
-        self.ax.spines['left'].set_color('#00ffff')
-        self.ax.spines['right'].set_color('#00ffff')
-        self.ax.xaxis.label.set_color('#00ffff')
-        self.ax.yaxis.label.set_color('#00ffff')
-        self.ax.title.set_color('#00ffff')
-        self.ax.grid(True, color='#404040', linestyle='--', linewidth=0.5)
-
-        self.ax.set_xlabel('Ilość ładunków')
-        self.ax.set_ylabel('Akcja')
-        self.ax.set_title('Stan korpusów')
-        
-        layout = QVBoxLayout()
-        layout.addWidget(self.canvas)
-        
-        self.setLayout(layout)
-        
-    def plot(self):
-        
-        self.start_times = [0 for place in self.petri_net.places.keys()]
-        self.durations = [place.tokens for place in self.petri_net.places.values()]
-
-        for bar, new_val in zip(self.bars, self.durations):
-            bar.set_width(new_val)
-        
-        self.canvas.draw()
-
 class PlotWidget(QWidget):
 
     def __init__(self, petri_net: PetriNet, parent=None):
         super(PlotWidget, self).__init__(parent)
 
+        self.plot_colors = ["skyblue", "red", "lightgreen"]
+        self.color_iter = 0
+        self.numb_of_plots = 0
         self.petri_net = petri_net
         self.list_of_machines_p = []
+
+        self.list_of_durations = []
+        self.list_of_starting_times = []
 
         self.tasks = []
         for place in self.petri_net.places.values():
@@ -150,12 +100,14 @@ class PlotWidget(QWidget):
 
     def update_plot1(self, body):
 
-        self.durations1 = self.calculate_duration(body)
-        self.start_times1 = self.calculate_starting_times()
+        self.calculate_duration(body)
+        self.calculate_starting_times()
 
-        self.bars1 = self.ax.barh(self.y_pos, self.durations1, left=self.start_times1, 
-                                  color='skyblue', height=0.4, label='Dataset 1')
+        self.bars1 = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
+                                  color=self.plot_colors[self.color_iter % 3], height=0.4, label='Dataset 1')
         
+        self.color_iter += 1
+        self.numb_of_plots += 1
         self.canvas.draw()
 
     def calculate_duration(self, body: Body):
@@ -227,22 +179,30 @@ class PlotWidget(QWidget):
 
         duration.append((self.petri_net.places["P611"].cooldown_ms + self.petri_net.places["P614"].cooldown_ms)/1000)
 
-        return duration
+        self.list_of_durations.append(duration)
     
     def calculate_starting_times(self):
 
+        if len(self.list_of_durations) > 1:
+            previous_starting_times = self.list_of_starting_times[self.numb_of_plots - 1]
+        else:
+            previous_starting_times = [0 for i in range(len(self.list_of_durations[0]))]
+
         starting_times = []
 
+        print(previous_starting_times)
         j = 0
         for machine in self.list_of_machines_p:
             i = 0
             sum = 0
-            for duration in self.durations1:
+            for duration in self.list_of_durations[self.numb_of_plots]:
                 if i == j: break
                 sum += duration
                 i += 1
                 if duration != 0: sum += 1
+            if sum <= previous_starting_times[i]:
+                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] + 1
             starting_times.append(sum)
             j += 1
 
-        return starting_times
+        self.list_of_starting_times.append(starting_times)
