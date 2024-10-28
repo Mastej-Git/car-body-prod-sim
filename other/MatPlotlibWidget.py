@@ -85,19 +85,6 @@ class PlotWidget(QWidget):
 
         self.i = 0
 
-    def update_plot(self):
-        
-        self.i += 1
-        new_durations1 = [d + np.sin(self.i / 10.0) for d in self.durations1]
-        new_durations2 = [d + np.sin(self.i / 10.0) for d in self.durations2]
-        
-        for bar, new_dur in zip(self.bars1, new_durations1):
-            bar.set_width(new_dur)
-        for bar, new_dur in zip(self.bars2, new_durations2):
-            bar.set_width(new_dur)
-        
-        self.canvas.draw()
-
     def update_plot1(self, body):
 
         self.calculate_duration(body)
