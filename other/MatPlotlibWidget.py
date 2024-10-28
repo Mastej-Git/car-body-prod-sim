@@ -191,6 +191,7 @@ class PlotWidget(QWidget):
         starting_times = []
 
         print(previous_starting_times)
+        print(self.list_of_durations[self.numb_of_plots])
         j = 0
         for machine in self.list_of_machines_p:
             i = 0
@@ -200,9 +201,25 @@ class PlotWidget(QWidget):
                 sum += duration
                 i += 1
                 if duration != 0: sum += 1
-            if sum <= previous_starting_times[i]:
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] + 1
+            if sum <= previous_starting_times[i] and self.check_previous_times(i):
+                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
+                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
+                    sum += 1
             starting_times.append(sum)
             j += 1
 
         self.list_of_starting_times.append(starting_times)
+
+    def check_previous_times(self, index):
+        for k in range(self.numb_of_plots):
+            if self.list_of_durations[k][index] != 0:
+                return True
+        return False
+
+    def sum_durations(self, index):
+        sum = 0
+
+        for j in range(self.numb_of_plots):
+            sum += self.list_of_durations[j][index]
+
+        return sum
