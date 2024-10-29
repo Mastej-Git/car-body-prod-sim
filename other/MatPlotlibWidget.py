@@ -17,7 +17,7 @@ class PlotWidget(QWidget):
     def __init__(self, petri_net: PetriNet, parent=None):
         super(PlotWidget, self).__init__(parent)
 
-        self.plot_colors = ["skyblue", "red", "lightgreen"]
+        self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "yellow"]
         self.color_iter = 0
         self.numb_of_plots = 0
         self.petri_net = petri_net
@@ -91,7 +91,7 @@ class PlotWidget(QWidget):
         self.calculate_starting_times()
 
         self.bars1 = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
-                                  color=self.plot_colors[self.color_iter % 3], height=0.4, label='Dataset 1')
+                                  color=self.plot_colors[self.color_iter % 5], height=0.4, label='Dataset 1')
         
         self.color_iter += 1
         self.numb_of_plots += 1
@@ -210,9 +210,9 @@ class PlotWidget(QWidget):
             #     if starting_time >= starting_times[j - 1] and starting_time <= starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]:
             #         starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]
 
-            # if len(starting_times) != 0:
-            #     if starting_time == starting_times[j - 1]:
-            #         starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i] + 1
+            if len(starting_times) != 0 and start == 11:
+                if self.list_of_durations[self.numb_of_plots - 1][i] == 0:
+                    starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots][i] + 1
 
             starting_times.append(starting_time)
             j += 1
