@@ -38,6 +38,7 @@ class ReadJSON():
                 
                 body_tmp = self.assign_body_parts(body_tmp, body_config)
                 gui.list_of_bodys.append(body_tmp)
+                gui.mpl_widget.update_plot(gui.list_of_bodys[gui.body_counter])
 
                 gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
                 gui.list_of_car_body_group_box[gui.body_counter].button_plan.clicked.connect(

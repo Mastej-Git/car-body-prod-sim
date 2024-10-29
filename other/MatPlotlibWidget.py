@@ -85,7 +85,7 @@ class PlotWidget(QWidget):
 
         self.i = 0
 
-    def update_plot1(self, body):
+    def update_plot(self, body):
 
         self.calculate_duration(body)
         self.calculate_starting_times()
@@ -177,105 +177,45 @@ class PlotWidget(QWidget):
 
         starting_times = []
 
-        # print(previous_starting_times)
-        # print(self.list_of_durations[self.numb_of_plots])
-        j = 0
-        for machine in self.list_of_machines_p[:2]:
-            i = 0
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][:2]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
-
-        j = 2
-        for machine in self.list_of_machines_p[2:4]:
-            i = 2
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][2:4]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
-
-        j = 4
-        for machine in self.list_of_machines_p[4:8]:
-            i = 4
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][4:8]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
-
-        j = 8
-        for machine in self.list_of_machines_p[8:11]:
-            i = 8
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][8:11]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
-
-        j = 11
-        for machine in self.list_of_machines_p[11:15]:
-            i = 11
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][11:15]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
-
-        j = 15
-        for machine in self.list_of_machines_p[15:]:
-            i = 15
-            sum = 0
-            for duration in self.list_of_durations[self.numb_of_plots][15:]:
-                if i == j: break
-                sum += duration
-                i += 1
-                if duration != 0: sum += 1
-            if sum <= previous_starting_times[i] and self.check_previous_times(i):
-                sum = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
-                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    sum += 1
-            starting_times.append(sum)
-            j += 1
+        self.calculate_prev_part_times(0, 2, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(2, 4, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(4, 8, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(8, 11, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(11, 15, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(15, 19, previous_starting_times, starting_times)
 
         self.list_of_starting_times.append(starting_times)
+    
+    def calculate_prev_part_times(self, start, end, previous_starting_times, starting_times):
+        
+        j = start
+        for machine in self.list_of_machines_p[start:end]:
+            i = start
+            starting_time = 0
+
+            for duration in self.list_of_durations[self.numb_of_plots][start:end]:
+                if i == j: break
+                starting_time += duration
+                i += 1
+                if duration != 0: starting_time += 1
+
+            # print(starting_time, previous_starting_times[i])
+
+            if starting_time <= previous_starting_times[i] and self.check_previous_times(i):
+                starting_time = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
+                if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
+                    starting_time += 1
+            
+            # if j != start:
+            #     if starting_time >= starting_times[j - 1] and starting_time <= starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]:
+            #         starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]
+
+            # if len(starting_times) != 0:
+            #     if starting_time == starting_times[j - 1]:
+            #         starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i] + 1
+
+            starting_times.append(starting_time)
+            j += 1
 
     def check_previous_times(self, index):
         for k in range(self.numb_of_plots):
