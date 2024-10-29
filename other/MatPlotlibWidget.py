@@ -17,7 +17,9 @@ class PlotWidget(QWidget):
     def __init__(self, petri_net: PetriNet, parent=None):
         super(PlotWidget, self).__init__(parent)
 
-        self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "yellow"]
+        self.list_of_bars = []
+
+        self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "yellow", "brown", "purple", "white", "teal", "peru"]
         self.color_iter = 0
         self.numb_of_plots = 0
         self.petri_net = petri_net
@@ -90,8 +92,10 @@ class PlotWidget(QWidget):
         self.calculate_duration(body)
         self.calculate_starting_times()
 
-        self.bars1 = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
-                                  color=self.plot_colors[self.color_iter % 5], height=0.4, label='Dataset 1')
+        bars = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
+                                  color=self.plot_colors[self.color_iter % 10], height=0.4, label='Dataset 1')
+        
+        self.list_of_bars.append(bars)
         
         self.color_iter += 1
         self.numb_of_plots += 1

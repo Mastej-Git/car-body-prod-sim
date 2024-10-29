@@ -1,89 +1,379 @@
 [
-    {
-        "body": {
-                "framework": {
-                        "material": "Skóra",
-                        "color": "Czerwony"
-                },
-                "upper_panel": {
-                        "is_controllable": "Tak",
-                        "type": "4-strefowa"
-                },
-                "middle_panel": {
-                        "functionality": "Interfejs multimedialny"
-                },
-                "lower_panel": {
-                        "functionality": "Ładowarka bezprzewodowa",
-                        "is_cup": "Tak",
-                        "color": "Czerwony"
-                },
-                "armrest": {
-                        "heating": "Tak",
-                        "material": "Skóra",
-                        "color": "Czerwony"
-                },
-                "cup_holder": {
-                        "usb_socket": "Tak",
-                        "color": "Czerwony"
+        {
+                "body": {
+                        "framework": {
+                                "material": "Skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Tak",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Ładowarka bezprzewodowa",
+                                "is_cup": "Tak",
+                                "color": "Czerwony"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Skóra",
+                                "color": "Czerwony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Czerwony"
+                        }
+                }
+        },
+        {
+                "body": {
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Niebieski"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Tak",
+                                "type": "2-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Schowek"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Nie",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Eko skóra",
+                                "color": "Niebieski"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Niebieski"
+                        }
+                }
+        },
+        {
+                "body": {
+                        "framework": {
+                                "material": "Sztuczna skóra",
+                                "color": "Zielony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "2-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Tak",
+                                "color": "Zielony"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Sztuczna skóra",
+                                "color": "Zielony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Zielony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Niebieski"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Ładowarka bezprzewodowa",
+                                "is_cup": "Tak",
+                                "color": "Czerwony"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Eko skóra",
+                                "color": "Zielony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Niebieski"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Sztuczna skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "2-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Tak",
+                                "color": "Zielony"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Skóra",
+                                "color": "Czerwony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Zielony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Zielony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Tak",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Schowek"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Nie",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Sztuczna skóra",
+                                "color": "Niebieski"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Niebieski"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Zielony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Ładowarka bezprzewodowa",
+                                "is_cup": "Tak",
+                                "color": "Zielony"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Eko skóra",
+                                "color": "Niebieski"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Niebieski"
+                        }
+                }                
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Sztuczna skóra",
+                                "color": "Niebieski"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Schowek"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Tak",
+                                "color": "Zielony"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Sztuczna skóra",
+                                "color": "Czerwony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Zielony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Tak",
+                                "type": "2-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Nie",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Sztuczna skóra",
+                                "color": "Niebieski"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Nie",
+                                "color": "Niebieski"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Skóra",
+                                "color": "Zielony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Nie",
+                                "color": "Zielony"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Eko skóra",
+                                "color": "Czerwony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Czerwony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Ładowarka bezprzewodowa",
+                                "is_cup": "Tak",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Tak",
+                                "material": "Eko skóra",
+                                "color": "Niebieski"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Zielony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "2-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Interfejs multimedialny"
+                        },
+                        "lower_panel": {
+                                "functionality": "Półka",
+                                "is_cup": "Tak",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Skóra",
+                                "color": "Zielony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Zielony"
+                        }
+                }
+        },
+        {
+                "body":{
+                        "framework": {
+                                "material": "Eko skóra",
+                                "color": "Czerwony"
+                        },
+                        "upper_panel": {
+                                "is_controllable": "Nie",
+                                "type": "4-strefowa"
+                        },
+                        "middle_panel": {
+                                "functionality": "Schowek"
+                        },
+                        "lower_panel": {
+                                "functionality": "Ładowarka bezprzewodowa",
+                                "is_cup": "Nie",
+                                "color": "Niebieski"
+                        },
+                        "armrest": {
+                                "heating": "Nie",
+                                "material": "Eko skóra",
+                                "color": "Czerwony"
+                        },
+                        "cup_holder": {
+                                "usb_socket": "Tak",
+                                "color": "Czerwony"
+                        }
                 }
         }
-    },
-    {
-        "body": {
-                "framework": {
-                        "material": "Eko skóra",
-                        "color": "Niebieski"
-                },
-                "upper_panel": {
-                        "is_controllable": "Tak",
-                        "type": "2-strefowa"
-                },
-                "middle_panel": {
-                        "functionality": "Schowek"
-                },
-                "lower_panel": {
-                        "functionality": "Półka",
-                        "is_cup": "Nie",
-                        "color": "Niebieski"
-                },
-                "armrest": {
-                        "heating": "Tak",
-                        "material": "Eko skóra",
-                        "color": "Niebieski"
-                },
-                "cup_holder": {
-                        "usb_socket": "Nie",
-                        "color": "Niebieski"
-                }
-        }
-    },
-    {
-        "body": {
-                "framework": {
-                        "material": "Sztuczna skóra",
-                        "color": "Zielony"
-                },
-                "upper_panel": {
-                        "is_controllable": "Nie",
-                        "type": "2-strefowa"
-                },
-                "middle_panel": {
-                        "functionality": "Interfejs multimedialny"
-                },
-                "lower_panel": {
-                        "functionality": "Półka",
-                        "is_cup": "Tak",
-                        "color": "Zielony"
-                },
-                "armrest": {
-                        "heating": "Nie",
-                        "material": "Sztuczna skóra",
-                        "color": "Zielony"
-                },
-                "cup_holder": {
-                        "usb_socket": "Tak",
-                        "color": "Zielony"
-                }
-        }
-    }
 ]
