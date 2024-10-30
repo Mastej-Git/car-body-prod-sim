@@ -1,4 +1,5 @@
 import numpy as np
+import re
 
 from PyQt5.QtWidgets import (
     QWidget,
@@ -31,10 +32,12 @@ class PlotWidget(QWidget):
         self.tasks = []
         for place in self.petri_net.places.values():
             if "Maszyna M" in place.description:
-                self.list_of_machines_p.append(place)
+                match = re.search(r'M\d+', place.description)
+                task_name = match.group() + " - " + place.name
+                self.list_of_machines_p.append(task_name)
 
         for machine in self.list_of_machines_p:
-            self.tasks.append(machine.name)
+            self.tasks.append(machine)
         
         # self.start_times1 = [1, 4, 7, 10, 14, 15, 17, 21, 24, 27, 31, 34, 38, 41, 45, 49, 53, 57, 61]
         # self.durations1 = [3, 2, 5, 1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3]
@@ -75,7 +78,7 @@ class PlotWidget(QWidget):
         self.ax.set_xlim(left=0, right=90)
         self.ax.set_xlabel('Czas')
         self.ax.set_ylabel('Maszyny')
-        self.ax.set_title('Planowane dystrybucja zadań do maszyn')
+        self.ax.set_title('Planowana dystrybucja zadań do maszyn')
         
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
