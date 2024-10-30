@@ -52,10 +52,10 @@ class PetriNetThread(QThread):
         self.pn_ch_thread = PetriNetSubThread(float(self.body.body_id) + 0.5, "Uchwyt", self.available_body_parts_transitions["cup_holder"], self.info_terminal)
         self.pn_fw_thread = PetriNetSubThread(float(self.body.body_id) + 0.6, "Szkielet", self.available_body_parts_transitions["framework"], self.info_terminal)
 
-        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
-        self.pn_mp_thread.add_sub_thread_text_signal.connect(self.add_sub_thread_text_emit)
         self.pn_up_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_up_thread.add_sub_thread_text_signal.connect(self.add_sub_thread_text_emit)
+        self.pn_mp_thread.finished_signal.connect(self.on_thread_finished)
+        self.pn_mp_thread.add_sub_thread_text_signal.connect(self.add_sub_thread_text_emit)
         self.pn_lp_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_lp_thread.add_sub_thread_text_signal.connect(self.add_sub_thread_text_emit)
         self.pn_ar_thread.finished_signal.connect(self.on_thread_finished)
@@ -65,6 +65,7 @@ class PetriNetThread(QThread):
         self.pn_fw_thread.finished_signal.connect(self.on_thread_finished)
         self.pn_fw_thread.add_sub_thread_text_signal.connect(self.add_sub_thread_text_emit)
 
+        self.pn_up_thread.start()
         self.pn_mp_thread.start()
         self.pn_lp_thread.start()
         self.pn_ar_thread.start()

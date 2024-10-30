@@ -7,7 +7,7 @@ class InfoTerminal:
 
     def __init__(self, list_of_info_group_box) -> None:
 
-        self.buffor_size = 100
+        self.buffor_size = 200
         
         self.list_of_info_group_box = list_of_info_group_box
 
