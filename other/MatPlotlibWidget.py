@@ -1,11 +1,10 @@
-import numpy as np
 import re
+import numpy as np
 
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
 )
-from PyQt5.QtCore import QTimer
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
@@ -16,7 +15,7 @@ from Body import Body
 class PlotWidget(QWidget):
 
     def __init__(self, petri_net: PetriNet, parent=None):
-        super(PlotWidget, self).__init__(parent)
+        super().__init__()
 
         self.list_of_bars = []
 
@@ -183,7 +182,8 @@ class PlotWidget(QWidget):
             starting_time = 0
 
             for duration in self.list_of_durations[self.numb_of_plots][start:end]:
-                if i == j: break
+                if i == j:
+                    break
                 starting_time += duration
                 i += 1
                 if duration != 0: starting_time += 1
@@ -207,9 +207,9 @@ class PlotWidget(QWidget):
         return False
 
     def sum_durations(self, index):
-        sum = 0
+        sum_time = 0
 
         for j in range(self.numb_of_plots):
-            sum += self.list_of_durations[j][index]
+            sum_time += self.list_of_durations[j][index]
 
-        return sum
+        return sum_time

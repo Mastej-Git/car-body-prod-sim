@@ -116,12 +116,7 @@ class PetriNetThread(QThread):
         self.add_text_signal.emit(text)
 
     def check_sub_thread_finish(self):
-        if (self.pn_up_thread._running is False and 
-            self.pn_mp_thread._running is False and 
-            self.pn_lp_thread._running is False and 
-            self.pn_ar_thread._running is False and
-            self.pn_ch_thread._running is False and
-            self.pn_fw_thread._running is False):
+        if all(i is False for i  in [self.pn_up_thread, self.pn_mp_thread, self.pn_lp_thread, self.pn_ar_thread, self.pn_ch_thread, self.pn_fw_thread]):
             return True
         return False
         

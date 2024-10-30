@@ -675,7 +675,7 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_plan_clicked(self, body_id):
-        print(f"\nPlanowanie korpusu")
+        print("\nPlanowanie korpusu")
         
         self.mpl_widget.update_plot(self.list_of_bodys[body_id])
     
