@@ -37,26 +37,12 @@ class PlotWidget(QWidget):
                 self.list_of_machines_p.append(task_name)
 
         for machine in self.list_of_machines_p:
-            self.tasks.append(machine)
-        
-        # self.start_times1 = [1, 4, 7, 10, 14, 15, 17, 21, 24, 27, 31, 34, 38, 41, 45, 49, 53, 57, 61]
-        # self.durations1 = [3, 2, 5, 1, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3, 2, 3]
-        # self.durations1 = self.calculate_duration()
-        # self.start_times1 = self.calculate_starting_times()
-
-        # self.start_times2 = [self.start_times1[i] + self.durations1[i] + 0.5 for i in range(len(self.tasks))]
-        # self.durations2 = [2, 3, 4, 2, 1, 4, 2, 3, 2, 3, 4, 3, 2, 4, 3, 2, 4, 3, 2]     
+            self.tasks.append(machine)   
         
         self.y_pos = np.arange(len(self.tasks))  
         
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
-        
-        # self.bars1 = self.ax.barh(self.y_pos, self.durations1, left=self.start_times1, 
-        #                           color='skyblue', height=0.4, label='Dataset 1')
-        
-        # self.bars2 = self.ax.barh(self.y_pos, self.durations2, left=self.start_times2, 
-        #                           color='lightgreen', height=0.4, label='Dataset 2')
         
         self.fig.set_facecolor("#2e2e2e")
         self.ax.set_facecolor('#2e2e2e')
@@ -83,10 +69,6 @@ class PlotWidget(QWidget):
         layout = QVBoxLayout()
         layout.addWidget(self.canvas)
         self.setLayout(layout)
-        
-        # self.timer = QTimer()
-        # self.timer.timeout.connect(self.update_plot)
-        # self.timer.start(100)  
 
         self.i = 0
 
@@ -206,16 +188,10 @@ class PlotWidget(QWidget):
                 i += 1
                 if duration != 0: starting_time += 1
 
-            # print(starting_time, previous_starting_times[i])
-
             if starting_time <= previous_starting_times[i] and self.check_previous_times(i):
                 starting_time = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
                 if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
                     starting_time += 1
-            
-            # if j != start:
-            #     if starting_time >= starting_times[j - 1] and starting_time <= starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]:
-            #         starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots - 1][i]
 
             if len(starting_times) != 0 and start == 11:
                 if self.list_of_durations[self.numb_of_plots - 1][i] == 0:

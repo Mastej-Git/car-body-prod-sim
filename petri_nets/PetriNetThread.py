@@ -5,7 +5,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex
 from Body import Body
 from qt_classes.InfoTerminal import InfoTerminal
 
-from BodyPetriNet_v1 import body_main_petri_net
+from BodyPetriNet import body_main_petri_net
 
 mutex = QMutex()
 
@@ -38,11 +38,7 @@ class PetriNetThread(QThread):
         self.available_transitions.extend(["T002", "T003", "T004", "T901", "T902", "T903", "T904"])  
 
         self.petri_net.fire_transition("T001")
-        # self.petri_net.fire_transition("T002")
-        # self.petri_net.fire_transition("T003")
-        # self.petri_net.fire_transition("T004")
 
-        # print(self.available_transitions)
         self.info_terminal.add_text_info(str(self.available_transitions))
 
         self.pn_up_thread = PetriNetSubThread(float(self.body.body_id) + 0.1, "Górny panel", self.available_body_parts_transitions["upper_panel"], self.info_terminal)
@@ -76,15 +72,9 @@ class PetriNetThread(QThread):
         i = 0
 
         while self._running:
-            # print(self.available_transitions)
-            # if self.check_sub_thread_finish():
             mutex.lock()
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                    # print(
-                    #     f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}"
-                    # )
-                    # self.info_terminal.add_text_info(f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.add_text_signal.emit(f"\nThread thread_id: {self.body.body_id} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])
@@ -120,7 +110,6 @@ class PetriNetThread(QThread):
     def on_thread_finished(self, thread_id, thread_name):
         thread = self.thread_finder(thread_id)
         thread._running = False
-        # print(f"Sub-Thread {thread_id} - {thread_name} has finished.")
         self.info_terminal.add_text_info(f"Podwątek {thread_id} - {thread_name} został zakończony")
 
     def add_sub_thread_text_emit(self, text):
@@ -232,7 +221,6 @@ class PetriNetSubThread(QThread):
     def __init__(self, thread_id: float, name: str,available_transitions: list, info_terminal: InfoTerminal):
         super().__init__()
         self._running = True
-        # self.finished_signal.connect(self.stop)
         self.thread_id = thread_id
         self.name = name
         self.petri_net = body_main_petri_net
@@ -242,7 +230,6 @@ class PetriNetSubThread(QThread):
         self.info_terminal = info_terminal
 
         self.info_terminal.add_text_info(str(self.available_transitions))
-        # print(self.available_transitions)
 
     def run(self):
         i = 0
@@ -251,10 +238,6 @@ class PetriNetSubThread(QThread):
             mutex.lock()
             try:
                 if self.petri_net.transitions[self.available_transitions[i]].is_enabled():
-                    # print(
-                    #     f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}"
-                    # )
-                    # self.info_terminal.add_text_info(f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.add_sub_thread_text_signal.emit(f"\nSub-Thread thread_id: {self.thread_id}, part: {self.name} - Odpalam Tranzycje {self.available_transitions[i]}")
                     self.petri_net.fire_transition(self.available_transitions[i])
                     self.executed_transitions.append(self.available_transitions[i])

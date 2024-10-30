@@ -40,17 +40,7 @@ class ReadJSON():
                 gui.list_of_bodys.append(body_tmp)
                 gui.mpl_widget.update_plot(gui.list_of_bodys[gui.body_counter])
 
-                gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
-                gui.list_of_car_body_group_box[gui.body_counter].button_plan.clicked.connect(
-                    lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_plan_clicked(x))
-                gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
-                    lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_schedule_clicked(x))
-                gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
-                    lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_ready_clicked(x))
-                gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(
-                    lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_delete_clicked(x))
-                
-                gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
+                self.add_new_cb_group_box(gui, body_tmp)
 
                 gui.body_counter += 1
 
@@ -76,3 +66,18 @@ class ReadJSON():
         body_tmp.cup_holder.color = body_config['body']['cup_holder']['color']
 
         return body_tmp
+    
+    def add_new_cb_group_box(self, gui, body_tmp):
+        gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
+
+        gui.list_of_car_body_group_box[gui.body_counter].button_plan.clicked.connect(
+            lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_plan_clicked(x))
+        gui.list_of_car_body_group_box[gui.body_counter].button_schedule.clicked.connect(
+            lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_schedule_clicked(x))
+        gui.list_of_car_body_group_box[gui.body_counter].button_ready.clicked.connect(
+            lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_ready_clicked(x))
+        gui.list_of_car_body_group_box[gui.body_counter].button_remove.clicked.connect(
+            lambda _, x=gui.list_of_car_body_group_box[gui.body_counter].body.body_id: gui.pb_delete_clicked(x))
+        
+        gui.outer_layout.addWidget(gui.list_of_car_body_group_box[gui.body_counter].group_box)
+

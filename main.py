@@ -44,7 +44,7 @@ from other.StyleSheets import (
     style_sheet_tab,
 )
 
-from BodyPetriNet_v1 import body_main_petri_net
+from BodyPetriNet import body_main_petri_net
 
 class GUI(QMainWindow):
 
@@ -681,7 +681,6 @@ class GUI(QMainWindow):
     
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):
-        # print(f"\nID: {body_id} - Rozpoczęto produkcję korpusu.")
         self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
 
         new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
@@ -695,7 +694,6 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_ready_clicked(self, body_id):
-        # print(f"\nKorpus ID: {body_id} gotowy do produkcji")
         self.info_terminal.add_text_info(f"\nKorpus ID: {body_id} gotowy do produkcji")
         
         self.body_counter += 1
@@ -705,7 +703,6 @@ class GUI(QMainWindow):
 
     @pyqtSlot()
     def pb_delete_clicked(self, body_id):
-        # print(f"Korpus ID: {body_id} został usunięty")
         self.info_terminal.add_text_info(f"Korpus ID: {body_id} został usunięty")
 
         index_remove = -1
@@ -727,7 +724,6 @@ class GUI(QMainWindow):
 
     @pyqtSlot(int)
     def on_thread_finished(self, thread_id):
-        # print(f"Thread {thread_id} has finished.")
         self.info_terminal.add_text_info(f"Wątek: {thread_id} został zakończony")
 
     def reset_radio_buttons(self):

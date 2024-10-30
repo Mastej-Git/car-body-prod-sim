@@ -15,7 +15,6 @@ class CarBodyGroupBox():
     def __init__(self, body: Body) -> None:
         
         self.group_box = QGroupBox()
-        # self.group_box.setStyleSheet(style_sheet_QGroupBox)
         self.body = body
 
         label_text = self.body.__str__()

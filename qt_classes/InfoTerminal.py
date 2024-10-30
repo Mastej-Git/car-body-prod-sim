@@ -39,9 +39,6 @@ class InfoTerminal:
             self.outer_layout_info.removeWidget(self.outer_layout_info.itemAt(0).widget())
             label.deleteLater()
 
-        group_box1 = QGroupBox()
-        group_box1.setFixedHeight(300)
-
         label1 = QLabel(text)
         label1.setWordWrap(True)
         label1.setAlignment(Qt.AlignLeft | Qt.AlignTop)
@@ -49,9 +46,6 @@ class InfoTerminal:
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(label1)
-        # group_box1.setLayout(main_layout)
 
-        # self.list_of_info_group_box.append(group_box1)
-        # self.outer_layout_info.addWidget(group_box1, alignment=Qt.AlignTop)
         self.list_of_info_group_box.append(label1)
         self.outer_layout_info.addWidget(label1, alignment=Qt.AlignTop)
