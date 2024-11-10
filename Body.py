@@ -57,8 +57,6 @@ class Body():
 
         label = f"ID:{self.body_id}: Korpus zawiera następujące elementy:\n"
 
-        if self.framework.is_activated is True:
-            label += f"▸  Szkielet:\n\t ▪ Pokrycie (materiał): {self.framework.material}\n\t ▪ Kolor: {self.framework.color}\n"
         if self.upper_panel.is_activated is True:
             label += f"▸  Panel gorny:\n\t ▪ Sterowanie klimatyzacja: {self.upper_panel.is_controlable}\n\t ▪ Typ: {self.upper_panel.ac_type}\n"
         if self.middle_panel.is_activated is True:
@@ -73,5 +71,7 @@ class Body():
                       f" ▪ Kolor: {self.armrest.color}\n")
         if self.cup_holder.is_activated is True:
             label += f"▸  Miejsce na kubki:\n\t ▪ Wejście USB: {self.cup_holder.usb_socket}\n\t ▪ Kolor: {self.cup_holder.color}\n"
+        if self.framework.is_activated is True:
+            label += f"▸  Szkielet:\n\t ▪ Pokrycie (materiał): {self.framework.material}\n\t ▪ Kolor: {self.framework.color}\n"
 
         return label

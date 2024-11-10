@@ -11,12 +11,14 @@ mutex = QMutex()
 
 class PetriNetThread(QThread):
 
-    finished_signal = pyqtSignal(int)
+    finished_signal = pyqtSignal(int, float)
     add_text_signal = pyqtSignal(str)
 
     def __init__(self, body: Body, info_terminal: InfoTerminal):
         super().__init__()
         self._running = True
+
+        self.start_time = time.time()
         # self.finished_signal.connect(self.stop)
         self.petri_net = body_main_petri_net
         self.body = body
@@ -87,7 +89,9 @@ class PetriNetThread(QThread):
 
             time.sleep(0.3)
 
-        self.finished_signal.emit(self.body.body_id)
+        end_time = time.time()
+        duration = end_time - self.start_time
+        self.finished_signal.emit(self.body.body_id, duration)
 
     def stop(self):
         self._running = False
@@ -110,6 +114,7 @@ class PetriNetThread(QThread):
     def on_thread_finished(self, thread_id, thread_name):
         thread = self.thread_finder(thread_id)
         thread._running = False
+
         self.info_terminal.add_text_info(f"Podwątek {thread_id} - {thread_name} został zakończony")
 
     def add_sub_thread_text_emit(self, text):

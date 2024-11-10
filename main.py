@@ -70,9 +70,9 @@ class GUI(QMainWindow):
         self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
 
         self.petri_net = body_main_petri_net
-        self.json_file_name = [""]
+        self.json_file_name = ""
 
-        self.json_reader = ReadJSON(self.json_file_name)
+        self.json_reader = ReadJSON()
         self.file_dialog = None
 
         self.info_terminal = InfoTerminal(self.list_of_info_group_box)
@@ -97,7 +97,7 @@ class GUI(QMainWindow):
         self.tabs.addTab(self.tab1, "Panel kontrolny")
         self.tabs.addTab(self.tab2, "Stan korpusów")
         self.tabs.addTab(self.tab3, "Wykres Gantta")
-        self.tabs.addTab(self.tab4, "Dodaj korpus")
+        self.tabs.addTab(self.tab4, "Nowy korpus")
         self.tabs.addTab(self.tab5, "Info")
 
         self.create_tabs_content()
@@ -119,7 +119,7 @@ class GUI(QMainWindow):
         read_file_button = AnimatedButton("Wczytaj")
         read_file_button.clicked.connect(self.pb_read_json)
 
-        self.file_dialog = FileDialog(self.json_file_name, label)
+        self.file_dialog = FileDialog(label)
 
         chose_file_button = AnimatedButton("Wybierz plik")
         chose_file_button.clicked.connect(self.pb_chose_file)
@@ -291,7 +291,7 @@ class GUI(QMainWindow):
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
@@ -341,7 +341,7 @@ class GUI(QMainWindow):
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
@@ -401,7 +401,7 @@ class GUI(QMainWindow):
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_lower_panel_color)
@@ -460,7 +460,7 @@ class GUI(QMainWindow):
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
@@ -516,7 +516,7 @@ class GUI(QMainWindow):
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         vbox_main = QVBoxLayout()
@@ -662,22 +662,24 @@ class GUI(QMainWindow):
 
     def pb_add_to_body(self):
 
-        self.body_tmp.body_id = self.body_counter - 1
-        self.list_of_bodys[self.body_counter - 1] = self.body_tmp
-        self.list_of_car_body_group_box[self.body_counter - 1].recreate_label()
-        self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
-            
-        self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+        if self.body_counter != 0:
+            self.body_tmp.body_id = self.body_counter - 1
+            self.list_of_bodys[self.body_counter - 1] = self.body_tmp
 
-        if self.list_of_bodys[self.body_counter - 1].is_ready():
-            self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(True)
+            self.list_of_car_body_group_box[self.body_counter - 1].update_body(self.list_of_bodys[self.body_counter - 1])
 
-    def pb_read_json(self):
-        self.json_reader.parse_json(self)
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+                
+            self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
 
-    def pb_chose_file(self):
-        self.file_dialog.show_file_dialog()
+            if self.list_of_bodys[self.body_counter - 1].is_ready():
+                self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(True)
+            elif not self.list_of_bodys[self.body_counter - 1].is_ready():
+                self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(False)
+        else:
+            self.info_terminal.add_text_info("Brak korpusu do dodania specyfikacji")
 
+    
     def pb_add_body(self):
 
         if self.body_counter == 0:
@@ -695,6 +697,18 @@ class GUI(QMainWindow):
         self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
 
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+
+    def pb_read_json(self):
+        if self.json_file_name != "":
+            self.json_reader.parse_json(self)
+        else:
+            self.info_terminal.add_text_info("Żaden plik nie został wybrany lub format pliku jest zły")
+
+    def pb_chose_file(self):
+        self.json_file_name = self.file_dialog.show_file_dialog()
+
+    def update_body_tmp(self):
+        self.body_tmp = self.list_of_bodys[self.body_counter - 1]
 
     @pyqtSlot()
     def pb_plan_clicked(self, body_id):
@@ -745,9 +759,9 @@ class GUI(QMainWindow):
         self.body_tmp.remove_parameters()
         self.check_body_group_box_number()
 
-    @pyqtSlot(int)
-    def on_thread_finished(self, thread_id):
-        self.info_terminal.add_text_info(f"Wątek: {thread_id} został zakończony")
+    @pyqtSlot(int, float)
+    def on_thread_finished(self, thread_id, time):
+        self.info_terminal.add_text_info(f"Wątek ID: {thread_id} - został zakończony po czasie {time:.4f} sekund. Korpus ID: {thread_id} jest gotowy")
 
     def reset_radio_buttons(self):
         for radio in self.list_of_radio_buttons:

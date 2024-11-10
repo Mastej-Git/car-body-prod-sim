@@ -12,14 +12,13 @@ from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
 class ReadJSON():
 
-    def __init__(self, file_name: list):
-
-        self.file_name = file_name
+    def __init__(self):
+        pass
 
     def parse_json(self, gui):
 
-        if self.file_name[0] != "" and self.file_name[0].endswith(".json"):
-            with open(self.file_name[0], "r", encoding="UTF-8") as file:
+        if gui.json_file_name != "" and gui.json_file_name.endswith(".json"):
+            with open(gui.json_file_name, "r", encoding="UTF-8") as file:
                 body_configs = json.load(file)
 
             if gui.body_counter == 0:
@@ -43,6 +42,7 @@ class ReadJSON():
                 self.add_new_cb_group_box(gui, body_tmp)
 
                 gui.body_counter += 1
+                gui.update_body_tmp()
                 gui.update_label()
 
     def assign_body_parts(self, body_tmp: Body, body_config):

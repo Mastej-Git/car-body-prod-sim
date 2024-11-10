@@ -208,7 +208,7 @@ class CarBodyGroupBox {
     AnimatedButton button_delete
 
     + get_car_body_group_box(): CarBodyGroupBox
-    + recreate_label(): void
+    + update_body(): void
 }
 
 class InfoTerminal {

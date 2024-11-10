@@ -7,10 +7,9 @@ from PyQt5.QtWidgets import (
 )
 
 class FileDialog(QWidget):
-    def __init__(self, file_name: list, label: QLabel):
+    def __init__(self, label: QLabel):
         super().__init__()
 
-        self.file_name = file_name
         self.label = label
 
     def show_file_dialog(self):
@@ -21,7 +20,8 @@ class FileDialog(QWidget):
                                                    "All Files (*);;Text Files (*.txt)", 
                                                    options=options)
         if read_file_name.endswith(".json"):
-            self.file_name[0] = read_file_name
             self.label.setText(f'Wybrany plik: {read_file_name}')
-        else:
-            self.label.setText(f'ZŁY FORMAT PLIKU! Oczekiwany format: .json\n\nWybrany plik: {read_file_name}')
+            return read_file_name
+        
+        self.label.setText(f'ZŁY FORMAT PLIKU! Oczekiwany format: .json\n\nWybrany plik: {read_file_name}')
+        return ""
