@@ -67,6 +67,8 @@ class GUI(QMainWindow):
         self.list_of_info_group_box = []
         self.list_of_bodys = []
 
+        self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
+
         self.petri_net = body_main_petri_net
         self.json_file_name = [""]
 
@@ -92,10 +94,10 @@ class GUI(QMainWindow):
         self.tab3 = QWidget()
         self.tab4 = QWidget()
         self.tab5 = QWidget()
-        self.tabs.addTab(self.tab1, "Dodaj korpus")
+        self.tabs.addTab(self.tab1, "Panel kontrolny")
         self.tabs.addTab(self.tab2, "Stan korpusów")
         self.tabs.addTab(self.tab3, "Wykres Gantta")
-        self.tabs.addTab(self.tab4, "Dodaj korpusy z pliku")
+        self.tabs.addTab(self.tab4, "Dodaj korpus")
         self.tabs.addTab(self.tab5, "Info")
 
         self.create_tabs_content()
@@ -103,7 +105,69 @@ class GUI(QMainWindow):
         self.setCentralWidget(central_widget)
 
     def create_tabs_content(self):
+        
         layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Wczytaj konfigurację")
+        group_box1.setFixedHeight(200)
+
+        label = QLabel("Nie wybrano żadnego pliku")
+
+        hbox_layout = QHBoxLayout()
+        vbox_layout = QVBoxLayout()
+
+        read_file_button = AnimatedButton("Wczytaj")
+        read_file_button.clicked.connect(self.pb_read_json)
+
+        self.file_dialog = FileDialog(self.json_file_name, label)
+
+        chose_file_button = AnimatedButton("Wybierz plik")
+        chose_file_button.clicked.connect(self.pb_chose_file)
+
+        vbox_layout.addWidget(chose_file_button)
+        vbox_layout.addWidget(read_file_button)
+
+        hbox_layout.addWidget(label)
+        hbox_layout.addLayout(vbox_layout)
+
+        group_box2 = QGroupBox("Panel kontrolny")
+        group_box2.setFixedHeight(600)
+
+        hbox_layout1 = QHBoxLayout()
+        hbox_layout1.addWidget(self.body_counter_label)
+
+        group_box1.setLayout(hbox_layout)
+        group_box2.setLayout(hbox_layout1)
+
+        layout1.addWidget(group_box2)
+        layout1.addWidget(group_box1)
+        self.tab1.setLayout(layout1)
+
+        self.layout = QVBoxLayout()
+
+        self.starting_label = QLabel("Brak korpusów w produkcji")
+        self.starting_label.setStyleSheet(style_sheet_label)
+        self.starting_label.setAlignment(Qt.AlignCenter)
+
+        self.scroll_area = QScrollArea()
+        self.scroll_widget = QWidget()
+        self.outer_layout = QVBoxLayout(self.scroll_widget)
+
+        self.scroll_widget.setLayout(self.outer_layout)
+        self.scroll_area.setWidget(self.scroll_widget)
+        self.scroll_area.setWidgetResizable(True)
+
+        self.outer_layout.addWidget(self.starting_label)
+        self.layout.addWidget(self.scroll_area)
+        self.tab2.setLayout(self.layout)
+        
+        self.mpl_widget = PlotWidget(self.petri_net)
+
+        layout3 = QVBoxLayout()
+        layout3.addWidget(self.mpl_widget)
+        self.tab3.setLayout(layout3)
+
+        layout4 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
         sub_tab_widget.setTabPosition(QTabWidget.West)
         sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
@@ -132,61 +196,7 @@ class GUI(QMainWindow):
         button_layout = QHBoxLayout()
         overlay_layout.addLayout(button_layout)
 
-        layout1.addWidget(overlay_widget)
-        self.tab1.setLayout(layout1)
-
-        self.layout = QVBoxLayout()
-
-        self.starting_label = QLabel("Brak korpusów w produkcji")
-        self.starting_label.setStyleSheet(style_sheet_label)
-        self.starting_label.setAlignment(Qt.AlignCenter)
-
-        self.scroll_area = QScrollArea()
-        self.scroll_widget = QWidget()
-        self.outer_layout = QVBoxLayout(self.scroll_widget)
-
-        self.scroll_widget.setLayout(self.outer_layout)
-        self.scroll_area.setWidget(self.scroll_widget)
-        self.scroll_area.setWidgetResizable(True)
-
-        self.outer_layout.addWidget(self.starting_label)
-        self.layout.addWidget(self.scroll_area)
-        self.tab2.setLayout(self.layout)
-
-        # self.mpl_widget = MatplotlibWidget(self.petri_net, self)
-        self.mpl_widget = PlotWidget(self.petri_net)
-
-        layout3 = QVBoxLayout()
-        layout3.addWidget(self.mpl_widget)
-        self.tab3.setLayout(layout3)
-
-        layout4 = QVBoxLayout()
-
-        group_box = QGroupBox("Wczytaj konfigurację")
-        group_box.setFixedHeight(200)
-
-        label = QLabel("No file selected")
-
-        hbox_layout = QHBoxLayout()
-        vbox_layout = QVBoxLayout()
-
-        read_file_button = AnimatedButton("Wczytaj")
-        read_file_button.clicked.connect(self.pb_read_json)
-
-        self.file_dialog = FileDialog(self.json_file_name, label)
-
-        chose_file_button = AnimatedButton("Wybierz plik")
-        chose_file_button.clicked.connect(self.pb_chose_file)
-
-        vbox_layout.addWidget(chose_file_button)
-        vbox_layout.addWidget(read_file_button)
-
-        hbox_layout.addWidget(label)
-        hbox_layout.addLayout(vbox_layout)
-
-        group_box.setLayout(hbox_layout)
-
-        layout4.addWidget(group_box)
+        layout4.addWidget(overlay_widget)
         self.tab4.setLayout(layout4)
 
         self.tab5.setLayout(self.info_terminal.layout_info)
@@ -198,18 +208,20 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry szkieletu")
+        label_ghost = self.create_label("A")
         label_material = self.create_label("Materiał")
         label_color = self.create_label("Kolor")
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_clicked)
-        button_add_body = AnimatedButton("Dodaj korpus")
+        button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
         combo_box_material = self.create_combo_box(["Skóra", "Eko skóra", "Sztuczna skóra"], self.on_change_cbox_framework_material)
         combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_framework_color)
 
         vbox_main = QVBoxLayout()
+        vbox_sub_ghost = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
 
@@ -764,6 +776,9 @@ class GUI(QMainWindow):
     
     def emit_thread_add_text(self, text):
         self.info_terminal.add_text_info(text)
+
+    def update_label(self):
+        self.body_counter_label.setText(f"Wczytanych korpusów: {self.body_counter}")
 
 def main():
     app = QApplication([])

@@ -43,6 +43,7 @@ class ReadJSON():
                 self.add_new_cb_group_box(gui, body_tmp)
 
                 gui.body_counter += 1
+                gui.update_label()
 
     def assign_body_parts(self, body_tmp: Body, body_config):
 

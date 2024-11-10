@@ -3,8 +3,7 @@ name = "petri-net"
 version = "0.1.0"
 description = ""
 authors = [
-    "Michał Mastej <m.mastej1812@gmail.com>",
-    "Juliusz Tarnowski <juliusz.stanislaw.tarnowski@gmail.com>"
+    "Michał Mastej <m.mastej1812@gmail.com>"
 ]
 readme = "README.md"
 

@@ -1,0 +1,300 @@
+@startuml Name
+
+class Armrest {
+    bool is_activated
+    string heating
+    string material
+    string color
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class CupHolder {
+    bool is_activated
+    string usb_socket
+    string color
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class Framework {
+    bool is_activated
+    string material
+    string color
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class LowerPanel {
+    bool is_activated
+    string functionality
+    string is_cup
+    string color
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class MiddlePanel {
+    bool is_activated
+    string functionality
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class UpperPanel {
+    bool is_activated
+    string controlable
+    string ac_type
+
+    + check_activation(): void
+    + remove_parameters(): void
+}
+
+class Body {
+
+    int body_id
+    UpperPanel upper_panel
+    MiddlePanel middle_panel
+    LowerPanel lower_panel
+    Armrest Armrest
+    CupHolder cup_holder
+    Framework framework
+
+    + remove_parameters(): void
+    + check_parts_activation(): void
+    + __str__(): string
+}
+
+class FileDialog {
+    
+    list file_name
+    QLabel label
+
+    + show_file_dialog: void
+}
+
+class QLabel {
+
+}
+
+class QWidget {
+
+}
+
+class MatPlotlibWidget {
+    
+    list list_of_bars
+    list plot_colors
+    list list_of_machines_p
+    list list_of_durations
+    list list_of_starting_times
+    list tasks
+    int color_iter
+    int number_of_plots
+    PetriNet petri_net
+
+    + update_plot(): void
+    + calculate_durations(): void
+    + calculate_starting_times(): void
+    + calculate_prev_part_times(): void
+    + check_previous_times(): bool
+    + sum_durations(): int
+}
+
+class ReadJSON {
+
+    string file_name
+
+    + parse_json(): void
+    + add_new_cb_group_box(): void
+    + assign_body_parts(): Body
+}
+
+class Place {
+
+    string name
+    string description
+    int tokens
+    int ready_tokens
+    int cooldown_ms
+    int max_tokens
+    InfoTerminal info_terminal
+
+    + set_terminal(): void
+    + print_info(): void
+    + __str__(): string
+}
+
+class Transition {
+
+    string name
+    dict inputs
+    dict outputs
+
+    + is_enabled(): void
+    + can_fire(): bool 
+    + fire(): void
+    + __str__(): string
+}
+
+class PetriNet {
+
+    dict places
+    dict transitions
+
+    + add_place(): void
+    + add_transition(): void
+    + fire_transition(): void
+    + set_info_terminal(): void
+    + __str__(): string 
+}
+
+class QThread {
+
+}
+
+class PetriNetThread {
+
+    bool running
+    PetriNet petri_net
+    InfoTerminal info_terminal
+    list available_transitions
+    list executed_transitions
+    dict available_body_parts_transitions
+
+    + run(): void
+    + stop(): stop
+    + on_thread_finished(thread_id: int, thread_name: string): void
+    + add_sub_thread_text_emit(text: string): void
+    + check_sub_thread_finish(): bool
+    + define_available_tr(): void
+}
+
+class AnimatedButton {
+
+    + animate_click(): void
+    + animate_reverse(): void
+}
+
+class QPushButton {
+
+}
+
+class PetriNetSubThread {
+
+    string name
+    bool running
+    PetriNet petri_net
+    InfoTerminal info_terminal
+    list available_transitions
+    list executed_transitions
+    list petri_net_sub_thread
+
+    + run(): void
+}
+
+class CarBodyGroupBox {
+
+    QGroupBox group_box
+    Body body
+    string label_text
+    QLabel label
+    AnimatedButton button_schedule
+    AnimatedButton button_delete
+
+    + get_car_body_group_box(): CarBodyGroupBox
+    + recreate_label(): void
+}
+
+class InfoTerminal {
+
+    int buffor_size
+    list list_of_info_group_box
+
+    + add_text_info(): void
+}
+
+class GUI {
+
+    int body_counter
+    Body body_tmp
+    list list_of_threads
+    list list_of_readio_buttons
+    list list_of_car_body_group_box
+    list list_of_info_group_box
+    list list_of_bodys
+    PetriNet petri_net
+    InfoTerminal info_terminal
+
+    + create_tabs_content(): void
+    + create_sub_tab_framework_content(): QWidget
+    + create_sub_tab_upper_panel_content(): QWidget
+    + create_sub_tab_middle_panel_content(): QWidget
+    + create_sub_tab_lower_panel_content(): QWidget
+    + create_sub_tab_armrest_content(): QWidget
+    + create_sub_tab_cup_holder_content(): QWidget
+    + create_group_box_body(): void
+    + on_change_cbox_framework_material(index: int): void
+    + on_change_cbox_framework_color(index: int): void
+    + on_change_cbox_lower_panel_color(index: int): void
+    + on_change_cbox_armrest_material(index: int): void
+    + on_change_cbox_armrest_color(index: int): void
+    + on_change_cbox_cup_holder_color(index: int): void
+    + on_radio_button_upper_panel_clicked(): void
+    + on_radio_button_middle_panel_clicked(): void
+    + on_radio_button_lower_panel_clicked(): void
+    + on_radio_button_armrest_clicked(): void
+    + on_radio_button_cup_holder_clicked(): void
+    + pb_add_clicked(): void
+    + pb_read_json(): void
+    + pb_chose_file(): void
+    + pb_add_body(): void
+    + pb_schedule_clicked(body_id: int): void
+    + pb_delete_clicked(body_id: int): void
+    + on_thread_finished(thread_id: int) void
+    + check_body_group_box_number(): void
+    + create_label(label_str: str, maximuxm_height: int): QLabel
+    + create_radio_button(label_str: str, signal_function: void): QRadioButton
+    + create_combo_box(list_of_elements: list, signal_function: void): QComboBox
+    + emit_thread_add_text(text: string): void
+    + update_label(): void
+}
+
+Body o-- UpperPanel
+Body o-- MiddlePanel
+Body o-- LowerPanel
+Body o-- Armrest
+Body o-- CupHolder
+Body o-- Framework
+FileDialog o-- QLabel
+FileDialog <|-- QWidget
+MatPlotlibWidget <|-- QWidget
+PetriNet o-- Place
+PetriNet o-- Transition
+PetriNetThread o-- PetriNetSubThread
+PetriNetThread <|-- QThread
+PetriNetSubThread <|-- QThread
+AnimatedButton <|-- QPushButton
+CarBodyGroupBox o-- AnimatedButton
+CarBodyGroupBox o-- QLabel
+CarBodyGroupBox o-- QGroupBox
+GUI <|-- QMainWindow
+GUI o-- Body
+GUI o-- FileDialog
+GUI o-- MatPlotlibWidget
+GUI o-- InfoTerminal
+GUI o-- CarBodyGroupBox
+GUI o-- PetriNet
+GUI o-- PetriNetThread
+GUI o-- ReadJSON
+CarBodyGroupBox o-- Body
+MatPlotlibWidget o-- PetriNet
+PetriNetThread o-- PetriNet
+PetriNetSubThread o-- PetriNet
+
+@enduml

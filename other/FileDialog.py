@@ -22,6 +22,6 @@ class FileDialog(QWidget):
                                                    options=options)
         if read_file_name.endswith(".json"):
             self.file_name[0] = read_file_name
-            self.label.setText(f'Selected File: {read_file_name}')
+            self.label.setText(f'Wybrany plik: {read_file_name}')
         else:
-            self.label.setText(f'WRONG FILE TYPE: Should be .json file\n\nSelected File: {read_file_name}')
+            self.label.setText(f'ZŁY FORMAT PLIKU! Oczekiwany format: .json\n\nWybrany plik: {read_file_name}')
