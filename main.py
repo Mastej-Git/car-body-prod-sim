@@ -172,19 +172,19 @@ class GUI(QMainWindow):
         sub_tab_widget.setTabPosition(QTabWidget.West)
         sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
 
-        sub_tab0 = self.create_sub_tab_framework_content()
         sub_tab1 = self.create_sub_tab_upper_panel_content()
         sub_tab2 = self.create_sub_tab_middle_panel_content()
         sub_tab3 = self.create_sub_tab_lower_panel_content()
         sub_tab4 = self.create_sub_tab_armrest_content()
         sub_tab5 = self.create_sub_tab_cup_holder_content()
+        sub_tab6 = self.create_sub_tab_framework_content()
 
-        sub_tab_widget.addTab(sub_tab0, "Szkielet")
         sub_tab_widget.addTab(sub_tab1, "Panel górny")
         sub_tab_widget.addTab(sub_tab2, "Panel środkowy")
         sub_tab_widget.addTab(sub_tab3, "Panel dolny")
         sub_tab_widget.addTab(sub_tab4, "Podłokietnik")
         sub_tab_widget.addTab(sub_tab5, "Miejsce na kubki")
+        sub_tab_widget.addTab(sub_tab6, "Szkielet")
 
         stacked_widget = QStackedWidget()
         stacked_widget.addWidget(sub_tab_widget)
@@ -208,12 +208,11 @@ class GUI(QMainWindow):
         sub_layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Parametry szkieletu")
-        label_ghost = self.create_label("A")
         label_material = self.create_label("Materiał")
         label_color = self.create_label("Kolor")
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -221,20 +220,27 @@ class GUI(QMainWindow):
         combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_framework_color)
 
         vbox_main = QVBoxLayout()
-        vbox_sub_ghost = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
         vbox_sub2 = QVBoxLayout()
+        vbox_sub_ghost = QVBoxLayout()
 
         vbox_sub1.addWidget(label_material)
         vbox_sub1.addWidget(combo_box_material)
-        vbox_sub1.setSpacing(500)
+        vbox_sub1.setSpacing(15)
 
         vbox_sub2.addWidget(label_color)
         vbox_sub2.addWidget(combo_box_color)
-        vbox_sub2.setSpacing(5)
+        vbox_sub2.setSpacing(15)
+
+        label_ghost_1 = QLabel("")
+        label_ghost_2 = QLabel("")
+        vbox_sub_ghost.addWidget(label_ghost_1)
+        vbox_sub_ghost.addWidget(label_ghost_2)
+        vbox_sub_ghost.setSpacing(500)
 
         vbox_main.addLayout(vbox_sub1)
         vbox_main.addLayout(vbox_sub2)
+        vbox_main.addLayout(vbox_sub_ghost)
         vbox_main.addWidget(button_add_to_body)
         vbox_main.addWidget(button_add_body)
 
@@ -284,7 +290,7 @@ class GUI(QMainWindow):
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Dodaj korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -334,7 +340,7 @@ class GUI(QMainWindow):
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Dodaj korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -394,7 +400,7 @@ class GUI(QMainWindow):
         radio_groupbox2.setLayout(radio_vboxlayout2)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Dodaj korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -453,7 +459,7 @@ class GUI(QMainWindow):
         combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_armrest_color)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Dodaj korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -509,7 +515,7 @@ class GUI(QMainWindow):
         combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_cup_holder_color)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
-        button_add_to_body.clicked.connect(self.pb_add_clicked)
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
         button_add_body = AnimatedButton("Dodaj korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
@@ -543,6 +549,7 @@ class GUI(QMainWindow):
 
         self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.clicked.connect(
             lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_schedule_clicked(x))
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(False)
         
         self.list_of_car_body_group_box[self.body_counter - 1].button_ready.clicked.connect(
             lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_ready_clicked(x))
@@ -653,14 +660,17 @@ class GUI(QMainWindow):
             self.info_terminal.add_text_info(f'Wybrana opcja dla: Miejsce na kubki - Wejście USB: {sender.text()}')
 
 
-    def pb_add_clicked(self):
+    def pb_add_to_body(self):
 
-        self.body_tmp.id = self.body_counter - 1
+        self.body_tmp.body_id = self.body_counter - 1
         self.list_of_bodys[self.body_counter - 1] = self.body_tmp
         self.list_of_car_body_group_box[self.body_counter - 1].recreate_label()
         self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
             
         self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+
+        if self.list_of_bodys[self.body_counter - 1].is_ready():
+            self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(True)
 
     def pb_read_json(self):
         self.json_reader.parse_json(self)
@@ -669,12 +679,13 @@ class GUI(QMainWindow):
         self.file_dialog.show_file_dialog()
 
     def pb_add_body(self):
+
         if self.body_counter == 0:
             self.outer_layout.removeWidget(self.starting_label)
             self.starting_label.deleteLater()
 
         self.body_counter += 1
-        self.body_tmp.id = self.body_counter - 1
+        self.body_tmp.body_id = self.body_counter - 1
 
         self.body_tmp.remove_parameters()
         self.reset_radio_buttons()

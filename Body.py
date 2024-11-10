@@ -41,6 +41,17 @@ class Body():
         self.cup_holder.check_activation()
         self.framework.check_activation()
 
+    def is_ready(self):
+        if (
+        self.upper_panel.is_activated and
+        self.middle_panel.is_activated and
+        self.lower_panel.is_activated and
+        self.armrest.is_activated and
+        self.cup_holder.is_activated and
+        self.framework.is_activated):
+            return True
+        return False
+
     def __str__(self) -> str:
         self.check_parts_activation()
 
