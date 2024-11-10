@@ -8,17 +8,17 @@ from PyQt5.QtWidgets import (
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
 from petri_nets.PetriNet import PetriNet
 from Body import Body
 
-class PlotWidget(QWidget):
 
-    def __init__(self, petri_net: PetriNet, parent=None):
-        super().__init__()
+class PlotWidget(QWidget):
+    def __init__(self, petri_net, parent=None):
+        super().__init__(parent)
 
         self.list_of_bars = []
-
         self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "yellow", "brown", "purple", "white", "teal", "peru"]
         self.color_iter = 0
         self.numb_of_plots = 0
@@ -43,6 +43,8 @@ class PlotWidget(QWidget):
         self.fig, self.ax = plt.subplots()
         self.canvas = FigureCanvas(self.fig)
         
+        self.toolbar = NavigationToolbar(self.canvas, self)
+        
         self.fig.set_facecolor("#2e2e2e")
         self.ax.set_facecolor('#2e2e2e')
         self.ax.tick_params(axis='x', colors='#00ffff')
@@ -58,7 +60,6 @@ class PlotWidget(QWidget):
         
         self.ax.set_yticks(self.y_pos)
         self.ax.set_yticklabels(self.tasks)
-
         self.ax.invert_yaxis()
         self.ax.set_xlim(left=0, right=90)
         self.ax.set_xlabel('Czas')
@@ -66,6 +67,7 @@ class PlotWidget(QWidget):
         self.ax.set_title('Planowana dystrybucja zadań do maszyn')
         
         layout = QVBoxLayout()
+        layout.addWidget(self.toolbar)
         layout.addWidget(self.canvas)
         self.setLayout(layout)
 
