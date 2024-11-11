@@ -124,10 +124,12 @@ body_main_petri_net.add_place("P617", "Maszyna M18 - Obszycie", tokens=0, ready_
 body_main_petri_net.add_place("P618", "Maszyna M19 - Malowanie", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 body_main_petri_net.add_place("P699", "Gotowy szkielet", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 
-
-body_main_petri_net.add_place("P900", "Gotowy panel", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
-body_main_petri_net.add_place("P901", "Składanie korpusu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(1*time_unit))
-body_main_petri_net.add_place("P902", "Gotowy korpus", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.2*time_unit))
+body_main_petri_net.add_place("P900", "Składanie panelu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(2*time_unit))
+body_main_petri_net.add_place("P901", "Gotowy panel", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
+body_main_petri_net.add_place("P902", "Składanie korpusu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(2*time_unit))
+body_main_petri_net.add_place("P903", "Gotowy korpus", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.2*time_unit))
+body_main_petri_net.add_place("P904", "Maszyna M20 - składanie panelu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
+body_main_petri_net.add_place("P905", "Maszyna M21 - składanie korpusu", tokens=0, ready_tokens=1, max_tokens=1, cooldown_ms=int(0.1*time_unit))
 
 
 
@@ -246,7 +248,8 @@ body_main_petri_net.add_transition("T618", {"P613": 1}, {"P614": 1})
 body_main_petri_net.add_transition("T619", {"P614": 1}, {"P618": 1, "P699": 1})
 
 
-body_main_petri_net.add_transition("T901", {"P199": 1, "P299": 1, "P399": 1}, {"P900": 1})
-body_main_petri_net.add_transition("T902", {"P900": 1, "P499": 1, "P599": 1, "P699": 1}, {"P901": 1})
-body_main_petri_net.add_transition("T903", {"P901": 1}, {"P902": 1})
-body_main_petri_net.add_transition("T904", {"P902": 1}, {})
+body_main_petri_net.add_transition("T901", {"P199": 1, "P299": 1, "P399": 1, "P904": 1}, {"P900": 1})
+body_main_petri_net.add_transition("T902", {"P900": 1}, {"P901": 1})
+body_main_petri_net.add_transition("T903", {"P901": 1, "P499": 1, "P599": 1, "P699": 1, "P905": 1}, {"P902": 1, "P904": 1})
+body_main_petri_net.add_transition("T904", {"P902": 1}, {"P903": 1})
+body_main_petri_net.add_transition("T905", {"P903": 1}, {"P905": 1})

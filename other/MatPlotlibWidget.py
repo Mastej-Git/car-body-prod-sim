@@ -61,7 +61,7 @@ class PlotWidget(QWidget):
         self.ax.set_yticks(self.y_pos)
         self.ax.set_yticklabels(self.tasks)
         self.ax.invert_yaxis()
-        self.ax.set_xlim(left=0, right=90)
+        self.ax.set_xlim(left=0, right=100)
         self.ax.set_xlabel('Czas')
         self.ax.set_ylabel('Maszyny')
         self.ax.set_title('Planowana dystrybucja zadań do maszyn')
@@ -134,11 +134,9 @@ class PlotWidget(QWidget):
             duration.append(0)
         
         duration.append((self.petri_net.places["P407"].cooldown_ms + self.petri_net.places["P410"].cooldown_ms)/1000)
-
         duration.append((self.petri_net.places["P412"].cooldown_ms + self.petri_net.places["P415"].cooldown_ms)/1000)
 
         duration.append((self.petri_net.places["P502"].cooldown_ms + self.petri_net.places["P503"].cooldown_ms)/1000)
-
         duration.append((self.petri_net.places["P504"].cooldown_ms + self.petri_net.places["P505"].cooldown_ms)/1000)
 
         if body.cup_holder.usb_socket == "Tak":
@@ -147,14 +145,14 @@ class PlotWidget(QWidget):
             duration.append(0)
         
         duration.append((self.petri_net.places["P510"].cooldown_ms + self.petri_net.places["P513"].cooldown_ms)/1000)
-
+        
         duration.append((self.petri_net.places["P602"].cooldown_ms + self.petri_net.places["P603"].cooldown_ms)/1000)
-
         duration.append((self.petri_net.places["P604"].cooldown_ms + self.petri_net.places["P605"].cooldown_ms)/1000)
-
         duration.append((self.petri_net.places["P606"].cooldown_ms + self.petri_net.places["P609"].cooldown_ms)/1000)
-
         duration.append((self.petri_net.places["P611"].cooldown_ms + self.petri_net.places["P614"].cooldown_ms)/1000)
+
+        duration.append((self.petri_net.places["P900"].cooldown_ms + self.petri_net.places["P901"].cooldown_ms)/1000)
+        duration.append((self.petri_net.places["P902"].cooldown_ms + self.petri_net.places["P903"].cooldown_ms)/1000)
 
         self.list_of_durations.append(duration)
     
@@ -172,7 +170,10 @@ class PlotWidget(QWidget):
         self.calculate_prev_part_times(4, 8, previous_starting_times, starting_times)
         self.calculate_prev_part_times(8, 11, previous_starting_times, starting_times)
         self.calculate_prev_part_times(11, 15, previous_starting_times, starting_times)
-        self.calculate_prev_part_times(15, 19, previous_starting_times, starting_times)
+        self.calculate_prev_part_times(15, 21, previous_starting_times, starting_times)
+
+
+        # self.calculate_prev_part_times(19, 21, previous_starting_times, starting_times)
 
         self.list_of_starting_times.append(starting_times)
     
@@ -198,6 +199,16 @@ class PlotWidget(QWidget):
             if len(starting_times) != 0 and start == 11:
                 if self.list_of_durations[self.numb_of_plots - 1][i] == 0:
                     starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots][i] + 1
+
+            if j == 19:
+                starting_time_tmp = 0
+                if starting_times[14] > starting_times[18]:
+                    starting_time = starting_times[14] + self.list_of_durations[self.numb_of_plots][14] + 1
+                else:
+                    starting_time = starting_times[18] + self.list_of_durations[self.numb_of_plots][18] + 1
+
+            if j == 20:
+                starting_time = starting_times[19] + self.list_of_durations[self.numb_of_plots][19] + 1
 
             starting_times.append(starting_time)
             j += 1
