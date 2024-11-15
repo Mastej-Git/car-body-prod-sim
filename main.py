@@ -49,26 +49,45 @@ from BodyPetriNet import body_main_petri_net
 from PyQt5.QtCore import QThread
 from queue import Queue
 from petri_nets.Worker import Worker
+from petri_nets.Listener import Listener
 
 class GUI(QMainWindow):
 
     def __init__(self):
         super().__init__()
 
-        self.task_queue = Queue()
+        available_tr = []
+
         self.worker_thread = QThread()
-        self.worker = Worker(self.task_queue)
+        self.worker = Worker(available_tr)
 
         # Move the worker to the thread
         self.worker.moveToThread(self.worker_thread)
 
         # Connect signals
-        self.worker.finished_signal.connect(self.on_thread_finished)
-        self.worker.add_text_signal.connect(self.emit_thread_add_text)
+        # self.worker.finished_signal.connect(self.on_thread_finished)
+        # self.worker.add_text_signal.connect(self.emit_thread_add_text)
 
         # Start the thread
         self.worker_thread.started.connect(self.worker.run)
         self.worker_thread.start()
+
+
+
+        self.task_queue = Queue()
+        self.listener_thread = QThread()
+        self.listener = Listener(self.task_queue, available_tr)
+
+        # Move the listener to the thread
+        self.listener.moveToThread(self.listener_thread)
+
+        # Connect signals
+        # self.listener.finished_signal.connect(self.on_thread_finished)
+        # self.listener.add_text_signal.connect(self.emit_thread_add_text)
+
+        # Start the thread
+        self.listener_thread.started.connect(self.listener.run)
+        self.listener_thread.start()
 
         self.body_counter = 0
         self.production_counter = 0

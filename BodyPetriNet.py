@@ -5,7 +5,7 @@ body_main_petri_net = PetriNet()
 time_unit = 1000
 
 body_main_petri_net.add_place("P000", "Zlecenie korpusu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
-body_main_petri_net.add_place("P001", "Zebranie materiałów i narzędzi", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(1*time_unit))
+body_main_petri_net.add_place("P001", "Zebranie materiałów i narzędzi", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P002", "Zlecenie panelu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P099", "Pracownicy", tokens=0, ready_tokens=50, max_tokens=50, cooldown_ms=int(0.5*time_unit))
 
@@ -82,7 +82,7 @@ body_main_petri_net.add_place("P418", "Maszyna M11 - Malowanie", tokens=0, ready
 body_main_petri_net.add_place("P499", "Gotowy podłokietnik", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 
 
-body_main_petri_net.add_place("P500", "Zlecenie uchwytu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
+body_main_petri_net.add_place("P500", "Zlecenie uchwytu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P501", "Przygotowanie materiałów i zlecenie instalacji uchwytów", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(1*time_unit))
 body_main_petri_net.add_place("P502", "Instalacja uchwytów", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(3*time_unit))
 body_main_petri_net.add_place("P503", "Gotowe uchwyty i zlecenie instalacji ładowarki bezprzewodowej", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
@@ -103,7 +103,7 @@ body_main_petri_net.add_place("P517", "Maszyna M15 - Malowanie", tokens=0, ready
 body_main_petri_net.add_place("P599", "Gotowy uchwyt", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 
 
-body_main_petri_net.add_place("P600", "Zlecenie szkieletu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
+body_main_petri_net.add_place("P600", "Zlecenie szkieletu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
 body_main_petri_net.add_place("P601", "Przygotowanie materiałów oraz zlecenie instalacji", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(1*time_unit))
 body_main_petri_net.add_place("P602", "Instalacja szkieletu", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(3*time_unit))
 body_main_petri_net.add_place("P603", "Gotowa instalacja i zlecenie instalacji kanałów powietrznych", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
