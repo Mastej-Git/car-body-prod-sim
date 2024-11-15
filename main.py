@@ -52,6 +52,8 @@ class GUI(QMainWindow):
         super().__init__()
 
         self.body_counter = 0
+        self.production_counter = 0
+
         self.body_tmp = Body(self.body_counter,
                              framework=Framework("", ""),
                              upper_panel=UpperPanel("", ""),
@@ -68,6 +70,7 @@ class GUI(QMainWindow):
         self.list_of_bodys = []
 
         self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
+        self.production_counter_label = self.create_label(f"Korpusów w produkcji: {self.production_counter}")
 
         self.petri_net = body_main_petri_net
         self.json_file_name = ""
@@ -133,8 +136,9 @@ class GUI(QMainWindow):
         group_box2 = QGroupBox("Panel kontrolny")
         group_box2.setFixedHeight(600)
 
-        hbox_layout1 = QHBoxLayout()
+        hbox_layout1 = QVBoxLayout()
         hbox_layout1.addWidget(self.body_counter_label)
+        hbox_layout1.addWidget(self.production_counter_label)
 
         group_box1.setLayout(hbox_layout)
         group_box2.setLayout(hbox_layout1)
@@ -718,6 +722,8 @@ class GUI(QMainWindow):
     
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):
+        self.update_production_counter(1)
+
         self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
 
         new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
@@ -761,6 +767,7 @@ class GUI(QMainWindow):
 
     @pyqtSlot(int, float)
     def on_thread_finished(self, thread_id, time):
+        self.update_production_counter(-1)
         self.info_terminal.add_text_info(f"Wątek ID: {thread_id} - został zakończony po czasie {time:.4f} sekund. Korpus ID: {thread_id} jest gotowy")
 
     def reset_radio_buttons(self):
@@ -804,6 +811,10 @@ class GUI(QMainWindow):
 
     def update_label(self):
         self.body_counter_label.setText(f"Wczytanych korpusów: {self.body_counter}")
+
+    def update_production_counter(self, value):
+        self.production_counter += value
+        self.production_counter_label.setText(f"Korpusów w produkcji: {self.production_counter}")
 
 def main():
     app = QApplication([])

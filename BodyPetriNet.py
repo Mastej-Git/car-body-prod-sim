@@ -170,7 +170,7 @@ body_main_petri_net.add_transition("T304", {"P302": 1, "P317": 1, "P099": 1}, {"
 body_main_petri_net.add_transition("T305", {"P303": 1}, {"P305": 1})
 body_main_petri_net.add_transition("T306", {"P304": 1}, {"P306": 1})
 body_main_petri_net.add_transition("T307", {"P305": 1}, {"P307": 1, "P316": 1, "P099": 1})
-body_main_petri_net.add_transition("T308", {"P306": 1}, {"P307": 1, "P316": 1, "P099": 1})
+body_main_petri_net.add_transition("T308", {"P306": 1}, {"P307": 1, "P317": 1, "P099": 1})
 body_main_petri_net.add_transition("T309", {"P307": 1, "P318": 1, "P099": 1}, {"P308": 1})
 body_main_petri_net.add_transition("T310", {"P307": 1}, {"P310": 1})
 body_main_petri_net.add_transition("T311", {"P308": 1}, {"P309": 1})
