@@ -46,10 +46,29 @@ from other.StyleSheets import (
 
 from BodyPetriNet import body_main_petri_net
 
+from PyQt5.QtCore import QThread
+from queue import Queue
+from petri_nets.Worker import Worker
+
 class GUI(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        self.task_queue = Queue()
+        self.worker_thread = QThread()
+        self.worker = Worker(self.task_queue)
+
+        # Move the worker to the thread
+        self.worker.moveToThread(self.worker_thread)
+
+        # Connect signals
+        self.worker.finished_signal.connect(self.on_thread_finished)
+        self.worker.add_text_signal.connect(self.emit_thread_add_text)
+
+        # Start the thread
+        self.worker_thread.started.connect(self.worker.run)
+        self.worker_thread.start()
 
         self.body_counter = 0
         self.production_counter = 0
@@ -723,14 +742,16 @@ class GUI(QMainWindow):
     @pyqtSlot()
     def pb_schedule_clicked(self, body_id):
         self.update_production_counter(1)
-
         self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
 
-        new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
-        new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
-        new_petri_net_thread.add_text_signal.connect(self.emit_thread_add_text)
-        self.list_of_threads.append(new_petri_net_thread)
-        self.list_of_threads[len(self.list_of_threads) - 1].start()
+        # new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
+        # new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
+        # new_petri_net_thread.add_text_signal.connect(self.emit_thread_add_text)
+        # self.list_of_threads.append(new_petri_net_thread)
+        # self.list_of_threads[len(self.list_of_threads) - 1].start()
+
+        body = self.list_of_bodys[body_id]
+        self.task_queue.put(body)
 
         self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)
 

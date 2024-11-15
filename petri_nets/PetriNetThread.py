@@ -36,7 +36,7 @@ class PetriNetThread(QThread):
 
         self.executed_transitions = []
 
-        self.available_transitions.extend(["T002", "T003", "T004"])  
+        self.available_transitions.extend(["T002", "T003", "T004"])
 
         self.define_available_tr()
 
