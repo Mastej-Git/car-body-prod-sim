@@ -730,7 +730,6 @@ class GUI(QMainWindow):
         new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
         new_petri_net_thread.add_text_signal.connect(self.emit_thread_add_text)
         self.list_of_threads.append(new_petri_net_thread)
-        # self.petri_net_thread.start()
         self.list_of_threads[len(self.list_of_threads) - 1].start()
 
         self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)

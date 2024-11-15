@@ -13,7 +13,7 @@ body_main_petri_net.add_place("P100", "Zlecenie panelu górnego", tokens=0, read
 body_main_petri_net.add_place("P101", "Przygotowanie materiałów", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=2*time_unit)
 body_main_petri_net.add_place("P102", "Zlecenie instalacji szybów klimatyzacji", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=1*time_unit)
 body_main_petri_net.add_place("P103", "Instalacja szybów klimatyzacji 2-strefowej", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
-body_main_petri_net.add_place("P104", "Instalacja szybów klimatyzacji 4-strefowej", tokens=0, ready_tokens=1, max_tokens=5, cooldown_ms=3*time_unit)
+body_main_petri_net.add_place("P104", "Instalacja szybów klimatyzacji 4-strefowej", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=3*time_unit)
 body_main_petri_net.add_place("P105", "Gotowy szkielet z szybami (2-strefowymi)", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P106", "Gotowy szkielet z szybami (4-strefowymi)", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.5*time_unit))
 body_main_petri_net.add_place("P107", "Zlecenie instalacji sterowania klimatyzacją", tokens=0, ready_tokens=0, max_tokens=5, cooldown_ms=int(0.3*time_unit))
