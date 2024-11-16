@@ -33,9 +33,12 @@ from qt_classes.InfoTerminal import InfoTerminal
 from other.MatPlotlibWidget import PlotWidget
 from other.ReadJSON import ReadJSON
 from other.FileDialog import FileDialog
+
 from other.Worker import Worker
 from other.Listener import Listener
-from other.StyleSheet import StyleSheet
+
+from enums.StyleSheet import StyleSheet
+from enums.BodyMaterials import BodyMaterials
 
 from BodyPetriNet import body_main_petri_net
 
@@ -239,8 +242,8 @@ class GUI(QMainWindow):
         button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
-        combo_box_material = self.create_combo_box(["Skóra", "Eko skóra", "Sztuczna skóra"], self.on_change_cbox_framework_material)
-        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_framework_color)
+        combo_box_material = self.create_combo_box([BodyMaterials.Leather.value, BodyMaterials.EcoLeather.value, BodyMaterials.ArtificialLeather.value], self.on_change_cbox_framework_material)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_framework_color)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -423,7 +426,7 @@ class GUI(QMainWindow):
         button_add_body = AnimatedButton("Nowy korpus")
         button_add_body.clicked.connect(self.pb_add_body)
 
-        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_lower_panel_color)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_lower_panel_color)
 
         vbox_main = QVBoxLayout()
         vbox_sub1 = QVBoxLayout()
@@ -474,8 +477,8 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        combo_box_material = self.create_combo_box(["Skóra", "Eko skóra", "Sztuczna skóra"], self.on_change_cbox_armrest_material)
-        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_armrest_color)
+        combo_box_material = self.create_combo_box([BodyMaterials.Leather.value, BodyMaterials.EcoLeather.value, BodyMaterials.ArtificialLeather.value], self.on_change_cbox_armrest_material)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_armrest_color)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
@@ -531,7 +534,7 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        combo_box_color = self.create_combo_box(["Czerwony", "Zielony", "Niebieski"], self.on_change_cbox_cup_holder_color)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_cup_holder_color)
 
         button_add_to_body = AnimatedButton("Dodaj do korpusu")
         button_add_to_body.clicked.connect(self.pb_add_to_body)
@@ -578,56 +581,56 @@ class GUI(QMainWindow):
         
     def on_change_cbox_framework_material(self, index):
         if index == 0:
-            self.body_tmp.framework.material = "Skóra"
+            self.body_tmp.framework.material = BodyMaterials.Leather.value
         elif index == 1:
-            self.body_tmp.framework.material = "Eko skóra"
+            self.body_tmp.framework.material = BodyMaterials.EcoLeather.value
         elif index == 2:
-            self.body_tmp.framework.material = "Sztuczna skóra"
+            self.body_tmp.framework.material = BodyMaterials.ArtificialLeather.value
 
     def on_change_cbox_framework_color(self, index):
 
         if index == 0:
-            self.body_tmp.framework.color = "Czerwony"
+            self.body_tmp.framework.color = BodyMaterials.Red.value
         elif index == 1:
-            self.body_tmp.framework.color = "Zielony"
+            self.body_tmp.framework.color = BodyMaterials.Green.value
         elif index == 2:
-            self.body_tmp.framework.color = "Niebieski"
+            self.body_tmp.framework.color = BodyMaterials.Blue.value
 
     def on_change_cbox_lower_panel_color(self, index):
 
         if index == 0:
-            self.body_tmp.lower_panel.color = "Czerwony"
+            self.body_tmp.lower_panel.color = BodyMaterials.Red.value
         elif index == 1:
-            self.body_tmp.lower_panel.color = "Zielony"
+            self.body_tmp.lower_panel.color = BodyMaterials.Green.value
         elif index == 2:
-            self.body_tmp.lower_panel.color = "Niebieski"
+            self.body_tmp.lower_panel.color = BodyMaterials.Blue.value
     
     def on_change_cbox_armrest_material(self, index):
 
         if index == 0:
-            self.body_tmp.armrest.material = "Skóra"
+            self.body_tmp.armrest.material = BodyMaterials.Leather.value
         elif index == 1:
-            self.body_tmp.armrest.material = "Eko skóra"
+            self.body_tmp.armrest.material = BodyMaterials.EcoLeather.value
         elif index == 2:
-            self.body_tmp.armrest.material = "Sztuczna skóra"
+            self.body_tmp.armrest.material = BodyMaterials.ArtificialLeather.value
 
     def on_change_cbox_armrest_color(self, index):
 
         if index == 0:
-            self.body_tmp.armrest.color = "Czerwony"
+            self.body_tmp.armrest.color = BodyMaterials.Red.value
         elif index == 1:
-            self.body_tmp.armrest.color = "Zielony"
+            self.body_tmp.armrest.color = BodyMaterials.Green.value
         elif index == 2:
-            self.body_tmp.armrest.color = "Niebieski"
+            self.body_tmp.armrest.color = BodyMaterials.Blue.value
 
     def on_change_cbox_cup_holder_color(self, index):
 
         if index == 0:
-            self.body_tmp.cup_holder.color = "Czerwony"
+            self.body_tmp.cup_holder.color = BodyMaterials.Red.value
         elif index == 1:
-            self.body_tmp.cup_holder.color = "Zielony"
+            self.body_tmp.cup_holder.color = BodyMaterials.Green.value
         elif index == 2:
-            self.body_tmp.cup_holder.color = "Niebieski"
+            self.body_tmp.cup_holder.color = BodyMaterials.Blue.value
 
     def on_radio_button_upper_panel_clicked(self):
 

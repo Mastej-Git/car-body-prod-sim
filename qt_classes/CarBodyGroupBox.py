@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QLabel,
 from Body import Body
 from qt_classes.AnimatedButton import AnimatedButton
 
-from other.StyleSheets import style_sheet_label, style_sheet_QGroupBox
+from enums.StyleSheet import StyleSheet
 
 
 class CarBodyGroupBox():
@@ -22,7 +22,7 @@ class CarBodyGroupBox():
         self.label = QLabel(label_text)
         self.label.setWordWrap(True)
         self.label.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        self.label.setStyleSheet(style_sheet_label)
+        self.label.setStyleSheet(StyleSheet.QLabel.value)
 
         self.button_plan = AnimatedButton("Planuj", 200, 40)
         self.button_schedule = AnimatedButton("Produkuj", 200, 40)

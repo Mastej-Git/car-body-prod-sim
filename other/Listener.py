@@ -1,6 +1,8 @@
 from PyQt5.QtCore import QObject, pyqtSignal
 from Body import Body
 
+from enums.BodyMaterials import BodyMaterials
+
 class Listener(QObject):
     finished_signal = pyqtSignal(int, float)
     add_text_signal = pyqtSignal(str)
@@ -78,11 +80,11 @@ class Listener(QObject):
             available_body_parts_transitions["lower_panel"].extend(["T309", "T311", "T312"])
         elif body.lower_panel.is_cup == "Nie":
             available_body_parts_transitions["lower_panel"].extend(["T310", "T313"])
-        if body.lower_panel.color == "Czerwony":
+        if body.lower_panel.color == BodyMaterials.Red.value:
             available_body_parts_transitions["lower_panel"].extend(["T314", "T317"])
-        elif body.lower_panel.color == "Zielony":
+        elif body.lower_panel.color == BodyMaterials.Green.value:
             available_body_parts_transitions["lower_panel"].extend(["T315", "T318"])
-        elif body.lower_panel.color == "Niebieski":
+        elif body.lower_panel.color == BodyMaterials.Blue.value:
             available_body_parts_transitions["lower_panel"].extend(["T316", "T319"])
         available_body_parts_transitions["lower_panel"].extend(["T320"])
 
@@ -92,18 +94,18 @@ class Listener(QObject):
             available_body_parts_transitions["armrest"].extend(["T403", "T405", "T406"])
         elif body.armrest.heating == "Nie":
             available_body_parts_transitions["armrest"].extend(["T404", "T407"])
-        if body.armrest.material == "Skóra":
+        if body.armrest.material == BodyMaterials.Leather.value:
             available_body_parts_transitions["armrest"].extend(["T408", "T411"])
-        elif body.armrest.material == "Eko skóra":
+        elif body.armrest.material == BodyMaterials.EcoLeather.value:
             available_body_parts_transitions["armrest"].extend(["T409", "T412"])
-        elif body.armrest.material == "Sztuczna skóra":
+        elif body.armrest.material == BodyMaterials.ArtificialLeather.value:
             available_body_parts_transitions["armrest"].extend(["T410", "T413"])
         available_body_parts_transitions["armrest"].extend(["T414"])
-        if body.armrest.color == "Czerwony":
+        if body.armrest.color == BodyMaterials.Red.value:
             available_body_parts_transitions["armrest"].extend(["T415", "T418"])
-        elif body.armrest.color == "Zielony":
+        elif body.armrest.color == BodyMaterials.Green.value:
             available_body_parts_transitions["armrest"].extend(["T416", "T419"])
-        elif body.armrest.color == "Niebieski":
+        elif body.armrest.color == BodyMaterials.Blue.value:
             available_body_parts_transitions["armrest"].extend(["T417", "T420"])
         available_body_parts_transitions["armrest"].extend(["T421"])
 
@@ -113,27 +115,27 @@ class Listener(QObject):
             available_body_parts_transitions["cup_holder"].extend(["T506", "T508", "T509"])
         elif body.cup_holder.usb_socket == "Nie":
             available_body_parts_transitions["cup_holder"].extend(["T507", "T510"])
-        if body.cup_holder.color == "Czerwony":
+        if body.cup_holder.color == BodyMaterials.Red.value:
             available_body_parts_transitions["cup_holder"].extend(["T511", "T514"])
-        elif body.cup_holder.color == "Zielony":
+        elif body.cup_holder.color == BodyMaterials.Green.value:
             available_body_parts_transitions["cup_holder"].extend(["T512", "T515"])
-        elif body.cup_holder.color == "Niebieski":
+        elif body.cup_holder.color == BodyMaterials.Blue.value:
             available_body_parts_transitions["cup_holder"].extend(["T513", "T516"])
         available_body_parts_transitions["cup_holder"].extend(["T517"])
 
     
         available_body_parts_transitions["framework"].extend(["T601", "T602", "T603", "T604", "T605"])
-        if body.framework.material == "Skóra":
+        if body.framework.material == BodyMaterials.Leather.value:
             available_body_parts_transitions["framework"].extend(["T606", "T609"])
-        elif body.framework.material == "Eko skóra":
+        elif body.framework.material == BodyMaterials.EcoLeather.value:
             available_body_parts_transitions["framework"].extend(["T607", "T610"])
-        elif body.framework.material == "Sztuczna skóra":
+        elif body.framework.material == BodyMaterials.ArtificialLeather.value:
             available_body_parts_transitions["framework"].extend(["T608", "T611"])
         available_body_parts_transitions["framework"].extend(["T612"])
-        if body.framework.color == "Czerwony":
+        if body.framework.color == BodyMaterials.Red.value:
             available_body_parts_transitions["framework"].extend(["T613", "T616"])
-        elif body.framework.color == "Zielony":
+        elif body.framework.color == BodyMaterials.Green.value:
             available_body_parts_transitions["framework"].extend(["T614", "T617"])
-        elif body.framework.color == "Niebieski":
+        elif body.framework.color == BodyMaterials.Blue.value:
             available_body_parts_transitions["framework"].extend(["T615", "T618"])
         available_body_parts_transitions["framework"].extend(["T619"])

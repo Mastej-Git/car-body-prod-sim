@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QLabel, QScrollArea, QWidget, QGroupBox
 from PyQt5.QtCore import Qt
 
-from other.StyleSheets import style_sheet_info_label
+from enums.StyleSheet import StyleSheet
 
 class InfoTerminal:
 
@@ -14,7 +14,7 @@ class InfoTerminal:
         self.layout_info = QVBoxLayout()
 
         self.starting_label_info = QLabel("Brak informacji")
-        self.starting_label_info.setStyleSheet(style_sheet_info_label)
+        self.starting_label_info.setStyleSheet(StyleSheet.InfoLabel.value)
         self.starting_label_info.setAlignment(Qt.AlignCenter)
 
         self.scroll_area1 = QScrollArea()
@@ -42,7 +42,7 @@ class InfoTerminal:
         label1 = QLabel(text)
         label1.setWordWrap(True)
         label1.setAlignment(Qt.AlignLeft | Qt.AlignTop)
-        label1.setStyleSheet(style_sheet_info_label)
+        label1.setStyleSheet(StyleSheet.InfoLabel.value)
 
         main_layout = QVBoxLayout()
         main_layout.addWidget(label1)
