@@ -1,3 +1,5 @@
+from queue import Queue
+
 from PyQt5.QtWidgets import (
     QApplication,
     QMainWindow,
@@ -14,8 +16,7 @@ from PyQt5.QtWidgets import (
     QRadioButton,
 )
 
-from PyQt5.QtCore import (Qt,
-                          pyqtSlot,)
+from PyQt5.QtCore import (Qt, pyqtSlot, QThread)
 
 from body_parts.Framework import Framework
 from body_parts.UpperPanel import UpperPanel
@@ -25,8 +26,6 @@ from body_parts.Armrest import Armrest
 from body_parts.CupHolder import CupHolder
 from Body import Body
 
-from petri_nets.PetriNetThread import PetriNetThread
-
 from qt_classes.AnimatedButton import AnimatedButton
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 from qt_classes.InfoTerminal import InfoTerminal
@@ -34,22 +33,13 @@ from qt_classes.InfoTerminal import InfoTerminal
 from other.MatPlotlibWidget import PlotWidget
 from other.ReadJSON import ReadJSON
 from other.FileDialog import FileDialog
-from other.StyleSheets import (
-    style_sheet_app,
-    style_sheet_central_widget,
-    style_sheet_label,
-    style_sheet_QComboBox,
-    style_sheet_QRadioButton,
-    style_sheet_sub_tab,
-    style_sheet_tab,
-)
+from other.Worker import Worker
+from other.Listener import Listener
+from other.StyleSheet import StyleSheet
 
 from BodyPetriNet import body_main_petri_net
 
-from PyQt5.QtCore import QThread
-from queue import Queue
-from petri_nets.Worker import Worker
-from petri_nets.Listener import Listener
+
 
 class GUI(QMainWindow):
 
@@ -60,32 +50,14 @@ class GUI(QMainWindow):
 
         self.worker_thread = QThread()
         self.worker = Worker(available_tr)
-
-        # Move the worker to the thread
         self.worker.moveToThread(self.worker_thread)
-
-        # Connect signals
-        # self.worker.finished_signal.connect(self.on_thread_finished)
-        # self.worker.add_text_signal.connect(self.emit_thread_add_text)
-
-        # Start the thread
         self.worker_thread.started.connect(self.worker.run)
         self.worker_thread.start()
-
-
 
         self.task_queue = Queue()
         self.listener_thread = QThread()
         self.listener = Listener(self.task_queue, available_tr)
-
-        # Move the listener to the thread
         self.listener.moveToThread(self.listener_thread)
-
-        # Connect signals
-        # self.listener.finished_signal.connect(self.on_thread_finished)
-        # self.listener.add_text_signal.connect(self.emit_thread_add_text)
-
-        # Start the thread
         self.listener_thread.started.connect(self.listener.run)
         self.listener_thread.start()
 
@@ -101,7 +73,6 @@ class GUI(QMainWindow):
                              cup_holder=CupHolder("", "")
                             )
         
-        self.list_of_threads = []
         self.list_of_radio_buttons = []
         self.list_of_car_body_group_box = []
         self.list_of_info_group_box = []
@@ -123,12 +94,12 @@ class GUI(QMainWindow):
         self.setGeometry(100, 100, 1400, 1000)
 
         central_widget = QFrame()
-        central_widget.setStyleSheet(style_sheet_central_widget)
+        central_widget.setStyleSheet(StyleSheet.CentralWidget.value)
         layout = QVBoxLayout(central_widget)
 
         self.tabs = QTabWidget()
         self.tabs.tabBar().setExpanding(True)
-        self.tabs.setStyleSheet(style_sheet_tab)
+        self.tabs.setStyleSheet(StyleSheet.Tab.value)
         
         self.tab1 = QWidget()
         self.tab2 = QWidget()
@@ -147,6 +118,14 @@ class GUI(QMainWindow):
 
     def create_tabs_content(self):
         
+        self.create_dial_tab()
+        self.create_body_watch_tab()
+        self.create_gantt_chart_tab()
+        self.create_body_construction_tab()
+        self.tab5.setLayout(self.info_terminal.layout_info)
+
+    def create_dial_tab(self):
+
         layout1 = QVBoxLayout()
 
         group_box1 = QGroupBox("Wczytaj konfigurację")
@@ -185,34 +164,38 @@ class GUI(QMainWindow):
         layout1.addWidget(group_box1)
         self.tab1.setLayout(layout1)
 
-        self.layout = QVBoxLayout()
+    def create_body_watch_tab(self):
 
-        self.starting_label = QLabel("Brak korpusów w produkcji")
-        self.starting_label.setStyleSheet(style_sheet_label)
+        layout2 = QVBoxLayout()
+
+        self.starting_label = self.create_label("Brak korpusów w produkcji")
         self.starting_label.setAlignment(Qt.AlignCenter)
 
-        self.scroll_area = QScrollArea()
-        self.scroll_widget = QWidget()
-        self.outer_layout = QVBoxLayout(self.scroll_widget)
+        scroll_area = QScrollArea()
+        scroll_widget = QWidget()
+        self.outer_layout = QVBoxLayout(scroll_widget)
 
-        self.scroll_widget.setLayout(self.outer_layout)
-        self.scroll_area.setWidget(self.scroll_widget)
-        self.scroll_area.setWidgetResizable(True)
+        scroll_widget.setLayout(self.outer_layout)
+        scroll_area.setWidget(scroll_widget)
+        scroll_area.setWidgetResizable(True)
 
         self.outer_layout.addWidget(self.starting_label)
-        self.layout.addWidget(self.scroll_area)
-        self.tab2.setLayout(self.layout)
+        layout2.addWidget(scroll_area)
+        self.tab2.setLayout(layout2)
         
         self.mpl_widget = PlotWidget(self.petri_net)
 
+    def create_gantt_chart_tab(self):
         layout3 = QVBoxLayout()
         layout3.addWidget(self.mpl_widget)
         self.tab3.setLayout(layout3)
 
+    def create_body_construction_tab(self):
+
         layout4 = QVBoxLayout()
         sub_tab_widget = QTabWidget()
         sub_tab_widget.setTabPosition(QTabWidget.West)
-        sub_tab_widget.setStyleSheet(style_sheet_sub_tab)
+        sub_tab_widget.setStyleSheet(StyleSheet.SubTab.value)
 
         sub_tab1 = self.create_sub_tab_upper_panel_content()
         sub_tab2 = self.create_sub_tab_middle_panel_content()
@@ -240,8 +223,6 @@ class GUI(QMainWindow):
 
         layout4.addWidget(overlay_widget)
         self.tab4.setLayout(layout4)
-
-        self.tab5.setLayout(self.info_terminal.layout_info)
 
     def create_sub_tab_framework_content(self):
 
@@ -314,12 +295,8 @@ class GUI(QMainWindow):
 
         radio_groupbox1.setLayout(radio_vboxlayout1)
 
-        radio_upac_4 = QRadioButton("4-strefowa")
-        radio_upac_2 = QRadioButton("2-strefowa")
-        radio_upac_4.setStyleSheet(style_sheet_QRadioButton)
-        radio_upac_2.setStyleSheet(style_sheet_QRadioButton)
-        radio_upac_4.toggled.connect(self.on_radio_button_upper_panel_clicked)
-        radio_upac_2.toggled.connect(self.on_radio_button_upper_panel_clicked)
+        radio_upac_4 = self.create_radio_button("4-strefowa", self.on_radio_button_upper_panel_clicked)
+        radio_upac_2 = self.create_radio_button("2-strefowa", self.on_radio_button_upper_panel_clicked)
 
         self.list_of_radio_buttons.extend([radio1, radio2, radio_upac_4, radio_upac_2])
 
@@ -763,12 +740,6 @@ class GUI(QMainWindow):
         self.update_production_counter(1)
         self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
 
-        # new_petri_net_thread = PetriNetThread(self.list_of_bodys[body_id], self.info_terminal)
-        # new_petri_net_thread.finished_signal.connect(self.on_thread_finished)
-        # new_petri_net_thread.add_text_signal.connect(self.emit_thread_add_text)
-        # self.list_of_threads.append(new_petri_net_thread)
-        # self.list_of_threads[len(self.list_of_threads) - 1].start()
-
         body = self.list_of_bodys[body_id]
         self.task_queue.put(body)
 
@@ -817,21 +788,19 @@ class GUI(QMainWindow):
 
     def check_body_group_box_number(self):
         if self.body_counter == 0 and len(self.list_of_car_body_group_box) == 0:
-            self.starting_label = QLabel("Brak korpusów w produkcji")
-            self.starting_label.setStyleSheet(style_sheet_label)
+            self.starting_label = self.create_label("Brak korpusów w produkcji")
             self.starting_label.setAlignment(Qt.AlignCenter)
             self.outer_layout.addWidget(self.starting_label)
 
     def create_label(self, label_str: str, maximuxm_height=70):
         label = QLabel(label_str)
-        label.setStyleSheet(style_sheet_label)
+        label.setStyleSheet(StyleSheet.QLabel.value)
         label.setMaximumHeight(maximuxm_height)
-
         return label
     
     def create_radio_button(self, label_str: str, signal_function):
         radio_button = QRadioButton(label_str)
-        radio_button.setStyleSheet(style_sheet_QRadioButton)
+        radio_button.setStyleSheet(StyleSheet.QRadioButton.value)
         radio_button.toggled.connect(signal_function)
 
         return radio_button
@@ -839,7 +808,7 @@ class GUI(QMainWindow):
     def create_combo_box(self, list_of_elements: list, signal_function):
         combo_box = QComboBox()
         combo_box.addItems(list_of_elements)
-        combo_box.setStyleSheet(style_sheet_QComboBox)
+        combo_box.setStyleSheet(StyleSheet.QComboBox.value)
         combo_box.currentIndexChanged.connect(signal_function)
         combo_box.activated.connect(signal_function)
 
@@ -857,7 +826,7 @@ class GUI(QMainWindow):
 
 def main():
     app = QApplication([])
-    app.setStyleSheet(style_sheet_app)
+    app.setStyleSheet(StyleSheet.App.value)
     window = GUI()
     window.show()
     app.exec_()

@@ -1,13 +1,9 @@
-import time
-from PyQt5.QtCore import QObject, QThread, pyqtSignal
-from queue import Queue
-
-from BodyPetriNet import body_main_petri_net
+from PyQt5.QtCore import QObject, pyqtSignal
 from Body import Body
 
 class Listener(QObject):
-    finished_signal = pyqtSignal(int, float)  # To signal when the task is done
-    add_text_signal = pyqtSignal(str)        # To emit log messages
+    finished_signal = pyqtSignal(int, float)
+    add_text_signal = pyqtSignal(str)
 
     def __init__(self, task_queue, available_tr):
         super().__init__()
@@ -27,18 +23,16 @@ class Listener(QObject):
 
         while self._running:
             try:
-                # Wait for a task to arrive (blocking)
-                task = self.task_queue.get(timeout=1)  # Wait for up to 1 second
-                if task is None:  # A `None` task can be used to signal shutdown
+                task = self.task_queue.get(timeout=1)
+                if task is None:
                     break
 
                 body = task
-                print("Dupa")
                 self.update_available_tr(body)
                 self.task_queue.task_done()
 
             except Exception as e:
-                continue  # Timeout occurred, or queue was empty
+                continue
 
     def update_available_tr(self, body: Body):
         self.body_counter += 1
