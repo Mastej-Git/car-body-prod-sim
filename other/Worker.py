@@ -8,7 +8,7 @@ class Worker(QObject):
     finished_signal = pyqtSignal()
     add_text_signal = pyqtSignal(str)
 
-    def __init__(self, available_tr):
+    def __init__(self, available_tr, info_terminal):
         super().__init__()
         self._running = True
 
@@ -16,6 +16,7 @@ class Worker(QObject):
         self.bodys_in_production = 0
         self.executed_bodys = 0
         self.available_tr = available_tr
+        self.info_terminal = info_terminal
 
         self.list_of_times = []
 
@@ -31,8 +32,10 @@ class Worker(QObject):
             if "T002" in self.available_tr:
                 self.started_bodys += 1
                 self.bodys_in_production += 1
-                print(f"Rozpoczynam produkcję korpusu id: {self.started_bodys - 1}")
-                print("Odpalam Tranzycje T001")
+                # print(f"Rozpoczynam produkcję korpusu id: {self.started_bodys - 1}")
+                # print("Odpalam Tranzycje T001")
+                self.add_text_signal.emit(f"Rozpoczynam produkcję korpusu id: {self.started_bodys - 1}")
+                self.add_text_signal.emit("Odpalam Tranzycje T001")
                 pn.fire_transition("T001")
 
                 start_time = time.time()
@@ -50,8 +53,8 @@ class Worker(QObject):
 
             for transition in tr_to_exec:
                 # self.add_text_signal.emit(f"\nProcessing transition {transition} for body {body.body_id}")
-                if pn.transitions[transition].is_enabled():
-                    # print(f"Odpalam Tranzycje {transition}")
+                if pn.transitions[transition].is_enabled() and pn.transitions[transition].can_fire():
+                    print(f"Odpalam Tranzycje {transition}")
                     pn.fire_transition(transition)
                     self.available_tr.remove(transition)
                     if transition == "T002":
@@ -61,7 +64,9 @@ class Worker(QObject):
                         self.executed_bodys += 1
                         duration = time.time() - self.list_of_times[self.executed_bodys - 1]
                         self.finished_signal.emit()
-                        print(f"Korpus o indeksie: {self.executed_bodys - 1} został wykonany w czasie: {duration}")
+                        # print(f"Korpus o indeksie: {self.executed_bodys - 1} został wykonany w czasie: {duration}")
+                        self.add_text_signal.emit(f"Korpus o indeksie: {self.executed_bodys - 1} został wykonany w czasie: {duration}")
+
 
             if not tr_to_exec:
                 time.sleep(0.5)

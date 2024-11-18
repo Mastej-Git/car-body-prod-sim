@@ -50,12 +50,23 @@ class GUI(QMainWindow):
     def __init__(self):
         super().__init__()
 
+        self.petri_net = body_main_petri_net
+
+        self.list_of_radio_buttons = []
+        self.list_of_car_body_group_box = []
+        self.list_of_bodys = []
+        self.list_of_info_group_box = []
+
+        self.info_terminal = InfoTerminal(self.list_of_info_group_box)
+        self.petri_net.set_info_terminal(self.info_terminal)
+
         available_tr = []
 
         self.worker_thread = QThread()
-        self.worker = Worker(available_tr)
+        self.worker = Worker(available_tr, self.info_terminal)
         self.worker.moveToThread(self.worker_thread)
         self.worker.finished_signal.connect(self.on_body_finished)
+        self.worker.add_text_signal.connect(self.emit_thread_add_text)
         self.worker_thread.started.connect(self.worker.run)
         self.worker_thread.start()
 
@@ -80,23 +91,16 @@ class GUI(QMainWindow):
                              cup_holder=CupHolder("", "")
                             )
         
-        self.list_of_radio_buttons = []
-        self.list_of_car_body_group_box = []
-        self.list_of_info_group_box = []
-        self.list_of_bodys = []
+
 
         self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
         self.production_counter_label = self.create_label(f"Korpusów w produkcji: {self.production_counter}")
         self.finished_bodys_label = self.create_label(f"Wyprodukowanych korpusów: {self.finished_bodys}")
 
-        self.petri_net = body_main_petri_net
         self.json_file_name = ""
 
         self.json_reader = ReadJSON()
         self.file_dialog = None
-
-        self.info_terminal = InfoTerminal(self.list_of_info_group_box)
-        self.petri_net.set_info_terminal(self.info_terminal)
         
         self.setWindowTitle("Tab Example")
         self.setGeometry(100, 100, 1400, 1000)
@@ -718,6 +722,7 @@ class GUI(QMainWindow):
 
             if self.list_of_bodys[self.body_counter - 1].is_ready():
                 self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(True)
+                self.update_label()
             elif not self.list_of_bodys[self.body_counter - 1].is_ready():
                 self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(False)
         else:
@@ -814,7 +819,7 @@ class GUI(QMainWindow):
         for i in range(self.finished_bodys, end):
             self.task_queue.put(self.list_of_bodys[i])
             self.list_of_car_body_group_box[i].button_schedule.setEnabled(False)
-        self.label_tmp.setText(f"")
+        self.label_tmp.setText(f"Korpusy przekazano do produkcji")
 
     @pyqtSlot()
     def on_body_finished(self):
