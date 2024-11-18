@@ -14,6 +14,7 @@ from PyQt5.QtWidgets import (
     QComboBox,
     QScrollArea,
     QRadioButton,
+    QInputDialog,
 )
 
 from PyQt5.QtCore import (Qt, pyqtSlot, QThread)
@@ -54,6 +55,7 @@ class GUI(QMainWindow):
         self.worker_thread = QThread()
         self.worker = Worker(available_tr)
         self.worker.moveToThread(self.worker_thread)
+        self.worker.finished_signal.connect(self.on_body_finished)
         self.worker_thread.started.connect(self.worker.run)
         self.worker_thread.start()
 
@@ -66,6 +68,8 @@ class GUI(QMainWindow):
 
         self.body_counter = 0
         self.production_counter = 0
+        self.finished_bodys = 0
+        self.set_to_produce = 0
 
         self.body_tmp = Body(self.body_counter,
                              framework=Framework("", ""),
@@ -83,6 +87,7 @@ class GUI(QMainWindow):
 
         self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
         self.production_counter_label = self.create_label(f"Korpusów w produkcji: {self.production_counter}")
+        self.finished_bodys_label = self.create_label(f"Wyprodukowanych korpusów: {self.finished_bodys}")
 
         self.petri_net = body_main_petri_net
         self.json_file_name = ""
@@ -156,12 +161,29 @@ class GUI(QMainWindow):
         group_box2 = QGroupBox("Panel kontrolny")
         group_box2.setFixedHeight(600)
 
-        hbox_layout1 = QVBoxLayout()
-        hbox_layout1.addWidget(self.body_counter_label)
-        hbox_layout1.addWidget(self.production_counter_label)
 
-        group_box1.setLayout(hbox_layout)
+        hbox_layout1 = QHBoxLayout()
+
+        vbox_layout1 = QVBoxLayout()
+        vbox_layout1.addWidget(self.body_counter_label)
+        vbox_layout1.addWidget(self.production_counter_label)
+        vbox_layout1.addWidget(self.finished_bodys_label)
+
+        vbox_layout2 = QVBoxLayout()
+        self.label_tmp = self.create_label("Brak wybranej ilości")
+        vbox_layout2.addWidget(self.label_tmp)
+        chose_value_button = AnimatedButton("Wybierz ilość")
+        chose_value_button.clicked.connect(self.pb_input_dialog)
+        vbox_layout2.addWidget(chose_value_button)
+        produce_button = AnimatedButton("Produkuj")
+        produce_button.clicked.connect(self.pb_produce)
+        vbox_layout2.addWidget(produce_button)
+
+        hbox_layout1.addLayout(vbox_layout1)
+        hbox_layout1.addLayout(vbox_layout2)
+
         group_box2.setLayout(hbox_layout1)
+        group_box1.setLayout(hbox_layout)
 
         layout1.addWidget(group_box2)
         layout1.addWidget(group_box1)
@@ -778,10 +800,26 @@ class GUI(QMainWindow):
         self.body_tmp.remove_parameters()
         self.check_body_group_box_number()
 
-    @pyqtSlot(int, float)
-    def on_thread_finished(self, thread_id, time):
+    def pb_input_dialog(self):
+        text, ok = QInputDialog.getInt(self, "Input Dialog", "Ilość korpusów do produkcji: ", value=0, min=0, max=self.body_counter)
+        if ok:
+            self.label_tmp.setText(f"Wybranych korpusów do produkcji: {text}" if text else "Nie wybrano żadnej ilości")
+        self.set_to_produce = text
+
+    def pb_produce(self):
+        self.update_production_counter(self.set_to_produce)
+        self.info_terminal.add_text_info(f"Rozpoczęto produkcję następujących korpusów: ID: ")
+        
+        end = self.finished_bodys + self.set_to_produce
+        for i in range(self.finished_bodys, end):
+            self.task_queue.put(self.list_of_bodys[i])
+            self.list_of_car_body_group_box[i].button_schedule.setEnabled(False)
+        self.label_tmp.setText(f"")
+
+    @pyqtSlot()
+    def on_body_finished(self):
+        self.update_finished_counter()
         self.update_production_counter(-1)
-        self.info_terminal.add_text_info(f"Wątek ID: {thread_id} - został zakończony po czasie {time:.4f} sekund. Korpus ID: {thread_id} jest gotowy")
 
     def reset_radio_buttons(self):
         for radio in self.list_of_radio_buttons:
@@ -791,7 +829,7 @@ class GUI(QMainWindow):
 
     def check_body_group_box_number(self):
         if self.body_counter == 0 and len(self.list_of_car_body_group_box) == 0:
-            self.starting_label = self.create_label("Brak korpusów w produkcji")
+            self.starting_label = self.create_label("Nie wybrano żadnej ilości")
             self.starting_label.setAlignment(Qt.AlignCenter)
             self.outer_layout.addWidget(self.starting_label)
 
@@ -826,6 +864,12 @@ class GUI(QMainWindow):
     def update_production_counter(self, value):
         self.production_counter += value
         self.production_counter_label.setText(f"Korpusów w produkcji: {self.production_counter}")
+
+    def update_finished_counter(self):
+        self.finished_bodys += 1
+        self.finished_bodys_label.setText(f"Wyprodukowanych korpusów: {self.finished_bodys}")
+
+
 
 def main():
     app = QApplication([])
