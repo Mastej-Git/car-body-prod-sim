@@ -12,6 +12,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 
 from petri_nets.PetriNet import PetriNet
 from Body import Body
+from BodyPetriNet import time_unit
 
 
 class PlotWidget(QWidget):
@@ -19,7 +20,7 @@ class PlotWidget(QWidget):
         super().__init__(parent)
 
         self.list_of_bars = []
-        self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "yellow", "brown", "purple", "white", "teal", "peru"]
+        self.plot_colors = ["skyblue", "red", "lightgreen", "magenta", "aquamarine", "yellow", "brown", "purple", "white", "teal", "peru", "gold", "cyan", "navy", "chocolate"]
         self.color_iter = 0
         self.numb_of_plots = 0
         self.petri_net = petri_net
@@ -27,6 +28,7 @@ class PlotWidget(QWidget):
 
         self.list_of_durations = []
         self.list_of_starting_times = []
+        self.list_of_times = []
 
         self.tasks = []
         for place in self.petri_net.places.values():
@@ -78,10 +80,18 @@ class PlotWidget(QWidget):
         self.calculate_duration(body)
         self.calculate_starting_times()
 
+        min_value = round(min(self.list_of_starting_times[self.numb_of_plots]), 2)
+        max_value = round(max(self.list_of_starting_times[self.numb_of_plots]), 2)
+        time = max_value + self.list_of_durations[self.numb_of_plots][20] + 2
+        # print(f"Minimum: {min_value}, Maximum: {max_value}, Duration: {time}")
+        self.list_of_times.append(round(time, 2))
         bars = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
-                                  color=self.plot_colors[self.color_iter % 10], height=0.4, label='Dataset 1')
+                                  color=self.plot_colors[self.color_iter % 15], height=0.4, label='Dataset 1')
         
         self.list_of_bars.append(bars)
+
+        if self.numb_of_plots == 29:
+            print(self.list_of_times)
         
         self.color_iter += 1
         self.numb_of_plots += 1
@@ -172,9 +182,6 @@ class PlotWidget(QWidget):
         self.calculate_prev_part_times(11, 15, previous_starting_times, starting_times)
         self.calculate_prev_part_times(15, 21, previous_starting_times, starting_times)
 
-
-        # self.calculate_prev_part_times(19, 21, previous_starting_times, starting_times)
-
         self.list_of_starting_times.append(starting_times)
     
     def calculate_prev_part_times(self, start, end, previous_starting_times, starting_times):
@@ -184,31 +191,43 @@ class PlotWidget(QWidget):
             i = start
             starting_time = 0
 
+            if (machine == "M1 - P111" or
+                machine == "M2 - P112" or
+                machine == "M3 - P207" or
+                machine == "M4 - P208" or
+                machine == "M5 - P316" or
+                machine == "M6 - P317" or
+                machine == "M9 - P416" or
+                machine == "M12 - P514" or
+                machine == "M16 - P615"):
+                starting_time += 2
+
             for duration in self.list_of_durations[self.numb_of_plots][start:end]:
                 if i == j:
                     break
                 starting_time += duration
                 i += 1
-                if duration != 0: starting_time += 1
+                if duration != 0: 
+                    starting_time += 0.5
 
             if starting_time <= previous_starting_times[i] and self.check_previous_times(i):
                 starting_time = previous_starting_times[i] + self.list_of_durations[self.numb_of_plots - 1][i] 
                 if self.list_of_durations[self.numb_of_plots - 1][i] != 0:
-                    starting_time += 1
+                    starting_time += 0.5
 
             if len(starting_times) != 0 and start == 11:
                 if self.list_of_durations[self.numb_of_plots - 1][i] == 0:
-                    starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots][i] + 1
+                    starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots][i] + 0.5
 
             if j == 19:
                 starting_time_tmp = 0
                 if starting_times[14] > starting_times[18]:
-                    starting_time = starting_times[14] + self.list_of_durations[self.numb_of_plots][14] + 1
+                    starting_time = starting_times[14] + self.list_of_durations[self.numb_of_plots][14] + 0.5
                 else:
-                    starting_time = starting_times[18] + self.list_of_durations[self.numb_of_plots][18] + 1
+                    starting_time = starting_times[18] + self.list_of_durations[self.numb_of_plots][18] + 0.5
 
             if j == 20:
-                starting_time = starting_times[19] + self.list_of_durations[self.numb_of_plots][19] + 1
+                starting_time = starting_times[19] + self.list_of_durations[self.numb_of_plots][19] + 0.5
 
             starting_times.append(starting_time)
             j += 1

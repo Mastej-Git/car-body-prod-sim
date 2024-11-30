@@ -1,4 +1,5 @@
-@startuml Name
+@startuml
+left to right direction
 
 class Armrest {
     bool is_activated
@@ -154,27 +155,6 @@ class PetriNet {
     + __str__(): string 
 }
 
-class QThread {
-
-}
-
-class PetriNetThread {
-
-    bool running
-    PetriNet petri_net
-    InfoTerminal info_terminal
-    list available_transitions
-    list executed_transitions
-    dict available_body_parts_transitions
-
-    + run(): void
-    + stop(): stop
-    + on_thread_finished(thread_id: int, thread_name: string): void
-    + add_sub_thread_text_emit(text: string): void
-    + check_sub_thread_finish(): bool
-    + define_available_tr(): void
-}
-
 class AnimatedButton {
 
     + animate_click(): void
@@ -185,18 +165,30 @@ class QPushButton {
 
 }
 
-class PetriNetSubThread {
+class Worker {
 
-    string name
-    bool running
-    PetriNet petri_net
-    InfoTerminal info_terminal
-    list available_transitions
-    list executed_transitions
-    list petri_net_sub_thread
+    pyqtSignal finished_body_s
+    pyqtSignal add_text_s
+
+    int started_bodys
+    int bodys_in_production
+    int executed_bodys
+    list available_tr
 
     + run(): void
+    + remove_duplicates(lst: list): list
 }
+
+class Listener {
+
+    Queue task_queue
+    list available_tr
+
+    + run(): void
+    + update_available_tr(body: Body): void
+    + define_available_tr(available_bp_tr: dict, body: Body): void
+}
+
 
 class CarBodyGroupBox {
 
@@ -218,6 +210,14 @@ class InfoTerminal {
 
     + add_text_info(): void
 }
+
+' enum BodyMaterial {
+
+' }
+
+' enum StyleSheet {
+
+' }
 
 class GUI {
 
@@ -263,6 +263,8 @@ class GUI {
     + create_combo_box(list_of_elements: list, signal_function: void): QComboBox
     + emit_thread_add_text(text: string): void
     + update_label(): void
+    + update_prooduction_counter(value: int): void
+    + update_finished_counter(): void
 }
 
 Body o-- UpperPanel
@@ -276,9 +278,6 @@ FileDialog <|-- QWidget
 MatPlotlibWidget <|-- QWidget
 PetriNet o-- Place
 PetriNet o-- Transition
-PetriNetThread o-- PetriNetSubThread
-PetriNetThread <|-- QThread
-PetriNetSubThread <|-- QThread
 AnimatedButton <|-- QPushButton
 CarBodyGroupBox o-- AnimatedButton
 CarBodyGroupBox o-- QLabel
@@ -290,11 +289,11 @@ GUI o-- MatPlotlibWidget
 GUI o-- InfoTerminal
 GUI o-- CarBodyGroupBox
 GUI o-- PetriNet
-GUI o-- PetriNetThread
 GUI o-- ReadJSON
 CarBodyGroupBox o-- Body
 MatPlotlibWidget o-- PetriNet
-PetriNetThread o-- PetriNet
-PetriNetSubThread o-- PetriNet
-
+Listener <|-- QObject
+Worker <|-- QObject
+GUI o-- Listener
+GUI o-- Worker
 @enduml

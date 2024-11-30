@@ -362,11 +362,11 @@
                         },
                         "lower_panel": {
                                 "functionality": "Ładowarka bezprzewodowa",
-                                "is_cup": "Nie",
+                                "is_cup": "Tak",
                                 "color": "Niebieski"
                         },
                         "armrest": {
-                                "heating": "Nie",
+                                "heating": "Tak",
                                 "material": "Eko skóra",
                                 "color": "Czerwony"
                         },
