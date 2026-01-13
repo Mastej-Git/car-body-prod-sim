@@ -813,13 +813,13 @@ class GUI(QMainWindow):
 
     def pb_produce(self):
         self.update_production_counter(self.set_to_produce)
-        self.info_terminal.add_text_info(f"Rozpoczęto produkcję następujących korpusów: ID: ")
+        self.info_terminal.add_text_info("Rozpoczęto produkcję następujących korpusów: ID: ")
         
         end = self.finished_bodys + self.set_to_produce
         for i in range(self.finished_bodys, end):
             self.task_queue.put(self.list_of_bodys[i])
             self.list_of_car_body_group_box[i].button_schedule.setEnabled(False)
-        self.label_tmp.setText(f"Korpusy przekazano do produkcji")
+        self.label_tmp.setText("Korpusy przekazano do produkcji")
 
     @pyqtSlot()
     def on_body_finished(self):

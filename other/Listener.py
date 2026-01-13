@@ -33,7 +33,7 @@ class Listener(QObject):
                 self.update_available_tr(body)
                 self.task_queue.task_done()
 
-            except Exception as e:
+            except Exception:
                 continue
 
     def update_available_tr(self, body: Body):

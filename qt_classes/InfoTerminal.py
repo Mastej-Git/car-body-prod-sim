@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QScrollArea, QWidget, QGroupBox
+from PyQt5.QtWidgets import QVBoxLayout, QLabel, QScrollArea, QWidget
 from PyQt5.QtCore import Qt
 
 from enums.StyleSheet import StyleSheet

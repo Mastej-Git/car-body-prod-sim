@@ -16,9 +16,12 @@ class FileDialog(QWidget):
         home_dir = os.environ.get('HOME')
 
         options = QFileDialog.Options()
-        read_file_name, _ = QFileDialog.getOpenFileName(self, "Open File", "", 
-                                                   "All Files (*);;Text Files (*.txt)", 
-                                                   options=options)
+        read_file_name, _ = QFileDialog.getOpenFileName(
+            self, "Open File", "", 
+            "All Files (*);;Text Files (*.txt)", 
+            options=options
+        )
+        
         if read_file_name.endswith(".json"):
             self.label.setText(f'Wybrany plik: {read_file_name}')
             return read_file_name

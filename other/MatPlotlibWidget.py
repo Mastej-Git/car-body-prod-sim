@@ -10,9 +10,7 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-from petri_nets.PetriNet import PetriNet
 from Body import Body
-from BodyPetriNet import time_unit
 
 
 class PlotWidget(QWidget):
@@ -80,10 +78,9 @@ class PlotWidget(QWidget):
         self.calculate_duration(body)
         self.calculate_starting_times()
 
-        min_value = round(min(self.list_of_starting_times[self.numb_of_plots]), 2)
+        # min_value = round(min(self.list_of_starting_times[self.numb_of_plots]), 2)
         max_value = round(max(self.list_of_starting_times[self.numb_of_plots]), 2)
         time = max_value + self.list_of_durations[self.numb_of_plots][20] + 2
-        # print(f"Minimum: {min_value}, Maximum: {max_value}, Duration: {time}")
         self.list_of_times.append(round(time, 2))
         bars = self.ax.barh(self.y_pos, self.list_of_durations[self.numb_of_plots], left=self.list_of_starting_times[self.numb_of_plots], 
                                   color=self.plot_colors[self.color_iter % 15], height=0.4, label='Dataset 1')
@@ -220,7 +217,6 @@ class PlotWidget(QWidget):
                     starting_time = starting_times[j - 1] + self.list_of_durations[self.numb_of_plots][i] + 0.5
 
             if j == 19:
-                starting_time_tmp = 0
                 if starting_times[14] > starting_times[18]:
                     starting_time = starting_times[14] + self.list_of_durations[self.numb_of_plots][14] + 0.5
                 else:
