@@ -1,16 +1,16 @@
 class LowerPanel():
 
-    def __init__(self, functionality, is_cup, color) -> None:
+    def __init__(self, functionality, is_cup, color):
         self.is_activated = False
         self.functionality = functionality
         self.is_cup = is_cup
         self.color = color
 
-    def check_activation(self):
+    def check_activation(self) -> None:
         if self.functionality != "" and self.is_cup != "" and self.color != "":
             self.is_activated = True
 
-    def remove_parameters(self):
+    def remove_parameters(self) -> None:
         self.functionality = ""
         self.is_cup = ""
         self.color = ""

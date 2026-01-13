@@ -1,0 +1,875 @@
+from queue import Queue
+
+from PyQt5.QtWidgets import (
+    QMainWindow,
+    QTabWidget,
+    QWidget,
+    QVBoxLayout,
+    QLabel,
+    QHBoxLayout,
+    QStackedWidget,
+    QFrame,
+    QGroupBox,
+    QComboBox,
+    QScrollArea,
+    QRadioButton,
+    QInputDialog,
+)
+
+from PyQt5.QtCore import (Qt, pyqtSlot, QThread)
+
+from body_parts.Framework import Framework
+from body_parts.UpperPanel import UpperPanel
+from body_parts.MiddlePanel import MiddlePanel
+from body_parts.LowerPanel import LowerPanel
+from body_parts.Armrest import Armrest
+from body_parts.CupHolder import CupHolder
+from body_parts.Body import Body
+
+from qt_classes.AnimatedButton import AnimatedButton
+from qt_classes.CarBodyGroupBox import CarBodyGroupBox
+from qt_classes.InfoTerminal import InfoTerminal
+
+from other.GanttChart import GanttChart
+from other.ReadJSON import ReadJSON
+from other.FileDialog import FileDialog
+
+from other.Worker import Worker
+from other.Listener import Listener
+
+from enums.StyleSheet import StyleSheet
+from enums.BodyMaterials import BodyMaterials
+
+from petri_nets.BodyPetriNet import body_main_petri_net
+
+
+
+class GUI(QMainWindow):
+
+    def __init__(self):
+        super().__init__()
+
+        self.petri_net = body_main_petri_net
+
+        self.list_of_radio_buttons = []
+        self.list_of_car_body_group_box = []
+        self.list_of_bodys = []
+        self.list_of_info_group_box = []
+
+        self.info_terminal = InfoTerminal(self.list_of_info_group_box)
+        self.petri_net.set_info_terminal(self.info_terminal)
+
+        available_tr = []
+
+        self.worker_thread = QThread()
+        self.worker = Worker(available_tr, self.info_terminal)
+        self.worker.moveToThread(self.worker_thread)
+        self.worker.finished_signal.connect(self.on_body_finished)
+        self.worker.add_text_signal.connect(self.emit_thread_add_text)
+        self.worker_thread.started.connect(self.worker.run)
+        self.worker_thread.start()
+
+        self.task_queue = Queue()
+        self.listener_thread = QThread()
+        self.listener = Listener(self.task_queue, available_tr)
+        self.listener.moveToThread(self.listener_thread)
+        self.listener_thread.started.connect(self.listener.run)
+        self.listener_thread.start()
+
+        self.body_counter = 0
+        self.production_counter = 0
+        self.finished_bodys = 0
+        self.set_to_produce = 0
+
+        self.body_tmp = Body(self.body_counter,
+                             framework=Framework("", ""),
+                             upper_panel=UpperPanel("", ""),
+                             middle_panel=MiddlePanel(""),
+                             lower_panel=LowerPanel("", "", ""),
+                             armrest=Armrest("", "", ""),
+                             cup_holder=CupHolder("", "")
+                            )
+        
+
+
+        self.body_counter_label = self.create_label(f"Wczytanych korpusów: {self.body_counter}")
+        self.production_counter_label = self.create_label(f"Korpusów w produkcji: {self.production_counter}")
+        self.finished_bodys_label = self.create_label(f"Wyprodukowanych korpusów: {self.finished_bodys}")
+
+        self.json_file_name = ""
+
+        self.json_reader = ReadJSON()
+        self.file_dialog = None
+        
+        self.setWindowTitle("Tab Example")
+        self.setGeometry(100, 100, 1400, 1000)
+
+        central_widget = QFrame()
+        central_widget.setStyleSheet(StyleSheet.CentralWidget.value)
+        layout = QVBoxLayout(central_widget)
+
+        self.tabs = QTabWidget()
+        self.tabs.tabBar().setExpanding(True)
+        self.tabs.setStyleSheet(StyleSheet.Tab.value)
+        
+        self.tab1 = QWidget()
+        self.tab2 = QWidget()
+        self.tab3 = QWidget()
+        self.tab4 = QWidget()
+        self.tab5 = QWidget()
+        self.tabs.addTab(self.tab1, "Panel kontrolny")
+        self.tabs.addTab(self.tab2, "Stan korpusów")
+        self.tabs.addTab(self.tab3, "Wykres Gantta")
+        self.tabs.addTab(self.tab4, "Nowy korpus")
+        self.tabs.addTab(self.tab5, "Info")
+
+        self.create_tabs_content()
+        layout.addWidget(self.tabs)
+        self.setCentralWidget(central_widget)
+
+    def create_tabs_content(self):
+        
+        self.create_dial_tab()
+        self.create_body_watch_tab()
+        self.create_gantt_chart_tab()
+        self.create_body_construction_tab()
+        self.tab5.setLayout(self.info_terminal.layout_info)
+
+    def create_dial_tab(self):
+
+        layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Wczytaj konfigurację")
+        group_box1.setFixedHeight(200)
+
+        label = QLabel("Nie wybrano żadnego pliku")
+
+        hbox_layout = QHBoxLayout()
+        vbox_layout = QVBoxLayout()
+
+        read_file_button = AnimatedButton("Wczytaj")
+        read_file_button.clicked.connect(self.pb_read_json)
+
+        self.file_dialog = FileDialog(label)
+
+        chose_file_button = AnimatedButton("Wybierz plik")
+        chose_file_button.clicked.connect(self.pb_chose_file)
+
+        vbox_layout.addWidget(chose_file_button)
+        vbox_layout.addWidget(read_file_button)
+
+        hbox_layout.addWidget(label)
+        hbox_layout.addLayout(vbox_layout)
+
+        group_box2 = QGroupBox("Panel kontrolny")
+        group_box2.setFixedHeight(600)
+
+
+        hbox_layout1 = QHBoxLayout()
+
+        vbox_layout1 = QVBoxLayout()
+        vbox_layout1.addWidget(self.body_counter_label)
+        vbox_layout1.addWidget(self.production_counter_label)
+        vbox_layout1.addWidget(self.finished_bodys_label)
+
+        vbox_layout2 = QVBoxLayout()
+        self.label_tmp = self.create_label("Brak wybranej ilości")
+        vbox_layout2.addWidget(self.label_tmp)
+        chose_value_button = AnimatedButton("Wybierz ilość")
+        chose_value_button.clicked.connect(self.pb_input_dialog)
+        vbox_layout2.addWidget(chose_value_button)
+        produce_button = AnimatedButton("Produkuj")
+        produce_button.clicked.connect(self.pb_produce)
+        vbox_layout2.addWidget(produce_button)
+
+        hbox_layout1.addLayout(vbox_layout1)
+        hbox_layout1.addLayout(vbox_layout2)
+
+        group_box2.setLayout(hbox_layout1)
+        group_box1.setLayout(hbox_layout)
+
+        layout1.addWidget(group_box2)
+        layout1.addWidget(group_box1)
+        self.tab1.setLayout(layout1)
+
+    def create_body_watch_tab(self):
+
+        layout2 = QVBoxLayout()
+
+        self.starting_label = self.create_label("Brak korpusów w produkcji")
+        self.starting_label.setAlignment(Qt.AlignCenter)
+
+        scroll_area = QScrollArea()
+        scroll_widget = QWidget()
+        self.outer_layout = QVBoxLayout(scroll_widget)
+
+        scroll_widget.setLayout(self.outer_layout)
+        scroll_area.setWidget(scroll_widget)
+        scroll_area.setWidgetResizable(True)
+
+        self.outer_layout.addWidget(self.starting_label)
+        layout2.addWidget(scroll_area)
+        self.tab2.setLayout(layout2)
+        
+        self.mpl_widget = GanttChart(self.petri_net)
+
+    def create_gantt_chart_tab(self):
+        layout3 = QVBoxLayout()
+        layout3.addWidget(self.mpl_widget)
+        self.tab3.setLayout(layout3)
+
+    def create_body_construction_tab(self):
+
+        layout4 = QVBoxLayout()
+        sub_tab_widget = QTabWidget()
+        sub_tab_widget.setTabPosition(QTabWidget.West)
+        sub_tab_widget.setStyleSheet(StyleSheet.SubTab.value)
+
+        sub_tab1 = self.create_sub_tab_upper_panel_content()
+        sub_tab2 = self.create_sub_tab_middle_panel_content()
+        sub_tab3 = self.create_sub_tab_lower_panel_content()
+        sub_tab4 = self.create_sub_tab_armrest_content()
+        sub_tab5 = self.create_sub_tab_cup_holder_content()
+        sub_tab6 = self.create_sub_tab_framework_content()
+
+        sub_tab_widget.addTab(sub_tab1, "Panel górny")
+        sub_tab_widget.addTab(sub_tab2, "Panel środkowy")
+        sub_tab_widget.addTab(sub_tab3, "Panel dolny")
+        sub_tab_widget.addTab(sub_tab4, "Podłokietnik")
+        sub_tab_widget.addTab(sub_tab5, "Miejsce na kubki")
+        sub_tab_widget.addTab(sub_tab6, "Szkielet")
+
+        stacked_widget = QStackedWidget()
+        stacked_widget.addWidget(sub_tab_widget)
+
+        overlay_widget = QWidget()
+        overlay_layout = QVBoxLayout(overlay_widget)
+        overlay_layout.addWidget(stacked_widget)
+
+        button_layout = QHBoxLayout()
+        overlay_layout.addLayout(button_layout)
+
+        layout4.addWidget(overlay_widget)
+        self.tab4.setLayout(layout4)
+
+    def create_sub_tab_framework_content(self):
+
+        sub_tab_upper_panel = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry szkieletu")
+        label_material = self.create_label("Materiał")
+        label_color = self.create_label("Kolor")
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        combo_box_material = self.create_combo_box([BodyMaterials.Leather.value, BodyMaterials.EcoLeather.value, BodyMaterials.ArtificialLeather.value], self.on_change_cbox_framework_material)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_framework_color)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+        vbox_sub_ghost = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(combo_box_material)
+        vbox_sub1.setSpacing(15)
+
+        vbox_sub2.addWidget(label_color)
+        vbox_sub2.addWidget(combo_box_color)
+        vbox_sub2.setSpacing(15)
+
+        label_ghost_1 = QLabel("")
+        label_ghost_2 = QLabel("")
+        vbox_sub_ghost.addWidget(label_ghost_1)
+        vbox_sub_ghost.addWidget(label_ghost_2)
+        vbox_sub_ghost.setSpacing(500)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addLayout(vbox_sub_ghost)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_upper_panel.setLayout(sub_layout1)
+
+        return sub_tab_upper_panel
+    
+    def create_sub_tab_upper_panel_content(self):
+
+        sub_tab_upper_panel = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu górnego")
+        label_material = self.create_label("Sterowanie klimatyzacją")
+        label_size = self.create_label("Rodzaj klimatyzacji")
+
+        radio1 = self.create_radio_button("Tak", self.on_radio_button_upper_panel_clicked)
+        radio2 = self.create_radio_button("Nie", self.on_radio_button_upper_panel_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio1)
+        radio_vboxlayout1.addWidget(radio2)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        radio_upac_4 = self.create_radio_button("4-strefowa", self.on_radio_button_upper_panel_clicked)
+        radio_upac_2 = self.create_radio_button("2-strefowa", self.on_radio_button_upper_panel_clicked)
+
+        self.list_of_radio_buttons.extend([radio1, radio2, radio_upac_4, radio_upac_2])
+
+        radio_groupbox2 = QGroupBox()
+        radio_vboxlayout2 = QVBoxLayout()
+
+        radio_vboxlayout2.addWidget(radio_upac_4)
+        radio_vboxlayout2.addWidget(radio_upac_2)
+
+        radio_groupbox2.setLayout(radio_vboxlayout2)
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_material)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_size)
+        vbox_sub2.addWidget(radio_groupbox2)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_upper_panel.setLayout(sub_layout1)
+
+        return sub_tab_upper_panel
+    
+    def create_sub_tab_middle_panel_content(self):
+
+        sub_tab_middle_panel = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu środkowego")
+        label_functionality = self.create_label("Funkcjonalność")
+
+        radio3 = self.create_radio_button("Interfejs multimedialny", self.on_radio_button_middle_panel_clicked)
+        radio4 = self.create_radio_button("Schowek", self.on_radio_button_middle_panel_clicked)
+        self.list_of_radio_buttons.extend([radio3, radio4])
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio3)
+        radio_vboxlayout1.addWidget(radio4)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_functionality)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_middle_panel.setLayout(sub_layout1)
+
+        return sub_tab_middle_panel    
+    
+    def create_sub_tab_lower_panel_content(self):
+
+        sub_tab_lower_panel = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry panelu dolnego")
+        label_functionality = self.create_label("Funkcjonalność")
+        label_cup_place = self.create_label("Miejsce na kubek")
+        label_color = self.create_label("Kolor")
+
+        radio5 = self.create_radio_button("Ładowarka bezprzewodowa", self.on_radio_button_lower_panel_clicked)
+        radio6 = self.create_radio_button("Półka", self.on_radio_button_lower_panel_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio5)
+        radio_vboxlayout1.addWidget(radio6)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        radio7 = self.create_radio_button("Tak", self.on_radio_button_lower_panel_clicked)
+        radio8 = self.create_radio_button("Nie", self.on_radio_button_lower_panel_clicked)
+
+        radio_groupbox2 = QGroupBox()
+        radio_vboxlayout2 = QVBoxLayout()
+
+        radio_vboxlayout2.addWidget(radio7)
+        radio_vboxlayout2.addWidget(radio8)
+
+        self.list_of_radio_buttons.extend([radio5, radio6, radio7, radio8])
+
+        radio_groupbox2.setLayout(radio_vboxlayout2)
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_lower_panel_color)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_functionality)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_cup_place)
+        vbox_sub2.addWidget(radio_groupbox2)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(label_color)
+        vbox_main.addWidget(combo_box_color)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_lower_panel.setLayout(sub_layout1)
+
+        return sub_tab_lower_panel
+    
+    def create_sub_tab_armrest_content(self):
+
+        sub_tab_armrest = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry podłokietnika")
+        label_heating = self.create_label("Grzanie")
+        label_material = self.create_label("Materiał")
+        label_color = self.create_label("Kolor")
+
+        radio9 = self.create_radio_button("Tak", self.on_radio_button_armrest_clicked)
+        radio10 = self.create_radio_button("Nie", self.on_radio_button_armrest_clicked)
+        self.list_of_radio_buttons.extend([radio9, radio10])
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio9)
+        radio_vboxlayout1.addWidget(radio10)
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        combo_box_material = self.create_combo_box([BodyMaterials.Leather.value, BodyMaterials.EcoLeather.value, BodyMaterials.ArtificialLeather.value], self.on_change_cbox_armrest_material)
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_armrest_color)
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_heating)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_sub2.addWidget(label_material)
+        vbox_sub2.addWidget(combo_box_material)
+        vbox_sub2.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(label_color)
+        vbox_main.addWidget(combo_box_color)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_armrest.setLayout(sub_layout1)
+
+        return sub_tab_armrest
+    
+    def create_sub_tab_cup_holder_content(self):
+
+        sub_tab_cup_holder = QWidget()
+
+        sub_layout1 = QVBoxLayout()
+
+        group_box1 = QGroupBox("Parametry miejsca na kubki")
+        label_usb_socket = self.create_label("Wejście USB")
+        label_color = self.create_label("Kolor")
+
+        radio11 = self.create_radio_button("Tak", self.on_radio_button_cup_holder_clicked)
+        radio12 = self.create_radio_button("Nie", self.on_radio_button_cup_holder_clicked)
+
+        radio_groupbox1 = QGroupBox()
+        radio_vboxlayout1 = QVBoxLayout()
+
+        radio_vboxlayout1.addWidget(radio11)
+        radio_vboxlayout1.addWidget(radio12)
+
+        self.list_of_radio_buttons.extend([radio11, radio12])
+
+        radio_groupbox1.setLayout(radio_vboxlayout1)
+
+        combo_box_color = self.create_combo_box([BodyMaterials.Red.value, BodyMaterials.Green.value, BodyMaterials.Blue.value], self.on_change_cbox_cup_holder_color)
+
+        button_add_to_body = AnimatedButton("Dodaj do korpusu")
+        button_add_to_body.clicked.connect(self.pb_add_to_body)
+        button_add_body = AnimatedButton("Nowy korpus")
+        button_add_body.clicked.connect(self.pb_add_body)
+
+        vbox_main = QVBoxLayout()
+        vbox_sub1 = QVBoxLayout()
+        vbox_sub2 = QVBoxLayout()
+
+        vbox_sub1.addWidget(label_usb_socket)
+        vbox_sub1.addWidget(radio_groupbox1)
+        vbox_sub1.setSpacing(5)
+
+        vbox_main.addLayout(vbox_sub1)
+        vbox_main.addLayout(vbox_sub2)
+        vbox_main.addWidget(label_color)
+        vbox_main.addWidget(combo_box_color)
+        vbox_main.addWidget(button_add_to_body)
+        vbox_main.addWidget(button_add_body)
+
+        group_box1.setLayout(vbox_main)
+
+        sub_layout1.addWidget(group_box1)
+        sub_tab_cup_holder.setLayout(sub_layout1)
+
+        return sub_tab_cup_holder
+    
+    def create_group_box_body(self):
+        self.list_of_car_body_group_box.append(CarBodyGroupBox(self.list_of_bodys[self.body_counter - 1]))
+
+        self.list_of_car_body_group_box[self.body_counter - 1].button_plan.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_plan_clicked(x))
+
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_schedule_clicked(x))
+        self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(False)
+        
+        self.list_of_car_body_group_box[self.body_counter - 1].button_ready.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_ready_clicked(x))
+        
+        self.list_of_car_body_group_box[self.body_counter - 1].button_remove.clicked.connect(
+            lambda _, x=self.list_of_car_body_group_box[self.body_counter - 1].body.body_id: self.pb_delete_clicked(x))
+        
+    def on_change_cbox_framework_material(self, index):
+        if index == 0:
+            self.body_tmp.framework.material = BodyMaterials.Leather.value
+        elif index == 1:
+            self.body_tmp.framework.material = BodyMaterials.EcoLeather.value
+        elif index == 2:
+            self.body_tmp.framework.material = BodyMaterials.ArtificialLeather.value
+
+    def on_change_cbox_framework_color(self, index):
+
+        if index == 0:
+            self.body_tmp.framework.color = BodyMaterials.Red.value
+        elif index == 1:
+            self.body_tmp.framework.color = BodyMaterials.Green.value
+        elif index == 2:
+            self.body_tmp.framework.color = BodyMaterials.Blue.value
+
+    def on_change_cbox_lower_panel_color(self, index):
+
+        if index == 0:
+            self.body_tmp.lower_panel.color = BodyMaterials.Red.value
+        elif index == 1:
+            self.body_tmp.lower_panel.color = BodyMaterials.Green.value
+        elif index == 2:
+            self.body_tmp.lower_panel.color = BodyMaterials.Blue.value
+    
+    def on_change_cbox_armrest_material(self, index):
+
+        if index == 0:
+            self.body_tmp.armrest.material = BodyMaterials.Leather.value
+        elif index == 1:
+            self.body_tmp.armrest.material = BodyMaterials.EcoLeather.value
+        elif index == 2:
+            self.body_tmp.armrest.material = BodyMaterials.ArtificialLeather.value
+
+    def on_change_cbox_armrest_color(self, index):
+
+        if index == 0:
+            self.body_tmp.armrest.color = BodyMaterials.Red.value
+        elif index == 1:
+            self.body_tmp.armrest.color = BodyMaterials.Green.value
+        elif index == 2:
+            self.body_tmp.armrest.color = BodyMaterials.Blue.value
+
+    def on_change_cbox_cup_holder_color(self, index):
+
+        if index == 0:
+            self.body_tmp.cup_holder.color = BodyMaterials.Red.value
+        elif index == 1:
+            self.body_tmp.cup_holder.color = BodyMaterials.Green.value
+        elif index == 2:
+            self.body_tmp.cup_holder.color = BodyMaterials.Blue.value
+
+    def on_radio_button_upper_panel_clicked(self):
+
+        sender = self.sender()
+
+        if sender.isChecked():
+            if (sender.text() == "Tak" or sender.text() == "Nie"):
+                self.body_tmp.upper_panel.is_controlable = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Górny panel - Sterowanie klimatyzacją: {sender.text()}')
+            else:
+                self.body_tmp.upper_panel.ac_type = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Górny panel - Typ klimatyzacji: {sender.text()}')
+
+    def on_radio_button_middle_panel_clicked(self):
+
+        sender = self.sender()
+
+        if sender.isChecked():
+            self.body_tmp.middle_panel.functionality = sender.text()
+            self.info_terminal.add_text_info(f'Wybrana opcja dla: Środkowy panel - Funkcjonalność: {sender.text()}')
+
+    def on_radio_button_lower_panel_clicked(self):
+
+        sender = self.sender()
+
+        if sender.isChecked():
+            if (sender.text() == "Tak" or sender.text() == "Nie"):
+                self.body_tmp.lower_panel.is_cup = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Dolny panel - Miejsce na kubki: {sender.text()}')
+            else:
+                self.body_tmp.lower_panel.functionality = sender.text()
+                self.info_terminal.add_text_info(f'Wybrana opcja dla: Dolny panel - Funkcjonalność: {sender.text()}')
+
+    def on_radio_button_armrest_clicked(self):
+
+        sender = self.sender()
+
+        if sender.isChecked():
+            self.body_tmp.armrest.heating = sender.text()
+        self.info_terminal.add_text_info(f'Wybrana opcja dla: Podłokietnika - Ogrzewanie: {sender.text()}')
+
+
+    def on_radio_button_cup_holder_clicked(self):
+
+        sender = self.sender()
+
+        if sender.isChecked():
+            self.body_tmp.cup_holder.usb_socket = sender.text()
+            self.info_terminal.add_text_info(f'Wybrana opcja dla: Miejsce na kubki - Wejście USB: {sender.text()}')
+
+
+    def pb_add_to_body(self):
+
+        if self.body_counter != 0:
+            self.body_tmp.body_id = self.body_counter - 1
+            self.list_of_bodys[self.body_counter - 1] = self.body_tmp
+
+            self.list_of_car_body_group_box[self.body_counter - 1].update_body(self.list_of_bodys[self.body_counter - 1])
+
+            self.outer_layout.removeWidget(self.outer_layout.itemAt(self.body_counter - 1).widget())
+                
+            self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+
+            if self.list_of_bodys[self.body_counter - 1].is_ready():
+                self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(True)
+                self.update_label()
+            elif not self.list_of_bodys[self.body_counter - 1].is_ready():
+                self.list_of_car_body_group_box[self.body_counter - 1].button_schedule.setEnabled(False)
+        else:
+            self.info_terminal.add_text_info("Brak korpusu do dodania specyfikacji")
+
+    
+    def pb_add_body(self):
+
+        if self.body_counter == 0:
+            self.outer_layout.removeWidget(self.starting_label)
+            self.starting_label.deleteLater()
+
+        self.body_counter += 1
+        self.body_tmp.body_id = self.body_counter - 1
+
+        self.body_tmp.remove_parameters()
+        self.reset_radio_buttons()
+
+        self.list_of_bodys.append(self.body_tmp)
+        self.create_group_box_body()
+        self.list_of_car_body_group_box[self.body_counter - 1].group_box.setMinimumWidth(738)
+
+        self.outer_layout.addWidget(self.list_of_car_body_group_box[self.body_counter - 1].group_box)
+
+    def pb_read_json(self):
+        if self.json_file_name != "":
+            self.json_reader.parse_json(self)
+        else:
+            self.info_terminal.add_text_info("Żaden plik nie został wybrany lub format pliku jest zły")
+
+    def pb_chose_file(self):
+        self.json_file_name = self.file_dialog.show_file_dialog()
+
+    def update_body_tmp(self):
+        self.body_tmp = self.list_of_bodys[self.body_counter - 1]
+
+    @pyqtSlot()
+    def pb_plan_clicked(self, body_id):
+        print("\nPlanowanie korpusu")
+        
+        self.mpl_widget.update_plot(self.list_of_bodys[body_id])
+    
+    @pyqtSlot()
+    def pb_schedule_clicked(self, body_id):
+        self.update_production_counter(1)
+        self.info_terminal.add_text_info(f"ID: {body_id} - Rozpoczęto produkcję korpusu.")
+
+        body = self.list_of_bodys[body_id]
+        self.task_queue.put(body)
+
+        self.list_of_car_body_group_box[body_id].button_schedule.setEnabled(False)
+
+    @pyqtSlot()
+    def pb_ready_clicked(self, body_id):
+        self.info_terminal.add_text_info(f"\nKorpus ID: {body_id} gotowy do produkcji")
+        
+        self.body_counter += 1
+        self.reset_radio_buttons()
+        self.body_tmp.remove_parameters()
+        self.list_of_car_body_group_box[body_id].button_ready.setEnabled(False)
+
+    @pyqtSlot()
+    def pb_delete_clicked(self, body_id):
+        self.info_terminal.add_text_info(f"Korpus ID: {body_id} został usunięty")
+
+        index_remove = -1
+        i = 0
+
+        for body in self.list_of_bodys:
+            if body.body_id == body_id:
+                index_remove = i
+            i += 1
+        
+        self.list_of_bodys.pop(index_remove)
+        self.outer_layout.removeWidget(self.list_of_car_body_group_box[index_remove].group_box)
+        self.list_of_car_body_group_box.pop(index_remove)        
+        self.body_counter -= 1
+
+        self.reset_radio_buttons()
+        self.body_tmp.remove_parameters()
+        self.check_body_group_box_number()
+
+    def pb_input_dialog(self):
+        text, ok = QInputDialog.getInt(self, "Input Dialog", "Ilość korpusów do produkcji: ", value=0, min=0, max=self.body_counter)
+        if ok:
+            self.label_tmp.setText(f"Wybranych korpusów do produkcji: {text}" if text else "Nie wybrano żadnej ilości")
+        self.set_to_produce = text
+
+    def pb_produce(self):
+        self.update_production_counter(self.set_to_produce)
+        self.info_terminal.add_text_info("Rozpoczęto produkcję następujących korpusów: ID: ")
+        
+        end = self.finished_bodys + self.set_to_produce
+        for i in range(self.finished_bodys, end):
+            self.task_queue.put(self.list_of_bodys[i])
+            self.list_of_car_body_group_box[i].button_schedule.setEnabled(False)
+        self.label_tmp.setText("Korpusy przekazano do produkcji")
+
+    @pyqtSlot()
+    def on_body_finished(self):
+        self.update_finished_counter()
+        self.update_production_counter(-1)
+
+    def reset_radio_buttons(self):
+        for radio in self.list_of_radio_buttons:
+            radio.setAutoExclusive(False)
+            radio.setChecked(False)
+            radio.setAutoExclusive(True)
+
+    def check_body_group_box_number(self):
+        if self.body_counter == 0 and len(self.list_of_car_body_group_box) == 0:
+            self.starting_label = self.create_label("Nie wybrano żadnej ilości")
+            self.starting_label.setAlignment(Qt.AlignCenter)
+            self.outer_layout.addWidget(self.starting_label)
+
+    def create_label(self, label_str: str, maximuxm_height=70):
+        label = QLabel(label_str)
+        label.setStyleSheet(StyleSheet.QLabel.value)
+        label.setMaximumHeight(maximuxm_height)
+        return label
+    
+    def create_radio_button(self, label_str: str, signal_function):
+        radio_button = QRadioButton(label_str)
+        radio_button.setStyleSheet(StyleSheet.QRadioButton.value)
+        radio_button.toggled.connect(signal_function)
+
+        return radio_button
+    
+    def create_combo_box(self, list_of_elements: list, signal_function):
+        combo_box = QComboBox()
+        combo_box.addItems(list_of_elements)
+        combo_box.setStyleSheet(StyleSheet.QComboBox.value)
+        combo_box.currentIndexChanged.connect(signal_function)
+        combo_box.activated.connect(signal_function)
+
+        return combo_box
+    
+    def emit_thread_add_text(self, text):
+        self.info_terminal.add_text_info(text)
+
+    def update_label(self):
+        self.body_counter_label.setText(f"Wczytanych korpusów: {self.body_counter}")
+
+    def update_production_counter(self, value):
+        self.production_counter += value
+        self.production_counter_label.setText(f"Korpusów w produkcji: {self.production_counter}")
+
+    def update_finished_counter(self):
+        self.finished_bodys += 1
+        self.finished_bodys_label.setText(f"Wyprodukowanych korpusów: {self.finished_bodys}")
+

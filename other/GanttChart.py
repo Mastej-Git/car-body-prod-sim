@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 
-from Body import Body
+from body_parts.Body import Body
 
 
-class PlotWidget(QWidget):
+class GanttChart(QWidget):
     def __init__(self, petri_net, parent=None):
         super().__init__(parent)
 
@@ -73,7 +73,7 @@ class PlotWidget(QWidget):
 
         self.i = 0
 
-    def update_plot(self, body):
+    def update_plot(self, body) -> None:
 
         self.calculate_duration(body)
         self.calculate_starting_times()
@@ -94,7 +94,7 @@ class PlotWidget(QWidget):
         self.numb_of_plots += 1
         self.canvas.draw()
 
-    def calculate_duration(self, body: Body):
+    def calculate_duration(self, body: Body) -> None:
 
         duration = []
 
@@ -163,7 +163,7 @@ class PlotWidget(QWidget):
 
         self.list_of_durations.append(duration)
     
-    def calculate_starting_times(self):
+    def calculate_starting_times(self) -> None:
 
         if len(self.list_of_durations) > 1:
             previous_starting_times = self.list_of_starting_times[self.numb_of_plots - 1]
@@ -181,7 +181,7 @@ class PlotWidget(QWidget):
 
         self.list_of_starting_times.append(starting_times)
     
-    def calculate_prev_part_times(self, start, end, previous_starting_times, starting_times):
+    def calculate_prev_part_times(self, start, end, previous_starting_times, starting_times) -> None:
         
         j = start
         for machine in self.list_of_machines_p[start:end]:
@@ -228,13 +228,13 @@ class PlotWidget(QWidget):
             starting_times.append(starting_time)
             j += 1
 
-    def check_previous_times(self, index):
+    def check_previous_times(self, index) -> bool:
         for k in range(self.numb_of_plots):
             if self.list_of_durations[k][index] != 0:
                 return True
         return False
 
-    def sum_durations(self, index):
+    def sum_durations(self, index) -> int:
         sum_time = 0
 
         for j in range(self.numb_of_plots):

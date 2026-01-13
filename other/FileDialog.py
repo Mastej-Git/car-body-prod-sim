@@ -12,7 +12,7 @@ class FileDialog(QWidget):
 
         self.label = label
 
-    def show_file_dialog(self):
+    def show_file_dialog(self) -> str:
         home_dir = os.environ.get('HOME')
 
         options = QFileDialog.Options()
@@ -21,7 +21,7 @@ class FileDialog(QWidget):
             "All Files (*);;Text Files (*.txt)", 
             options=options
         )
-        
+
         if read_file_name.endswith(".json"):
             self.label.setText(f'Wybrany plik: {read_file_name}')
             return read_file_name

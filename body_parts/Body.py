@@ -7,13 +7,15 @@ from body_parts.Framework import Framework
 
 class Body():
 
-    def __init__(self, body_id,
-                 framework: Framework,
-                 upper_panel: UpperPanel,
-                 middle_panel: MiddlePanel,
-                 lower_panel: LowerPanel,
-                 armrest: Armrest,
-                 cup_holder: CupHolder):
+    def __init__(self,
+        body_id,
+        framework: Framework,
+        upper_panel: UpperPanel,
+        middle_panel: MiddlePanel,
+        lower_panel: LowerPanel,
+        armrest: Armrest,
+        cup_holder: CupHolder
+    ):
         
         self.body_id = body_id
 
@@ -24,7 +26,7 @@ class Body():
         self.cup_holder = cup_holder
         self.framework = framework
 
-    def remove_parameters(self):
+    def remove_parameters(self) -> None:
 
         self.upper_panel.remove_parameters()
         self.middle_panel.remove_parameters()
@@ -33,7 +35,7 @@ class Body():
         self.cup_holder.remove_parameters()
         self.framework.remove_parameters()
 
-    def check_parts_activation(self):
+    def check_parts_activation(self) -> None:
         self.upper_panel.check_activation()
         self.middle_panel.check_activation()
         self.lower_panel.check_activation()
@@ -41,7 +43,7 @@ class Body():
         self.cup_holder.check_activation()
         self.framework.check_activation()
 
-    def is_ready(self):
+    def is_ready(self) -> bool:
         if (
         self.upper_panel.is_activated and
         self.middle_panel.is_activated and

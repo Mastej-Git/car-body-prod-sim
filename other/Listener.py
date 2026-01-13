@@ -1,5 +1,5 @@
 from PyQt5.QtCore import QObject, pyqtSignal
-from Body import Body
+from body_parts.Body import Body
 
 from enums.BodyMaterials import BodyMaterials
 
@@ -17,12 +17,9 @@ class Listener(QObject):
         self.available_tr = available_tr
 
     def stop(self):
-        """Stop the worker."""
         self._running = False
 
     def run(self):
-        """Main loop to process tasks."""
-
         while self._running:
             try:
                 task = self.task_queue.get(timeout=1)
@@ -53,7 +50,7 @@ class Listener(QObject):
             self.available_tr.extend(value)
         self.available_tr.extend(["T901", "T902", "T903", "T904", "T905"])
 
-    def define_available_tr(self, available_body_parts_transitions, body: Body):
+    def define_available_tr(self, available_body_parts_transitions, body: Body) -> None:
 
         available_body_parts_transitions["upper_panel"].extend(["T101", "T102"])
         if body.upper_panel.ac_type == "2-strefowa":

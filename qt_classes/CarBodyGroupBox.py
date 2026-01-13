@@ -1,10 +1,12 @@
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import (QLabel,
-                             QGroupBox,
-                             QVBoxLayout,
-                             QHBoxLayout)
+from PyQt5.QtWidgets import (
+    QLabel,
+    QGroupBox,
+    QVBoxLayout,
+    QHBoxLayout
+)
 
-from Body import Body
+from body_parts.Body import Body
 from qt_classes.AnimatedButton import AnimatedButton
 
 from enums.StyleSheet import StyleSheet
