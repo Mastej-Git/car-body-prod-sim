@@ -1,6 +1,6 @@
 import time
 from PyQt5.QtCore import QObject, pyqtSignal, QMutex
-from BodyPetriNet import body_main_petri_net
+from petri_nets.BodyPetriNet import body_main_petri_net
 
 mutex = QMutex()
 
@@ -24,7 +24,7 @@ class Worker(QObject):
     def stop(self):
         self._running = False
 
-    def run(self):
+    def run(self) -> None:
 
         interator = 0
         iterator = 0
@@ -38,13 +38,8 @@ class Worker(QObject):
                 self.started_bodys += 1
                 self.bodys_in_production += 1
                 print(f"Rozpoczynam produkcję korpusu id: {self.started_bodys - 1}")
-                # print("Odpalam Tranzycje T001")
                 self.add_text_signal.emit(f"Rozpoczynam produkcję korpusu id: {self.started_bodys - 1}")
-                # self.add_text_signal.emit("Odpalam Tranzycje T001")
                 pn.fire_transition("T001")
-
-                # start_time = time.time()
-                # self.list_of_times.append(start_time)
 
                 time.sleep(0.5)
 
@@ -62,7 +57,6 @@ class Worker(QObject):
             for transition in tr_to_exec:
                 # self.add_text_signal.emit(f"\nProcessing transition {transition} for body {body.body_id}")
                 if pn.transitions[transition].is_enabled() and pn.transitions[transition].can_fire():
-                    # print(f"Odpalam Tranzycje {transition}")
                     pn.fire_transition(transition)
                     self.available_tr.remove(transition)
                     if transition == "T002":
@@ -91,7 +85,7 @@ class Worker(QObject):
 
             tr_to_exec.clear()
 
-    def remove_duplicates(self, lst):
+    def remove_duplicates(self, lst) -> list[str]:
         seen = set()
         result = []
         for item in lst:
@@ -100,7 +94,7 @@ class Worker(QObject):
                 seen.add(item)
         return result
 
-    def get_lpt(self, lst, pn):
+    def get_lpt(self, lst, pn) -> list[str]:
 
         tmp = {}
         for transition in lst:
@@ -114,3 +108,4 @@ class Worker(QObject):
 
         sorted_names = [name for name, _ in sorted_tr]
         return sorted_names
+    

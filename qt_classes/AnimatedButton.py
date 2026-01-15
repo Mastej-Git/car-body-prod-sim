@@ -14,13 +14,15 @@ class AnimatedButton(QPushButton):
 
         self.clicked.connect(self.animate_click)
 
-    def animate_click(self):
+    def animate_click(self) -> None:
 
         original_geometry = self.geometry()
-        scaled_geometry = QRect(original_geometry.x() - 5, 
-                                original_geometry.y() - 5, 
-                                original_geometry.width() + 10, 
-                                original_geometry.height() + 10)
+        scaled_geometry = QRect(
+            original_geometry.x() - 5, 
+            original_geometry.y() - 5, 
+            original_geometry.width() + 10, 
+            original_geometry.height() + 10
+        )
 
         self.animation = QPropertyAnimation(self, b"geometry")
         self.animation.setDuration(100)
@@ -34,10 +36,12 @@ class AnimatedButton(QPushButton):
 
     def animate_reverse(self):
         original_geometry = self.geometry()
-        normal_geometry = QRect(original_geometry.x() + 5, 
-                                original_geometry.y() + 5, 
-                                original_geometry.width() - 10, 
-                                original_geometry.height() - 10)
+        normal_geometry = QRect(
+            original_geometry.x() + 5, 
+            original_geometry.y() + 5, 
+            original_geometry.width() - 10, 
+            original_geometry.height() - 10
+        )
         
         self.animation = QPropertyAnimation(self, b"geometry")
         self.animation.setDuration(100)

@@ -42,7 +42,8 @@ class Listener(QObject):
             "lower_panel": [],
             "armrest": [],
             "cup_holder": [],
-            "framework": []}
+            "framework": []
+        }
         self.define_available_tr(available_body_parts_transitions, body)
 
         self.available_tr.extend(["T002", "T003", "T004"])

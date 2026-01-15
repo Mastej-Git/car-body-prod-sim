@@ -6,7 +6,7 @@ from body_parts.MiddlePanel import MiddlePanel
 from body_parts.LowerPanel import LowerPanel
 from body_parts.Armrest import Armrest
 from body_parts.CupHolder import CupHolder
-from Body import Body
+from body_parts.Body import Body
 
 from qt_classes.CarBodyGroupBox import CarBodyGroupBox
 
@@ -15,7 +15,7 @@ class ReadJSON():
     def __init__(self):
         pass
 
-    def parse_json(self, gui):
+    def parse_json(self, gui) -> None:
 
         if gui.json_file_name != "" and gui.json_file_name.endswith(".json"):
             with open(gui.json_file_name, "r", encoding="UTF-8") as file:
@@ -45,7 +45,7 @@ class ReadJSON():
                 gui.update_body_tmp()
                 gui.update_label()
 
-    def assign_body_parts(self, body_tmp: Body, body_config):
+    def assign_body_parts(self, body_tmp: Body, body_config) -> Body:
 
         body_tmp.framework.material = body_config['body']['framework']['material']
         body_tmp.framework.color = body_config['body']['framework']['color']
@@ -68,7 +68,7 @@ class ReadJSON():
 
         return body_tmp
     
-    def add_new_cb_group_box(self, gui, body_tmp):
+    def add_new_cb_group_box(self, gui, body_tmp) -> None:
         gui.list_of_car_body_group_box.append(CarBodyGroupBox(body_tmp))
 
         gui.list_of_car_body_group_box[gui.body_counter].button_plan.clicked.connect(

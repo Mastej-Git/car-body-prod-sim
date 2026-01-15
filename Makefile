@@ -1,7 +1,6 @@
 run:
 	poetry run python3.13 ./main.py
 
-build:
 ruff_check:
 	poetry run ruff check .
 

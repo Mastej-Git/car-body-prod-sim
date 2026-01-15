@@ -4,16 +4,16 @@ class Transition:
         self.inputs = inputs
         self.outputs = outputs
 
-    def is_enabled(self):
+    def is_enabled(self) -> bool:
         return all(place.ready_tokens >= weight for place, weight in self.inputs.items())
     
-    def can_fire(self):
+    def can_fire(self) -> bool:
         for place, count in self.outputs.items():
             if place.max_tokens is not None and place.ready_tokens + count > place.max_tokens:
                 return False
         return True
     
-    def fire(self):
+    def fire(self) -> None:
         if not self.is_enabled():
             raise Exception(f"Transition {self.name} is not enabled")
         if not self.can_fire():
@@ -25,7 +25,7 @@ class Transition:
         for place, weight in self.outputs.items():
             place.tokens += weight
 
-    def reverse_fire(self):
+    def reverse_fire(self) -> None:
         for place, weight in self.inputs.items():
             place.ready_tokens += weight
 

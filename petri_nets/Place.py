@@ -17,23 +17,23 @@ class Place(QObject):
         self.tokens_changed.connect(self.on_tokens_changed)
 
     @property
-    def tokens(self):
+    def tokens(self) -> int:
         return self._tokens
 
     @tokens.setter
-    def tokens(self, value):
+    def tokens(self, value) -> None:
         if value != self._tokens:
             self._tokens = value
             
             self.tokens_changed.emit()
 
-    def on_tokens_changed(self):
+    def on_tokens_changed(self) -> None:
         QTimer.singleShot(self.cooldown_ms, self.print_info)
 
-    def set_terminal(self, terminal):
+    def set_terminal(self, terminal) -> None:
         self.info_terminal = terminal
 
-    def print_info(self):
+    def print_info(self) -> None:
         self.ready_tokens += self._tokens
         self._tokens = 0
 
