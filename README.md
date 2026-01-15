@@ -4,10 +4,10 @@ PN Car Body App is an application prepared for the engenieering thesis at Wrocla
 
 ## Key Features
 
-- [Input]: Loading the number of car bodies from JSON file description - `bodies.json`.
-- [Digital Twin](https://en.wikipedia.org/wiki/Digital_twin): Simulate the real production process and use output values to optimize the real-world process.
-- [Representation] Production process is represented using Gantt Chart.
-- [Model](https://en.wikipedia.org/wiki/Petri_net): Applies Petri nets  (PT net) mathematical modeling language to represent the production process. 
+- **Input:** Loading the number of car bodies from JSON file description - `bodies.json`.
+- **[Digital Twin](https://en.wikipedia.org/wiki/Digital_twin):** Simulate the real production process and use output values to optimize the real-world process.
+- **[Representation]** Production process is represented using Gantt Chart.
+- **[Model](https://en.wikipedia.org/wiki/Petri_net):** Applies Petri nets  (PT net) mathematical modeling language to represent the production process. 
 
 ## Quick Start
 
@@ -25,8 +25,8 @@ make run
 
 ## Tools
 
-- [Poetry](https://python-poetry.org/): Python packaging and dependency management.
-- [Ruff](https://docs.astral.sh/ruff/): An extremely fast Python linter and code formatter.
+- **[Poetry](https://python-poetry.org/):** Python packaging and dependency management.
+- **[Ruff](https://docs.astral.sh/ruff/):** An extremely fast Python linter and code formatter.
 
 ## Engineering Thesis
 
