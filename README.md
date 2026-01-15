@@ -13,7 +13,7 @@ PN Car Body App is an application prepared for the engenieering thesis at Wrocla
 
 This section guides you through building PN-Car-Body-App from source code.
 
-### Clone &rarr; Build &rarr; Run:
+**Clone &rarr; Build &rarr; Run:**
 
 
 ```bash
